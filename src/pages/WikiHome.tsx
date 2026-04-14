@@ -32,6 +32,39 @@ const operationPlaybooks = [
   },
 ];
 
+
+const strategicNextSteps = [
+  {
+    title: "Homologar detalle de los 13 módulos",
+    description:
+      "Elevar cada módulo al estándar narrativo y técnico del Módulo Cero, con APIs, modelos de datos, pipelines y despliegue claramente documentados.",
+    links: [
+      { to: "/articulo/introduccion", label: "Introducción conceptual" },
+      { to: "/articulo/diferenciadores", label: "Por qué TAMV y qué nos diferencia" },
+    ],
+  },
+  {
+    title: "Cerrar la capa infra MD-X4/MD-X5",
+    description:
+      "Explicitar operación sobre 177–195 repos, criterios del motor hexagonal, materialización ISNI/SNI en APIs y bases de datos, y despliegue del kernel en Kubernetes.",
+    links: [
+      { to: "/articulo/api-isni", label: "API ISNI y endpoints" },
+      { to: "/articulo/cicd-pipelines", label: "CI/CD y pipelines" },
+      { to: "/articulo/webhooks-eventos", label: "Webhooks y eventos" },
+    ],
+  },
+  {
+    title: "Conectar home 3D con rutas operativas",
+    description:
+      "El home MD-X4 debe funcionar como enrutador táctico hacia fundamentos, metaverso-XR, roadmap civilizatorio y guía de implementación para uso real.",
+    links: [
+      { to: "/articulo/dreamspaces-xr", label: "DreamSpaces y experiencias XR" },
+      { to: "/articulo/roadmap-civilizatorio", label: "Roadmap civilizatorio" },
+      { to: "/modulo/8", label: "Guía de implementación (Módulo 8)" },
+    ],
+  },
+];
+
 const faq = [
   {
     q: "¿Cómo navego entre módulos, submódulos y capítulos?",
@@ -93,6 +126,30 @@ export default function WikiHome() {
             </article>
           ))}
         </div>
+      </section>
+
+
+      <section className="rounded-lg border border-primary/30 bg-card p-5 space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Huecos y siguientes pasos clave</h2>
+        <div className="space-y-3">
+          {strategicNextSteps.map((step) => (
+            <article key={step.title} className="rounded-lg border border-border/70 bg-slate-900/30 p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-2">{step.title}</h3>
+              <p className="text-xs text-muted-foreground mb-2">{step.description}</p>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {step.links.map((link) => (
+                  <Link key={link.to} to={link.to} className="px-2 py-1 rounded border border-border hover:border-primary/50 hover:text-primary transition-colors">
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          En su estado actual, TAMV Atlas ya funciona como puerta oficial del ecosistema. El siguiente umbral es consolidar
+          una capa infra verificable y mantener profundidad homogénea en los 13 módulos para acelerar onboarding de nodos y proyectos.
+        </p>
       </section>
 
       <section className="rounded-lg border border-border bg-card p-5 space-y-3">
