@@ -1,30 +1,38 @@
-import { WikiH1, WikiH2, WikiP, WikiBreadcrumb, WikiCard } from "@/components/WikiComponents";
+import { WikiH1, WikiH2, WikiP, WikiBreadcrumb, WikiCard, WikiTable, WikiLink } from "@/components/WikiComponents";
 
 export default function ProyectosPrincipales() {
   return (
     <div>
       <WikiBreadcrumb section="ecosistema-codigo" page="proyectos-principales" />
-      <WikiH1>Proyectos Principales</WikiH1>
-      <WikiP>Los proyectos del ecosistema TAMV abarcan desde infraestructura de backend hasta interfaces de usuario inmersivas y herramientas de gobernanza.</WikiP>
+      <WikiH1>Proyecto Único TAMV: mapa de frentes activos</WikiH1>
+      <WikiP>
+        A partir del perfil de <WikiLink href="https://github.com/OsoPanda1">OsoPanda1</WikiLink>, los repositorios se pueden leer como
+        frentes de ejecución de un solo programa: <strong>TAMV ONLINE como sistema operativo territorial</strong>.
+      </WikiP>
 
-      <WikiH2>MD‑X4 Kernel</WikiH2>
-      <WikiP>Motor central del ecosistema que orquesta las siete federaciones funcionales. Implementa protocolos de seguridad Zero-Trust, gestión de identidad soberana y gobernanza ejecutable. Es el corazón técnico de toda la infraestructura TAMV.</WikiP>
+      <WikiH2>Modelo de alineación</WikiH2>
+      <WikiTable
+        headers={["Frente", "Objetivo", "Repositorios representativos"]}
+        rows={[
+          ["Núcleo", "Definir arquitectura y principios del sistema", "OsoPanda1, civilizational-core"],
+          ["Territorio", "Operar Real del Monte como nodo vivo", "real-del-monte-explorer, real-del-monte-twin, rdm-digital-2dbd42b0"],
+          ["Integración", "Unificar experiencias y servicios", "ecosistema-nextgen-tamv, tamv-nexus-verse, RDM-Digital-X"],
+          ["Plantillas/arranque", "Replicabilidad y despliegue", "ECOSISTEMA-TAMVONLINE, TAMV-ONLINE-NEXTGEN-1.0"],
+          ["Canales experimentales", "Prueba de interfaces y alcance", "new-beginnings, real-del-monte-elevated"],
+        ]}
+      />
 
-      <WikiH2>RDM Digital / RDM‑TOS</WikiH2>
-      <WikiP>Smart City OS y gemelo digital de Real del Monte. Incluye módulos de mapeo 2D/3D (Mapbox/Leaflet), telemetría en tiempo real (Supabase Realtime), y al menos 48 nodos que cubren comercio, turismo, servicios urbanos y rutas inteligentes.</WikiP>
-
-      <WikiH2>Isabella Villaseñor AI</WikiH2>
-      <WikiP>IA nativa ética con triple bloqueo (semántico, conductual, contextual). Opera como auditor maestro en gobernanza XR/4D y como IA ejecutiva para expansión de marcas. Diseñada para proteger identidad, mediar interacciones y garantizar transparencia.</WikiP>
-
-      <WikiH2>UTAMV Campus</WikiH2>
-      <WikiP>Campus digital de educación avanzada con motor de IA pedagógica (AI Academic Core 2026). Implementa doble pipeline normativo y académico, basado en la Taxonomía de Bloom con trazabilidad completa.</WikiP>
-
-      <WikiH2>Blockchain MSR / BookPI</WikiH2>
-      <WikiP>Propuesta de blockchain permissioned orientada a trazabilidad y reparación ética. El ledger BookPI (SHA-256) asegura memoria digital como derecho protegido y auditable, alejándose del modelo especulativo de criptomonedas.</WikiP>
-
-      <WikiCard title="Subsistemas adicionales" accent="cyan">
-        El ecosistema incluye más de 35 subsistemas propios: TENOCHTITLAN, ANUBIS/HORUS/DEKATEOTL, ID-NVIDA, THE SOF (The Shadow of Failure), DreamSpaces y módulos de gestión de eventos, entre otros.
+      <WikiH2>Conclusión de arquitectura</WikiH2>
+      <WikiCard title="No es fragmentación: es partición funcional" accent="cyan">
+        El valor estratégico está en que cada repo aborda una parte específica del mismo objetivo civilizatorio. La arquitectura gana
+        claridad cuando se gestiona como <strong>programa multiproyecto con dirección única</strong>.
       </WikiCard>
+
+      <WikiH2>Siguiente paso de gobernanza técnica</WikiH2>
+      <WikiP>
+        Para facilitar colaboración externa, se recomienda mantener un <strong>índice canónico</strong> en esta wiki con: estado por repositorio
+        (idea, activo, consolidación), relación con módulos ISNI/TAMV y criterio de continuidad o fusión.
+      </WikiP>
     </div>
   );
 }
