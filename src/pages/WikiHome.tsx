@@ -9,57 +9,66 @@ type FeatureGroup = {
 const totalArticles = wikiStructure.reduce((acc, module) => acc + module.children.length, 0);
 
 const featureGroups: FeatureGroup[] = [
-  { title: "Social", items: ["Reels", "Stories 24h", "Mensajería", "Comentarios y reacciones", "Seguir/Dejar de seguir"] },
-  { title: "Contenido", items: ["Streaming en vivo", "Chat en vivo", "Grabación automática", "Calidades múltiples"] },
-  { title: "Educación", items: ["Cursos", "Seguimiento de progreso", "Certificados verificables", "Monetización"] },
-  { title: "Economía", items: ["CGIFTS", "Lotería transparente", "Trust Score", "Pagos seguros"] },
-  { title: "XR", items: ["DreamSpaces 3D", "Avatares", "Interacción real-time", "Propiedad de objetos"] },
-  { title: "Cumplimiento", items: ["GDPR", "CCPA", "Derecho al olvido", "Exportación de datos"] },
+  { title: "Conceptualidad", items: ["Modelo civilizatorio", "Soberanía digital", "Ontologías vivas", "Diseño orientado a confianza"] },
+  { title: "Filosofía", items: ["Humanismo en código", "Kórima", "Ética por diseño", "Gobernanza distribuida"] },
+  { title: "Economía y Finanzas", items: ["BookPI", "Trazabilidad de valor", "Trust Score", "Mecanismos antifraude"] },
+  { title: "Técnico", items: ["Microservicios", "JSON-LD", "Observabilidad", "Pipelines CI/CD"] },
+  { title: "APIs e Integraciones", items: ["API ISNI", "Webhooks", "Open Science", "Interoperabilidad multired"] },
+  { title: "Operación", items: ["Protocolos", "Planes de emergencia", "Plan de desastre", "FAQ de operación"] },
 ];
 
-const progressData = [
-  { label: "Fase 0 · Especificación", value: 100, status: "completada" },
-  { label: "Fase 1 · Core services", value: 100, status: "completada" },
-  { label: "Fase 2 · Avanzadas", value: 40, status: "en progreso" },
-  { label: "Fase 3 · Polish/Deploy", value: 0, status: "pendiente" },
-  { label: "Total proyecto", value: 65, status: "en desarrollo" },
+const operationPlaybooks = [
+  {
+    title: "Protocolos base",
+    points: ["Escalamiento de incidentes por severidad", "Matriz de responsables por módulo", "Registro auditable de decisiones"],
+  },
+  {
+    title: "Plan de emergencia",
+    points: ["Conmutación a servicios críticos", "Comunicados a stakeholders en <15 min", "Modo degradado con continuidad académica"],
+  },
+  {
+    title: "Plan de desastre",
+    points: ["Backups verificados y prueba trimestral", "Objetivo RTO/RPO por dominio", "Recuperación guiada por runbooks"],
+  },
 ];
 
-function ProgressRow({ label, value, status }: { label: string; value: number; status: string }) {
-  return (
-    <div className="space-y-1">
-      <div className="flex justify-between text-xs">
-        <span className="text-foreground">{label}</span>
-        <span className="text-muted-foreground">{value}% · {status}</span>
-      </div>
-      <div className="h-2 rounded bg-secondary overflow-hidden">
-        <div className="h-full bg-primary" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
-}
+const faq = [
+  {
+    q: "¿Cómo navego entre módulos, submódulos y capítulos?",
+    a: "Usa el índice por módulos y los enlaces de artículo anterior/siguiente para navegación continua.",
+  },
+  {
+    q: "¿Qué pasa con enlaces antiguos?",
+    a: "Las rutas legacy /wiki/:section/:page redirigen automáticamente a la ruta canónica /articulo/:slug.",
+  },
+  {
+    q: "¿Dónde encuentro contenido técnico y de APIs?",
+    a: "En Módulo 8 (Implementación Técnica) y Módulo 9 (Automatización), con referencias cruzadas en el índice global.",
+  },
+];
 
 export default function WikiHome() {
   return (
     <div className="px-6 py-8 md:px-8 lg:px-10 space-y-10">
-      <section className="rounded-xl border border-primary/30 bg-slate-900/60 p-6">
+      <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-slate-900/90 to-slate-950 p-6">
         <p className="text-xs font-mono text-primary mb-2">TAMV ATLAS · RESUMEN EJECUTIVO</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-glow-cyan mb-4">TAMV · Plataforma Social del Futuro</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-glow-cyan mb-4">Interfaz integral de nueva generación</h1>
         <p className="text-sm text-muted-foreground max-w-4xl">
-          Integración unificada de red social, educación digital, economía trazable y espacios 3D: una capa operativa que conecta
-          TikTok + Instagram + Zoom + metaverso funcional bajo principios de soberanía digital y transparencia.
+          Arquitectura visual y operativa unificada para módulos, submódulos y capítulos con navegación canónica,
+          redireccionamientos inteligentes, paginación por contexto y secciones especializadas para filosofía,
+          economía, finanzas, ingeniería, APIs, protocolos y continuidad de negocio.
         </p>
         <div className="mt-5 flex flex-wrap gap-2 text-xs font-mono">
-          <span className="px-2 py-1 border border-border rounded">25 servicios</span>
-          <span className="px-2 py-1 border border-border rounded">100+ endpoints</span>
-          <span className="px-2 py-1 border border-border rounded">14 tablas BD</span>
-          <span className="px-2 py-1 border border-border rounded">~65% avance funcional</span>
+          <span className="px-2 py-1 border border-border rounded">13 módulos</span>
+          <span className="px-2 py-1 border border-border rounded">{totalArticles}+ capítulos</span>
+          <span className="px-2 py-1 border border-border rounded">Flujo canónico de rutas</span>
+          <span className="px-2 py-1 border border-border rounded">Navegación asistida</span>
         </div>
       </section>
 
       <section className="grid md:grid-cols-2 gap-4">
         {featureGroups.map((group) => (
-          <article key={group.title} className="rounded-lg border border-border bg-card p-4">
+          <article key={group.title} className="rounded-lg border border-border bg-card/80 p-4 backdrop-blur-sm">
             <h2 className="text-sm font-semibold text-primary mb-2">{group.title}</h2>
             <ul className="space-y-1 text-xs text-muted-foreground">
               {group.items.map((item) => (
@@ -71,41 +80,31 @@ export default function WikiHome() {
       </section>
 
       <section className="rounded-lg border border-border bg-card p-5 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Arquitectura en simple</h2>
-        <pre className="text-[11px] leading-relaxed text-muted-foreground bg-secondary/60 border border-border rounded p-3 overflow-auto">{`Usuario/App Web-Móvil
-    │
-    ▼
-TAMV Core (Realtime, Reels, Stories, Messaging, Live, Courses, XR)
-    │
-    ├─ Cache rápido (Redis)
-    ├─ Base de datos (PostgreSQL)
-    ├─ BookPI (contabilidad inmutable)
-    └─ Panteón (seguridad, fraude, moderación)`}</pre>
-      </section>
-
-      <section className="rounded-lg border border-border bg-card p-5 space-y-3">
-        <h2 className="text-lg font-semibold">Progreso visual (corte reportado: febrero 2026)</h2>
-        <p className="text-xs text-muted-foreground">
-          Nota: estas métricas se muestran como estado documental reportado en febrero de 2026; requieren validación operativa continua
-          para una publicación técnica definitiva.
-        </p>
-        <div className="space-y-3">
-          {progressData.map((row) => (
-            <ProgressRow key={row.label} {...row} />
+        <h2 className="text-lg font-semibold text-foreground">Protocolos y continuidad operativa</h2>
+        <div className="grid md:grid-cols-3 gap-4">
+          {operationPlaybooks.map((playbook) => (
+            <article key={playbook.title} className="rounded-lg border border-border/70 bg-slate-900/40 p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-2">{playbook.title}</h3>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {playbook.points.map((point) => (
+                  <li key={point}>• {point}</li>
+                ))}
+              </ul>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="rounded-lg border border-orange-400/30 bg-orange-500/5 p-5 space-y-3">
-        <h2 className="text-lg font-semibold text-orange-300">UTAMV · Bloque institucional pre‑RVOE</h2>
-        <p className="text-sm text-muted-foreground">
-          La UTAMV se presenta como institución privada en fase de preparación y, en su caso, solicitud de RVOE. Salvo resolución
-          oficial expresa para programas específicos, los estudios tienen carácter institucional sin validez oficial.
-        </p>
-        <blockquote className="border-l-2 border-orange-400 pl-3 text-xs text-orange-200">
-          “Estudios sin reconocimiento de validez oficial. La formación educativa ofrecida no cuenta con reconocimiento por parte de
-          la autoridad educativa competente.”
-        </blockquote>
+      <section className="rounded-lg border border-border bg-card p-5 space-y-3">
+        <h2 className="text-lg font-semibold">Preguntas frecuentes</h2>
+        <div className="space-y-2">
+          {faq.map((item) => (
+            <details key={item.q} className="rounded border border-border px-3 py-2">
+              <summary className="cursor-pointer text-sm text-foreground">{item.q}</summary>
+              <p className="mt-2 text-xs text-muted-foreground">{item.a}</p>
+            </details>
+          ))}
+        </div>
       </section>
 
       <section className="space-y-4">

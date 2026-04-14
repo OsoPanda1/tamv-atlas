@@ -7,6 +7,7 @@ import WikiHome from "@/pages/WikiHome";
 import ModuleOverview from "@/pages/ModuleOverview";
 import NotFound from "@/pages/NotFound";
 import { wikiStructure } from "@/data/wikiStructure";
+import { articleBySlug, getAdjacentArticles } from "@/lib/wikiNavigation";
 
 type WikiModule = {
   id: number;
@@ -87,10 +88,42 @@ function ArticleRouter() {
   const { slug } = useParams();
   const article = articleIndex.find((item) => item.slug === slug);
 
-  if (!article?.component) return <Navigate to="/resumen" replace />;
+  if (!article?.component || !slug) return <Navigate to="/resumen" replace />;
 
+  const canonical = articleBySlug.get(slug);
   const ArticleComponent = article.component;
-  return <ArticleComponent />;
+  const { previous, next } = getAdjacentArticles(slug);
+
+  return (
+    <div className="px-6 py-8 md:px-8 lg:px-10 space-y-6">
+      <header className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 md:p-5">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-blue-300/80">
+          {canonical?.moduleTitle ?? article.sectionTitle}
+        </p>
+        <h1 className="text-xl md:text-2xl font-semibold text-slate-100 mt-1">{article.title}</h1>
+        <p className="text-xs text-slate-400 mt-2">Ruta canónica: /articulo/{article.slug}</p>
+      </header>
+
+      <ArticleComponent />
+
+      <footer className="rounded-xl border border-slate-800 bg-slate-900/40 p-4 flex flex-wrap items-center justify-between gap-3">
+        {previous ? (
+          <Link to={`/articulo/${previous.slug}`} className="text-sm text-slate-300 hover:text-blue-300 transition-colors">
+            ← {previous.title}
+          </Link>
+        ) : (
+          <span className="text-sm text-slate-500">Inicio del atlas</span>
+        )}
+        {next ? (
+          <Link to={`/articulo/${next.slug}`} className="text-sm text-slate-300 hover:text-blue-300 transition-colors ml-auto">
+            {next.title} →
+          </Link>
+        ) : (
+          <span className="text-sm text-slate-500 ml-auto">Fin del atlas</span>
+        )}
+      </footer>
+    </div>
+  );
 }
 
 function LegacyWikiRouter() {
