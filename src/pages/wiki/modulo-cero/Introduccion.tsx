@@ -1,12 +1,13 @@
-import { WikiH1, WikiH2, WikiH3, WikiP, WikiBreadcrumb, WikiCard, WikiTag, WikiLink } from "@/components/WikiComponents";
+import { WikiH1, WikiH2, WikiH3, WikiP, WikiBreadcrumb, WikiCard, WikiTag, WikiLink, WikiCode } from "@/components/WikiComponents";
 
 export default function Introduccion() {
   return (
     <div>
       <WikiBreadcrumb section="modulo-cero" page="introduccion" />
       <WikiH1>Introducción Conceptual a TAMV ONLINE</WikiH1>
+
       <WikiP>
-        TAMV ONLINE (Tecnología Avanzada Mexicana Versátil) es un ecosistema digital civilizatorio nacido en Real del Monte, Hidalgo, México. A diferencia de las plataformas convencionales, TAMV no se limita a ofrecer servicios digitales aislados: propone un sistema operativo civilizatorio completo que conecta contenidos, experiencias inmersivas y servicios en línea dentro de una infraestructura tecnológica federada.
+        TAMV ONLINE (Tecnología Avanzada Mexicana Versátil) se define como un <strong>Ecosistema Civilizatorio Federado</strong> de nueva generación, diseñado para operar como infraestructura base de soberanía tecnológica en América Latina. No es una simple plataforma o aplicación: es un Sistema Operativo Social y Técnico que articula identidad, conocimiento, inteligencia artificial, economía y territorio dentro de una misma arquitectura.
       </WikiP>
 
       <div className="flex flex-wrap mb-6">
@@ -15,42 +16,85 @@ export default function Introduccion() {
         <WikiTag>Soberanía Tecnológica</WikiTag>
         <WikiTag>LATAM</WikiTag>
         <WikiTag>Antifrágil</WikiTag>
+        <WikiTag>Web 4.0 / 5.0</WikiTag>
+        <WikiTag>ISNI</WikiTag>
       </div>
 
-      <WikiH2>Definición del ecosistema</WikiH2>
+      <WikiH2>Naturaleza del sistema</WikiH2>
       <WikiP>
-        TAMV ONLINE integra herramientas para publicación y gestión de contenidos audiovisuales, administración de usuarios con roles y accesos personalizados, control de membresías y suscripciones, e integración con experiencias inmersivas a través de los módulos MD‑X4 y MD‑X5. Todo esto se articula mediante un modelo de gobernanza basado en siete federaciones funcionales.
+        TAMV ONLINE es un sistema híbrido con cinco dimensiones interdependientes:
       </WikiP>
-
-      <WikiCard title="Concepto central">
-        El ecosistema está diseñado para que territorios, creadores y organizaciones de Latinoamérica operen su propio sistema operativo digital, en lugar de ser únicamente infraestructura de datos para terceros. Su filosofía se resume en la noción de <strong>Dignity‑by‑Design</strong>: cada módulo funciona como mecanismo de protección ética, no como herramienta de explotación.
+      <WikiCard accent="cyan">
+        <ul className="space-y-2">
+          <li><strong>Dimensión ontológica:</strong> Define qué entidades existen (personas, organizaciones, territorios, proyectos, comunidades) mediante ISNI, PIDs (ORCID, DOI, ROR) y DIDs/SSI.</li>
+          <li><strong>Dimensión técnica (MD‑X4 / MD‑X5):</strong> Provee la infraestructura de ejecución, observabilidad y evolución del ecosistema — kernel heptafederado con protocolo HOYO NEGRO.</li>
+          <li><strong>Dimensión cognitiva (Isabella AI):</strong> Orquesta cómo el sistema piensa, interpreta y media interacciones, con IA acompañante responsable y seguridad cognitiva.</li>
+          <li><strong>Dimensión académica (UTAMV):</strong> Estructura el conocimiento, valida competencias y conecta con la red de ciencia abierta (UTAMV AI Core, ORCID, Zenodo, OpenAIRE).</li>
+          <li><strong>Dimensión territorial (RDM Digital):</strong> Ancla TAMV al mundo físico mediante nodos como Real del Monte Digital, que digitalizan economías y culturas locales.</li>
+        </ul>
       </WikiCard>
 
-      <WikiH2>Alcance y adaptabilidad</WikiH2>
+      <WikiH2>Paradigma: Infraestructura vs. Plataforma</WikiH2>
       <WikiP>
-        TAMV se adapta a distintos modelos de negocio: catálogos privados, academias digitales, proyectos de turismo inteligente y plataformas públicas de difusión. En todos los casos, prioriza estabilidad, seguridad, claridad visual y facilidad de uso, tanto para administradores como para usuarios finales.
+        La distinción central de TAMV ONLINE es que se concibe como <strong>Infraestructura Crítica de Conocimiento</strong>, no como "plataforma" de captura de usuarios. Una plataforma encierra al usuario en un entorno cautivo; TAMV ofrece cimientos para que la identidad sea propiedad del usuario, la IA sea un aliado ético y el territorio se digitalice sin perder su esencia.
       </WikiP>
 
-      <WikiH3>Capacidades principales</WikiH3>
+      <WikiH2>Problema estructural que aborda</WikiH2>
+      <WikiP>TAMV surge frente a cuatro fallas estructurales en LATAM:</WikiP>
       <ul className="list-disc list-inside space-y-2 text-secondary-foreground mb-6 text-sm">
-        <li>Publicación de contenidos audiovisuales en alta calidad (on‑demand y en vivo)</li>
-        <li>Gestión de campañas, páginas informativas y módulos orientados a turismo y educación</li>
-        <li>Integración con entornos interactivos y experiencias inmersivas (metaverso productivo)</li>
-        <li>Infraestructura federada con criptografía post‑cuántica y modelo Zero‑Trust</li>
-        <li>Campus digital educativo UTAMV con IA pedagógica integrada</li>
+        <li>Dependencia de infraestructuras tecnológicas externas</li>
+        <li>Fragmentación del conocimiento y de la identidad académica</li>
+        <li>Invisibilidad de producción local en redes globales</li>
+        <li>Desconexión entre tecnología y territorio</li>
       </ul>
 
-      <WikiH2>Posicionamiento</WikiH2>
+      <WikiH2>Principio fundacional</WikiH2>
+      <WikiCard title="Axioma innegociable" accent="orange">
+        <em>"No puede existir soberanía tecnológica sin soberanía de identidad, conocimiento e infraestructura."</em>
+        <div className="mt-3 space-y-1">
+          <div><strong>Identidad (ISNI/SNI):</strong> Infraestructura soberana de nombres e identidades</div>
+          <div><strong>Infraestructura (MD-X4/X5):</strong> Kernel operativo antifrágil</div>
+          <div><strong>Inteligencia (Isabella AI):</strong> Conciencia operativa ética</div>
+        </div>
+      </WikiCard>
+
+      <WikiH2>Arquitectura base del ecosistema</WikiH2>
+      <WikiCode>{`Nivel 0 — ISNI / SNI (Identidad y Ontología)
+  └── Infraestructura soberana de nombres e identidades
+  └── Ontología JSON-LD/schema.org, perfiles tipo ORCID
+
+Nivel 1 — MD-X4 / MD-X5 (Infraestructura y Evolución)
+  └── Observabilidad, autopoiesis, protocolo HOYO NEGRO
+  └── Normalización de 177 repos federados
+
+Nivel 2 — Isabella Villaseñor AI / TAMVAI (Inteligencia)
+  └── Conciencia operativa, mediación XR
+  └── Triple bloqueo: semántico, conductual, contextual
+
+Nivel 3 — UTAMV (Transferencia Cognitiva)
+  └── Campus digital, AI Academic Core 2026
+  └── Doble pipeline: Normativo + Académico (Bloom)
+
+Nivel 4 — RDM Digital y Pueblos Digitales
+  └── Nodos territoriales, gemelo digital 2D/3D
+  └── 48+ nodos: comercio, turismo, servicios, rutas
+
+Nivel 5 — Integración global (Odoo, XR/4D, redes)
+  └── ERP/CRM soberano, ciencia abierta, metaverso`}</WikiCode>
+
+      <WikiH2>Componentes del DM-X4™</WikiH2>
       <WikiP>
-        TAMV se posiciona como el primer ecosistema civilizatorio federado antifrágil nacido en Latinoamérica, con un avance real del 75% documentado y comprobable. Su hoja de ruta lo proyecta hacia Web 4.0 y Web 5.0, incorporando identidad digital avanzada, IA colaborativa y contextual, experiencias sensoriales y capas de seguridad diseñadas para defender personas, no para vigilarlas.
+        El DM-X4™ (Digital Nexus) es el primer API global 5D multisensorial que activa DreamSpaces, DAO, marketplace, universidad y economía XR en tiempo real, con capa post-cuántica y voz emocional. Integra 11 dominios activos y 48 nodos federados operando con seguridad "Zero-Trust" y arquitectura híbrida.
       </WikiP>
 
-      <WikiCard title="Referencias canónicas" accent="orange">
+      <WikiCard title="Referencias canónicas" accent="green">
         <ul className="space-y-1">
+          <li>· Portal ISNI: <WikiLink href="https://groups.io/g/TAMVONLINE-ECOSISTEM-LATAM/wiki/ISNI-Home">groups.io/ISNI-Home</WikiLink></li>
           <li>· Sitio oficial: <WikiLink href="https://tamvonline-oficial.odoo.com">tamvonline-oficial.odoo.com</WikiLink></li>
           <li>· Blog: <WikiLink href="https://tamvonlinenetwork.blogspot.com">tamvonlinenetwork.blogspot.com</WikiLink></li>
           <li>· GitHub: <WikiLink href="https://github.com/OsoPanda1">github.com/OsoPanda1</WikiLink></li>
-          <li>· Zenodo (white paper): <WikiLink href="https://zenodo.org/records/19562517">DOI: 10.5281/zenodo.19562517</WikiLink></li>
+          <li>· Zenodo: <WikiLink href="https://zenodo.org/records/19562517">DOI: 10.5281/zenodo.19562517</WikiLink></li>
+          <li>· Comunidad Zenodo: <WikiLink href="https://zenodo.org/communities/tamvonline-oficial/">tamvonline-oficial</WikiLink></li>
         </ul>
       </WikiCard>
     </div>
