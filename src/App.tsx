@@ -1,78 +1,159 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes, Navigate, useParams } from "react-router-dom";
+import type { ComponentType, ReactNode } from "react";
+import { BrowserRouter, Link, Navigate, Route, Routes, useParams } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import WikiLayout from "@/components/WikiLayout";
+import Index from "@/pages/Index";
 import WikiHome from "@/pages/WikiHome";
+import ModuleOverview from "@/pages/ModuleOverview";
 import NotFound from "@/pages/NotFound";
-import Introduccion from "@/pages/wiki/modulo-cero/Introduccion";
-import Diferenciadores from "@/pages/wiki/modulo-cero/Diferenciadores";
-import OrigenProposito from "@/pages/wiki/modulo-cero/OrigenProposito";
-import BiografiaCeo from "@/pages/wiki/modulo-cero/BiografiaCeo";
-import HumanismoEnCodigo from "@/pages/wiki/modulo-cero/HumanismoEnCodigo";
-import VisionGeneral from "@/pages/wiki/fundamentos/VisionGeneral";
-import PrincipiosDiseno from "@/pages/wiki/fundamentos/PrincipiosDiseno";
-import ConceptosClave from "@/pages/wiki/fundamentos/ConceptosClave";
-import SmartDestinations from "@/pages/wiki/fundamentos/SmartDestinations";
-import CapasArquitectonicas from "@/pages/wiki/arquitectura/CapasArquitectonicas";
-import OntologiasDatos from "@/pages/wiki/arquitectura/OntologiasDatos";
-import GrafoConocimiento from "@/pages/wiki/arquitectura/GrafoConocimiento";
-import Interoperabilidad from "@/pages/wiki/arquitectura/Interoperabilidad";
-import GithubRepos from "@/pages/wiki/ecosistema-codigo/GithubRepos";
-import ProyectosPrincipales from "@/pages/wiki/ecosistema-codigo/ProyectosPrincipales";
-import StackTecnologico from "@/pages/wiki/ecosistema-codigo/StackTecnologico";
-import RoadmapTecnico from "@/pages/wiki/ecosistema-codigo/RoadmapTecnico";
-import OrcidDoiIsni from "@/pages/wiki/identidad/OrcidDoiIsni";
-import DidsSsi from "@/pages/wiki/identidad/DidsSsi";
-import Perfiles from "@/pages/wiki/identidad/Perfiles";
-import CredencialesVc from "@/pages/wiki/identidad/CredencialesVc";
-import Territoriales from "@/pages/wiki/casos-de-uso/Territoriales";
-import TurismoCultura from "@/pages/wiki/casos-de-uso/TurismoCultura";
-import JourneysUsuario from "@/pages/wiki/casos-de-uso/JourneysUsuario";
-import ProyectosPiloto from "@/pages/wiki/casos-de-uso/ProyectosPiloto";
-import GobernanzaDatos from "@/pages/wiki/gobernanza/GobernanzaDatos";
-import Roles from "@/pages/wiki/gobernanza/Roles";
-import EticaPrivacidad from "@/pages/wiki/gobernanza/EticaPrivacidad";
-import Contribucion from "@/pages/wiki/gobernanza/Contribucion";
-import ReferenciasAcademicas from "@/pages/wiki/referencias/ReferenciasAcademicas";
-import DocumentacionEstandares from "@/pages/wiki/referencias/DocumentacionEstandares";
-import RecursosSmartCities from "@/pages/wiki/referencias/RecursosSmartCities";
-import Creditos from "@/pages/wiki/referencias/Creditos";
-import IsabellaAI from "@/pages/wiki/metaverso-xr/IsabellaAI";
-import DreamspacesXR from "@/pages/wiki/metaverso-xr/DreamspacesXR";
-import RdmPueblosDigitales from "@/pages/wiki/metaverso-xr/RdmPueblosDigitales";
-import KorimaFilosofia from "@/pages/wiki/metaverso-xr/KorimaFilosofia";
-import MsrBlockchain from "@/pages/wiki/metaverso-xr/MsrBlockchain";
-import EconomiaCuantica from "@/pages/wiki/metaverso-xr/EconomiaCuantica";
-import RoadmapCivilizatorio from "@/pages/wiki/metaverso-xr/RoadmapCivilizatorio";
-import DekateotlSeguridad from "@/pages/wiki/metaverso-xr/DekateotlSeguridad";
+import { wikiStructure } from "@/data/wikiStructure";
 
-const pageMap: Record<string, Record<string, React.ComponentType>> = {
-  "modulo-cero": { introduccion: Introduccion, diferenciadores: Diferenciadores, "origen-proposito": OrigenProposito, "biografia-ceo": BiografiaCeo, "humanismo-en-codigo": HumanismoEnCodigo },
-  fundamentos: { "vision-general": VisionGeneral, "principios-diseno": PrincipiosDiseno, "conceptos-clave": ConceptosClave, "smart-destinations": SmartDestinations },
-  arquitectura: { "capas-arquitectonicas": CapasArquitectonicas, "ontologias-datos": OntologiasDatos, "grafo-conocimiento": GrafoConocimiento, interoperabilidad: Interoperabilidad },
-  "ecosistema-codigo": { "github-repos": GithubRepos, "proyectos-principales": ProyectosPrincipales, "stack-tecnologico": StackTecnologico, "roadmap-tecnico": RoadmapTecnico },
-  identidad: { "orcid-doi-isni": OrcidDoiIsni, "dids-ssi": DidsSsi, perfiles: Perfiles, "credenciales-vc": CredencialesVc },
-  "casos-de-uso": { territoriales: Territoriales, "turismo-cultura": TurismoCultura, "journeys-usuario": JourneysUsuario, "proyectos-piloto": ProyectosPiloto },
-  gobernanza: { "gobernanza-datos": GobernanzaDatos, roles: Roles, "etica-privacidad": EticaPrivacidad, contribucion: Contribucion },
-  referencias: { "referencias-academicas": ReferenciasAcademicas, "documentacion-estandares": DocumentacionEstandares, "recursos-smart-cities": RecursosSmartCities, creditos: Creditos },
-  "metaverso-xr": {
-    "isabella-ai": IsabellaAI,
-    "dreamspaces-xr": DreamspacesXR,
-    "rdm-pueblos-digitales": RdmPueblosDigitales,
-    "korima-filosofia": KorimaFilosofia,
-    "msr-blockchain": MsrBlockchain,
-    "economia-cuantica": EconomiaCuantica,
-    "roadmap-civilizatorio": RoadmapCivilizatorio,
-    "dekateotl-seguridad": DekateotlSeguridad,
-  },
+type WikiModule = {
+  id: number;
+  code: string;
+  path: string;
+  label: string;
+  description: string;
 };
 
-function WikiPageRouter() {
-  const { sectionId, pageSlug } = useParams();
-  const Page = pageMap[sectionId || ""]?.[pageSlug || ""];
-  if (!Page) return <Navigate to="/" replace />;
-  return <Page />;
+const WIKI_MODULES: WikiModule[] = [
+  { id: 0, code: "MD-X4", path: "/", label: "Módulo 0 · Observabilidad", description: "MD-X4 · Núcleo de observabilidad civilizatoria TAMV." },
+  { id: 1, code: "ISNI-CORE", path: "/modulo/1", label: "Módulo 1 · Fundamentos ISNI", description: "Arquitectura base de la Infraestructura Soberana de Nombres." },
+  { id: 2, code: "ISNI-ARCH", path: "/modulo/2", label: "Módulo 2 · Arquitectura ISNI", description: "Capas, dominios y ontologías del sistema ISNI TAMV." },
+  { id: 3, code: "IDENTITIES", path: "/modulo/3", label: "Módulo 3 · Modelado de Identidades", description: "Personas, instituciones, territorios y roles." },
+  { id: 4, code: "SSI-DID", path: "/modulo/4", label: "Módulo 4 · SSI / DID", description: "Identidad autosoberana y descentralizada en TAMV." },
+  { id: 5, code: "PROFILES", path: "/modulo/5", label: "Módulo 5 · Sistema de Perfiles", description: "Perfiles TAMV, vistas y proyecciones." },
+  { id: 6, code: "FLOWS", path: "/modulo/6", label: "Módulo 6 · Flujos & Visualizaciones", description: "Pipelines y UI de identidades en movimiento." },
+  { id: 7, code: "USE-CASES", path: "/modulo/7", label: "Módulo 7 · Casos de Uso SSI", description: "Aplicaciones en campus, ciudades y metaversos." },
+  { id: 8, code: "APIS", path: "/modulo/8", label: "Módulo 8 · Implementación Técnica / API", description: "Especificación de servicios y endpoints soberanos." },
+  { id: 9, code: "AUTOMATION", path: "/modulo/9", label: "Módulo 9 · Automatización", description: "Bots, orquestación y flujos automáticos." },
+  { id: 10, code: "GOV", path: "/modulo/10", label: "Módulo 10 · Gobernanza & Ética", description: "Normas, principios y modelo de poder distribuido." },
+  { id: 11, code: "REFS", path: "/modulo/11", label: "Módulo 11 · Referencias", description: "Bibliografía, DOIs, ORCID, Zenodo y anexos." },
+  { id: 12, code: "XR-AI", path: "/modulo/12", label: "Módulo 12 · Metaverso / XR / IA", description: "Isabella AI, DreamSpaces, Kórima, DEKATEOTL." },
+];
+
+const wikiPageModules = import.meta.glob<{ default: ComponentType }>("./pages/wiki/**/*.tsx", {
+  eager: true,
+});
+
+const slugifyFileName = (name: string) =>
+  name
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
+
+const discoveredComponents = Object.entries(wikiPageModules).reduce<
+  Record<string, Record<string, ComponentType>>
+>((acc, [path, module]) => {
+  const match = path.match(/\.\/pages\/wiki\/(.+)\/([^/]+)\.tsx$/);
+  if (!match) return acc;
+  const [, sectionId, fileName] = match;
+  const slug = slugifyFileName(fileName);
+  acc[sectionId] ??= {};
+  acc[sectionId][slug] = module.default;
+  return acc;
+}, {});
+
+const aliasByPageKey: Record<string, string> = {
+  "arquitectura/ontologia-formal": "arquitectura/ontologias-datos",
+  "arquitectura/arquitectura-interoperable": "arquitectura/interoperabilidad",
+  "ssi-did/credenciales-vc": "identidad/credenciales-vc",
+  "gobernanza/gobernanza-documental": "gobernanza/gobernanza-datos",
+};
+
+const resolveComponent = (sectionId: string, slug: string) => {
+  const direct = discoveredComponents[sectionId]?.[slug];
+  if (direct) return direct;
+
+  const alias = aliasByPageKey[`${sectionId}/${slug}`];
+  if (!alias) return undefined;
+
+  const [aliasSectionId, aliasSlug] = alias.split("/");
+  return discoveredComponents[aliasSectionId]?.[aliasSlug];
+};
+
+const articleIndex = wikiStructure.flatMap((section, moduleIndex) =>
+  section.children.map((page) => ({
+    moduleId: moduleIndex.toString(),
+    sectionId: section.id,
+    sectionTitle: section.title,
+    slug: page.slug,
+    title: page.title,
+    component: resolveComponent(section.id, page.slug),
+  }))
+);
+
+function ArticleRouter() {
+  const { slug } = useParams();
+  const article = articleIndex.find((item) => item.slug === slug);
+
+  if (!article?.component) return <Navigate to="/resumen" replace />;
+
+  const ArticleComponent = article.component;
+  return <ArticleComponent />;
 }
+
+function LegacyWikiRouter() {
+  const { sectionId, pageSlug } = useParams();
+  if (!sectionId || !pageSlug) return <Navigate to="/resumen" replace />;
+
+  const article = articleIndex.find((item) => item.sectionId === sectionId && item.slug === pageSlug);
+  if (!article) return <Navigate to="/resumen" replace />;
+
+  return <Navigate to={`/articulo/${article.slug}`} replace />;
+}
+
+const AppShell = ({ children }: { children: ReactNode }) => (
+  <div className="min-h-screen bg-slate-950 text-slate-200">
+    <header className="border-b border-blue-500/20 bg-slate-950/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[11px] tracking-[0.25em] uppercase">
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#4ade80]" />
+        <span className="text-slate-400">TAMV·ONLINE // Digital Civilization System v1.0</span>
+      </div>
+      <div className="flex items-center gap-4">
+        <span className="text-blue-400/80">Kernel: MD-X · ISNI · UTAMV · Isabella</span>
+        <span className="text-slate-500 hidden md:inline">DOI: 10.5281/ZENODO.19564367</span>
+      </div>
+    </header>
+
+    <div className="grid grid-cols-12 gap-0 h-[calc(100vh-40px)]">
+      <aside className="hidden lg:block col-span-2 border-r border-slate-800 bg-slate-950/90 backdrop-blur-sm text-[11px]">
+        <div className="px-4 py-3 border-b border-slate-800">
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Atlas TAMV · ISNI</p>
+          <p className="text-[9px] text-slate-500">13 módulos · ~60 artículos · Infraestructura viva</p>
+        </div>
+        <nav className="overflow-y-auto h-[calc(100vh-88px)] scrollbar-thin">
+          <ul className="py-2">
+            {WIKI_MODULES.map((mod) => (
+              <li key={mod.id}>
+                <Link
+                  to={mod.path}
+                  className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-blue-500/70 hover:bg-slate-900/60 transition-colors"
+                >
+                  <span className="text-[9px] text-blue-400">{mod.code}</span>
+                  <span className="text-[10px] text-slate-200">{mod.label}</span>
+                  <span className="text-[9px] text-slate-500 line-clamp-1">{mod.description}</span>
+                </Link>
+              </li>
+            ))}
+            <li>
+              <Link
+                to="/resumen"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-blue-500/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-blue-400">ATLAS-INDEX</span>
+                <span className="text-[10px] text-slate-200">Resumen e índice global</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Navega módulos y artículos enlazables.</span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main className="col-span-12 lg:col-span-10 h-full overflow-auto">{children}</main>
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -80,13 +161,16 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <BrowserRouter>
-        <Routes>
-          <Route element={<WikiLayout />}>
-            <Route path="/" element={<WikiHome />} />
-            <Route path="/wiki/:sectionId/:pageSlug" element={<WikiPageRouter />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AppShell>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/resumen" element={<WikiHome />} />
+            <Route path="/modulo/:id" element={<ModuleOverview />} />
+            <Route path="/articulo/:slug" element={<ArticleRouter />} />
+            <Route path="/wiki/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AppShell>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
