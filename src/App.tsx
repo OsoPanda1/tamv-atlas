@@ -37,6 +37,14 @@ import ReferenciasAcademicas from "@/pages/wiki/referencias/ReferenciasAcademica
 import DocumentacionEstandares from "@/pages/wiki/referencias/DocumentacionEstandares";
 import RecursosSmartCities from "@/pages/wiki/referencias/RecursosSmartCities";
 import Creditos from "@/pages/wiki/referencias/Creditos";
+import IsabellaAI from "@/pages/wiki/metaverso-xr/IsabellaAI";
+import DreamspacesXR from "@/pages/wiki/metaverso-xr/DreamspacesXR";
+import RdmPueblosDigitales from "@/pages/wiki/metaverso-xr/RdmPueblosDigitales";
+import KorimaFilosofia from "@/pages/wiki/metaverso-xr/KorimaFilosofia";
+import MsrBlockchain from "@/pages/wiki/metaverso-xr/MsrBlockchain";
+import EconomiaCuantica from "@/pages/wiki/metaverso-xr/EconomiaCuantica";
+import RoadmapCivilizatorio from "@/pages/wiki/metaverso-xr/RoadmapCivilizatorio";
+import DekateotlSeguridad from "@/pages/wiki/metaverso-xr/DekateotlSeguridad";
 
 const pageMap: Record<string, Record<string, React.ComponentType>> = {
   "modulo-cero": { introduccion: Introduccion, diferenciadores: Diferenciadores, "origen-proposito": OrigenProposito, "biografia-ceo": BiografiaCeo, "humanismo-en-codigo": HumanismoEnCodigo },
@@ -47,6 +55,16 @@ const pageMap: Record<string, Record<string, React.ComponentType>> = {
   "casos-de-uso": { territoriales: Territoriales, "turismo-cultura": TurismoCultura, "journeys-usuario": JourneysUsuario, "proyectos-piloto": ProyectosPiloto },
   gobernanza: { "gobernanza-datos": GobernanzaDatos, roles: Roles, "etica-privacidad": EticaPrivacidad, contribucion: Contribucion },
   referencias: { "referencias-academicas": ReferenciasAcademicas, "documentacion-estandares": DocumentacionEstandares, "recursos-smart-cities": RecursosSmartCities, creditos: Creditos },
+  "metaverso-xr": {
+    "isabella-ai": IsabellaAI,
+    "dreamspaces-xr": DreamspacesXR,
+    "rdm-pueblos-digitales": RdmPueblosDigitales,
+    "korima-filosofia": KorimaFilosofia,
+    "msr-blockchain": MsrBlockchain,
+    "economia-cuantica": EconomiaCuantica,
+    "roadmap-civilizatorio": RoadmapCivilizatorio,
+    "dekateotl-seguridad": DekateotlSeguridad,
+  },
 };
 
 function WikiPageRouter() {
