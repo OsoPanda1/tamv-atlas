@@ -1,192 +1,228 @@
 import { Link } from "react-router-dom";
 import { wikiStructure } from "@/data/wikiStructure";
+import MatrixRain from "@/components/MatrixRain";
 
-type FeatureGroup = {
-  title: string;
-  items: string[];
-};
+const totalArticles = wikiStructure.reduce((acc, m) => acc + m.children.length, 0);
 
-const totalArticles = wikiStructure.reduce((acc, module) => acc + module.children.length, 0);
-
-const featureGroups: FeatureGroup[] = [
-  { title: "Conceptualidad", items: ["Modelo civilizatorio", "Soberanía digital", "Ontologías vivas", "Diseño orientado a confianza"] },
-  { title: "Filosofía", items: ["Humanismo en código", "Kórima", "Ética por diseño", "Gobernanza distribuida"] },
-  { title: "Economía y Finanzas", items: ["BookPI", "Trazabilidad de valor", "Trust Score", "Mecanismos antifraude"] },
-  { title: "Técnico", items: ["Microservicios", "JSON-LD", "Observabilidad", "Pipelines CI/CD"] },
-  { title: "APIs e Integraciones", items: ["API ISNI", "Webhooks", "Open Science", "Interoperabilidad multired"] },
-  { title: "Operación", items: ["Protocolos", "Planes de emergencia", "Plan de desastre", "FAQ de operación"] },
+const ECOSYSTEM_LAYERS = [
+  { level: "Nivel 0", name: "ISNI / SNI", desc: "Identidad y Ontología Soberana", color: "#60a5fa", items: ["JSON-LD", "PIDs", "DIDs", "schema.org"] },
+  { level: "Nivel 1", name: "MD-X4 / MD-X5", desc: "Kernel Operativo e Infraestructura", color: "#a78bfa", items: ["Observabilidad", "Autopoiesis", "HOYO NEGRO", "GitOps"] },
+  { level: "Nivel 2", name: "Isabella AI / IN", desc: "Conciencia Operativa y Seguridad Cognitiva", color: "#34d399", items: ["Triple bloqueo", "Pipeline hexagonal", "Master Canon", "TTS Kore"] },
+  { level: "Nivel 3", name: "UTAMV", desc: "Transferencia Cognitiva y Academia", color: "#fbbf24", items: ["Campus XR", "AI Academic Core", "Credenciales VC", "Bloom"] },
+  { level: "Nivel 4", name: "RDM Digital", desc: "Nodos Territoriales y Pueblos Digitales", color: "#f472b6", items: ["Smart Destinations", "Comercio digital", "XR tours", "Artesanías"] },
+  { level: "Nivel 5", name: "Integración Global", desc: "Odoo, XR/4D, Ciencia Abierta, Redes", color: "#2dd4bf", items: ["Odoo ERP", "ORCID", "Zenodo", "AVIXA"] },
 ];
 
-const operationPlaybooks = [
-  {
-    title: "Protocolos base",
-    points: ["Escalamiento de incidentes por severidad", "Matriz de responsables por módulo", "Registro auditable de decisiones"],
-  },
-  {
-    title: "Plan de emergencia",
-    points: ["Conmutación a servicios críticos", "Comunicados a stakeholders en <15 min", "Modo degradado con continuidad académica"],
-  },
-  {
-    title: "Plan de desastre",
-    points: ["Backups verificados y prueba trimestral", "Objetivo RTO/RPO por dominio", "Recuperación guiada por runbooks"],
-  },
-];
-
-
-const strategicNextSteps = [
-  {
-    title: "Homologar detalle de los 13 módulos",
-    description:
-      "Elevar cada módulo al estándar narrativo y técnico del Módulo Cero, con APIs, modelos de datos, pipelines y despliegue claramente documentados.",
-    links: [
-      { to: "/articulo/introduccion", label: "Introducción conceptual" },
-      { to: "/articulo/diferenciadores", label: "Por qué TAMV y qué nos diferencia" },
-    ],
-  },
-  {
-    title: "Cerrar la capa infra MD-X4/MD-X5",
-    description:
-      "Explicitar operación sobre 177–195 repos, criterios del motor hexagonal, materialización ISNI/SNI en APIs y bases de datos, y despliegue del kernel en Kubernetes.",
-    links: [
-      { to: "/articulo/api-isni", label: "API ISNI y endpoints" },
-      { to: "/articulo/cicd-pipelines", label: "CI/CD y pipelines" },
-      { to: "/articulo/webhooks-eventos", label: "Webhooks y eventos" },
-    ],
-  },
-  {
-    title: "Conectar home 3D con rutas operativas",
-    description:
-      "El home MD-X4 debe funcionar como enrutador táctico hacia fundamentos, metaverso-XR, roadmap civilizatorio y guía de implementación para uso real.",
-    links: [
-      { to: "/articulo/dreamspaces-xr", label: "DreamSpaces y experiencias XR" },
-      { to: "/articulo/roadmap-civilizatorio", label: "Roadmap civilizatorio" },
-      { to: "/modulo/8", label: "Guía de implementación (Módulo 8)" },
-    ],
-  },
-];
-
-const faq = [
-  {
-    q: "¿Cómo navego entre módulos, submódulos y capítulos?",
-    a: "Usa el índice por módulos y los enlaces de artículo anterior/siguiente para navegación continua.",
-  },
-  {
-    q: "¿Qué pasa con enlaces antiguos?",
-    a: "Las rutas legacy /wiki/:section/:page redirigen automáticamente a la ruta canónica /articulo/:slug.",
-  },
-  {
-    q: "¿Dónde encuentro contenido técnico y de APIs?",
-    a: "En Módulo 8 (Implementación Técnica) y Módulo 9 (Automatización), con referencias cruzadas en el índice global.",
-  },
+const COMPARISON = [
+  { feature: "Identidad soberana (DIDs/SSI)", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Grafo de conocimiento semántico", tamv: true, wikipedia: true, prisma: false, sourcegraph: false },
+  { feature: "Visualización 3D de ecosistema", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Integración ORCID/DOI/ROR nativa", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Pipeline hexagonal doble flujo", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "IA ética integrada (Isabella)", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Niveles de acceso por rol", tamv: true, wikipedia: false, prisma: true, sourcegraph: true },
+  { feature: "XR/4D inmersivo", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Credenciales verificables", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
+  { feature: "Territorialización LATAM", tamv: true, wikipedia: false, prisma: false, sourcegraph: false },
 ];
 
 export default function WikiHome() {
   return (
-    <div className="px-6 py-8 md:px-8 lg:px-10 space-y-10">
-      <section className="rounded-xl border border-primary/30 bg-gradient-to-br from-slate-900/90 to-slate-950 p-6">
-        <p className="text-xs font-mono text-primary mb-2">TAMV ATLAS · RESUMEN EJECUTIVO</p>
-        <h1 className="text-3xl md:text-4xl font-bold text-glow-cyan mb-4">Interfaz integral de nueva generación</h1>
-        <p className="text-sm text-muted-foreground max-w-4xl">
-          Arquitectura visual y operativa unificada para módulos, submódulos y capítulos con navegación canónica,
-          redireccionamientos inteligentes, paginación por contexto y secciones especializadas para filosofía,
-          economía, finanzas, ingeniería, APIs, protocolos y continuidad de negocio.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2 text-xs font-mono">
-          <span className="px-2 py-1 border border-border rounded">13 módulos</span>
-          <span className="px-2 py-1 border border-border rounded">{totalArticles}+ capítulos</span>
-          <span className="px-2 py-1 border border-border rounded">Flujo canónico de rutas</span>
-          <span className="px-2 py-1 border border-border rounded">Navegación asistida</span>
-        </div>
-      </section>
+    <div className="relative min-h-screen">
+      {/* Subtle matrix in background */}
+      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none">
+        <MatrixRain color="platinum" />
+      </div>
+      <div className="fixed inset-0 bg-slate-950/70 z-[1] pointer-events-none" />
 
-      <section className="grid md:grid-cols-2 gap-4">
-        {featureGroups.map((group) => (
-          <article key={group.title} className="rounded-lg border border-border bg-card/80 p-4 backdrop-blur-sm">
-            <h2 className="text-sm font-semibold text-primary mb-2">{group.title}</h2>
-            <ul className="space-y-1 text-xs text-muted-foreground">
-              {group.items.map((item) => (
-                <li key={item}>• {item}</li>
-              ))}
-            </ul>
-          </article>
-        ))}
-      </section>
+      <div className="relative z-10 px-4 py-6 md:px-8 lg:px-10 space-y-8 max-w-7xl mx-auto">
 
-      <section className="rounded-lg border border-border bg-card p-5 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Protocolos y continuidad operativa</h2>
-        <div className="grid md:grid-cols-3 gap-4">
-          {operationPlaybooks.map((playbook) => (
-            <article key={playbook.title} className="rounded-lg border border-border/70 bg-slate-900/40 p-4">
-              <h3 className="text-sm font-semibold text-foreground mb-2">{playbook.title}</h3>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                {playbook.points.map((point) => (
-                  <li key={point}>• {point}</li>
-                ))}
-              </ul>
-            </article>
-          ))}
-        </div>
-      </section>
-
-
-      <section className="rounded-lg border border-primary/30 bg-card p-5 space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Huecos y siguientes pasos clave</h2>
-        <div className="space-y-3">
-          {strategicNextSteps.map((step) => (
-            <article key={step.title} className="rounded-lg border border-border/70 bg-slate-900/30 p-4">
-              <h3 className="text-sm font-semibold text-foreground mb-2">{step.title}</h3>
-              <p className="text-xs text-muted-foreground mb-2">{step.description}</p>
-              <div className="flex flex-wrap gap-2 text-xs">
-                {step.links.map((link) => (
-                  <Link key={link.to} to={link.to} className="px-2 py-1 rounded border border-border hover:border-primary/50 hover:text-primary transition-colors">
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          En su estado actual, TAMV Atlas ya funciona como puerta oficial del ecosistema. El siguiente umbral es consolidar
-          una capa infra verificable y mantener profundidad homogénea en los 13 módulos para acelerar onboarding de nodos y proyectos.
-        </p>
-      </section>
-
-      <section className="rounded-lg border border-border bg-card p-5 space-y-3">
-        <h2 className="text-lg font-semibold">Preguntas frecuentes</h2>
-        <div className="space-y-2">
-          {faq.map((item) => (
-            <details key={item.q} className="rounded border border-border px-3 py-2">
-              <summary className="cursor-pointer text-sm text-foreground">{item.q}</summary>
-              <p className="mt-2 text-xs text-muted-foreground">{item.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Índice global de módulos (0–12)</h2>
-          <p className="text-xs text-muted-foreground">{totalArticles} artículos enlazados</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {wikiStructure.map((section, moduleIndex) => (
-            <div key={section.id} className="bg-card border border-border rounded-lg p-5 hover:border-primary/40 transition-colors">
-              <Link to={`/modulo/${moduleIndex}`} className="flex items-center gap-3 mb-3 group">
-                <span className="text-xl">{section.icon}</span>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm">{section.title}</h3>
-              </Link>
-              <ul className="space-y-1 mb-3">
-                {section.children.map((page) => (
-                  <li key={page.slug}>
-                    <Link to={`/articulo/${page.slug}`} className="text-xs text-muted-foreground hover:text-primary">· {page.title}</Link>
-                  </li>
-                ))}
-              </ul>
+        {/* Hero */}
+        <section className="rounded-xl border border-blue-500/25 bg-gradient-to-br from-slate-900/95 to-slate-950/95 p-6 backdrop-blur-sm">
+          <div className="flex items-start justify-between flex-wrap gap-4">
+            <div>
+              <p className="text-[10px] font-mono text-blue-400 mb-1 tracking-widest">TAMV ATLAS · INFRAESTRUCTURA SOBERANA DE NOMBRES E IDENTIDADES</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-100 mb-3" style={{ textShadow: "0 0 20px rgba(96,165,250,0.3)" }}>
+                Ecosistema Civilizatorio Federado
+              </h1>
+              <p className="text-sm text-slate-400 max-w-3xl leading-relaxed">
+                Documentación central del sistema ISNI / TAMV ONLINE — arquitectura de identidad soberana,
+                grafo de conocimiento semántico, kernel MD-X, Isabella AI, UTAMV y nodos territoriales RDM Digital.
+                Diseñada para ingenieros, investigadores, gobiernos y comunidades LATAM.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="flex flex-wrap gap-2 text-[10px] font-mono">
+              <span className="px-2 py-1 border border-blue-500/30 rounded bg-slate-900/80 text-blue-300">13 módulos</span>
+              <span className="px-2 py-1 border border-blue-500/30 rounded bg-slate-900/80 text-blue-300">{totalArticles} artículos</span>
+              <span className="px-2 py-1 border border-emerald-500/30 rounded bg-slate-900/80 text-emerald-300">7 federaciones</span>
+              <span className="px-2 py-1 border border-purple-500/30 rounded bg-slate-900/80 text-purple-300">48+ nodos</span>
+            </div>
+          </div>
+        </section>
+
+        {/* Ecosystem Architecture Map */}
+        <section className="rounded-xl border border-blue-500/20 bg-slate-900/50 backdrop-blur-sm p-5">
+          <h2 className="text-sm font-bold text-slate-200 mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_#60a5fa]" />
+            Mapa de Arquitectura del Ecosistema TAMV
+          </h2>
+          <div className="space-y-2">
+            {ECOSYSTEM_LAYERS.map((layer, i) => (
+              <div key={layer.level} className="flex items-stretch gap-3 group">
+                <div className="w-20 flex-shrink-0 flex flex-col justify-center">
+                  <span className="text-[9px] font-mono font-bold" style={{ color: layer.color }}>{layer.level}</span>
+                </div>
+                <div
+                  className="flex-1 rounded-lg p-3 border transition-colors"
+                  style={{ borderColor: `${layer.color}25`, background: `${layer.color}08` }}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: layer.color, boxShadow: `0 0 6px ${layer.color}` }} />
+                    <h3 className="text-[11px] font-bold text-slate-200">{layer.name}</h3>
+                    <span className="text-[9px] text-slate-500">— {layer.desc}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {layer.items.map(item => (
+                      <span key={item} className="text-[8px] px-1.5 py-0.5 rounded bg-slate-950/60 border border-slate-700/50 text-slate-400">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                {i < ECOSYSTEM_LAYERS.length - 1 && (
+                  <div className="w-4 flex justify-center">
+                    <div className="w-px h-full bg-gradient-to-b from-blue-500/20 to-transparent" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Grafo Lógico ASCII */}
+        <section className="rounded-xl border border-purple-500/20 bg-slate-900/40 backdrop-blur-sm p-5">
+          <h2 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_8px_#a78bfa]" />
+            Grafo Lógico Integrado — Mapa Maestro
+          </h2>
+          <pre className="text-[10px] font-mono leading-relaxed overflow-x-auto p-4 bg-slate-950/60 rounded-lg border border-slate-800">
+{`        ┌─────────────────────────────────┐
+        │     VALIDACIÓN GLOBAL           │
+        │  ORCID · ROR · DOI · Zenodo     │
+        │  OpenAIRE · LinkedIn · GitHub   │
+        └───────────────┬─────────────────┘
+                        │ PIDs / APIs
+               ┌────────┴────────┐
+               │   ISNI / SNI    │  ← Identidad soberana
+               └────────┬────────┘
+                        │
+          ┌─────────────┼─────────────┐
+          │             │             │
+    ┌─────┴─────┐ ┌─────┴─────┐ ┌────┴─────┐
+    │  MD-X4/X5 │ │  ISABELLA │ │  BOOKPI  │
+    │  Infra    │ │ Conciencia│ │  Ética   │
+    └─────┬─────┘ └─────┬─────┘ └────┬─────┘
+          └─────────────┼─────────────┘
+                        │
+               ┌────────┴────────┐
+               │      UTAMV      │  ← Cognición académica
+               └────────┬────────┘
+                        │
+          ┌─────────────┴─────────────┐
+          │                           │
+    ┌─────┴──────┐        ┌───────────┴──────┐
+    │RDM DIGITAL │        │  OTROS NODOS     │
+    │ Territorio │        │ Pueblos digitales │
+    └─────┬──────┘        └──────────────────┘
+          │
+          ▼
+  ┌───────────────────────┐
+  │ Odoo · Web · XR · 4D  │
+  │  Economía soberana     │
+  └───────────────────────┘`}
+          </pre>
+        </section>
+
+        {/* Comparison Table */}
+        <section className="rounded-xl border border-cyan-500/20 bg-slate-900/40 backdrop-blur-sm p-5">
+          <h2 className="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#22d3ee]" />
+            TAMV Atlas vs Wikipedia · Sourcegraph · Prisma
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[10px]">
+              <thead>
+                <tr className="border-b border-slate-700">
+                  <th className="text-left py-2 px-2 text-slate-400 font-mono">Funcionalidad</th>
+                  <th className="text-center py-2 px-2 text-blue-400 font-bold">TAMV</th>
+                  <th className="text-center py-2 px-2 text-slate-500">Wikipedia</th>
+                  <th className="text-center py-2 px-2 text-slate-500">Prisma</th>
+                  <th className="text-center py-2 px-2 text-slate-500">Sourcegraph</th>
+                </tr>
+              </thead>
+              <tbody>
+                {COMPARISON.map(row => (
+                  <tr key={row.feature} className="border-b border-slate-800/50">
+                    <td className="py-1.5 px-2 text-slate-300">{row.feature}</td>
+                    <td className="text-center">{row.tamv ? <span className="text-emerald-400">✓</span> : <span className="text-slate-600">—</span>}</td>
+                    <td className="text-center">{row.wikipedia ? <span className="text-emerald-400/50">✓</span> : <span className="text-slate-600">—</span>}</td>
+                    <td className="text-center">{row.prisma ? <span className="text-emerald-400/50">✓</span> : <span className="text-slate-600">—</span>}</td>
+                    <td className="text-center">{row.sourcegraph ? <span className="text-emerald-400/50">✓</span> : <span className="text-slate-600">—</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Full Module Index */}
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-slate-100">Índice global · Módulos 0–12</h2>
+            <span className="text-[10px] font-mono text-slate-500">{totalArticles} artículos enlazados</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+            {wikiStructure.map((section, moduleIndex) => (
+              <div key={section.id} className="bg-slate-900/50 border border-slate-800 rounded-lg p-4 hover:border-blue-500/30 transition-colors backdrop-blur-sm group">
+                <Link to={`/modulo/${moduleIndex}`} className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">{section.icon}</span>
+                  <h3 className="text-[11px] font-bold text-slate-200 group-hover:text-blue-300 transition-colors">{section.title}</h3>
+                </Link>
+                <ul className="space-y-0.5">
+                  {section.children.map(page => (
+                    <li key={page.slug}>
+                      <Link to={`/articulo/${page.slug}`} className="text-[10px] text-slate-500 hover:text-blue-300 transition-colors block py-0.5">
+                        · {page.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Identity & External Links */}
+        <section className="rounded-xl border border-slate-700/50 bg-slate-900/30 backdrop-blur-sm p-5">
+          <h2 className="text-sm font-bold text-slate-300 mb-3">Identidad Central del Ecosistema</h2>
+          <div className="grid md:grid-cols-2 gap-4 text-[10px]">
+            <div className="space-y-1.5">
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Autor:</span> Edwin Oswaldo Castillo Trejo (Anubis Villaseñor)</p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Rol:</span> Chief Systems Architect · CEO & Founder</p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">ORCID:</span> <a href="https://orcid.org/0009-0008-5050-1539" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">0009-0008-5050-1539</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">DOI:</span> <a href="https://doi.org/10.5281/zenodo.19562517" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">10.5281/zenodo.19562517</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Nodo:</span> Real del Monte, Hidalgo, México</p>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">GitHub:</span> <a href="https://github.com/OsoPanda1" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">github.com/OsoPanda1</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Odoo:</span> <a href="https://tamvonline-oficial.odoo.com" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">tamvonline-oficial.odoo.com</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Blog:</span> <a href="https://tamvonlinenetwork.blogspot.com" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">tamvonlinenetwork.blogspot.com</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">Zenodo:</span> <a href="https://zenodo.org/communities/tamvonline-oficial/" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">Comunidad TAMV</a></p>
+              <p className="text-slate-400"><span className="text-blue-400 font-bold">AVIXA:</span> <a href="https://xchange.avixa.org" target="_blank" rel="noreferrer" className="text-blue-300 hover:underline">AVIXA Xchange</a></p>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
