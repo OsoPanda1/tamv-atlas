@@ -1,6 +1,9 @@
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { wikiStructure } from "@/data/wikiStructure";
 import MatrixRain from "@/components/MatrixRain";
+import { Input } from "@/components/ui/input";
+import { searchWikiStructure } from "@/lib/wikiSearch";
 
 const totalArticles = wikiStructure.reduce((acc, m) => acc + m.children.length, 0);
 
@@ -27,6 +30,10 @@ const COMPARISON = [
 ];
 
 export default function WikiHome() {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const searchResults = useMemo(() => searchWikiStructure(wikiStructure, searchQuery).slice(0, 12), [searchQuery]);
+
   return (
     <div className="relative min-h-screen">
       {/* Subtle matrix in background */}
@@ -173,6 +180,47 @@ export default function WikiHome() {
               </tbody>
             </table>
           </div>
+        </section>
+
+        {/* Global Search */}
+        <section className="rounded-xl border border-emerald-500/20 bg-slate-900/40 backdrop-blur-sm p-5 space-y-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <h2 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#34d399]" />
+              Buscador global del Atlas
+            </h2>
+            <span className="text-[10px] font-mono text-slate-500">title · slug · módulo</span>
+          </div>
+
+          <Input
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Busca por artículo, slug o módulo (ej. credenciales, dekateotl, implementación...)"
+            className="border-emerald-500/30 bg-slate-950/60 text-slate-200 placeholder:text-slate-500"
+            aria-label="Buscar en el Atlas TAMV"
+          />
+
+          {searchQuery.trim().length > 0 && (
+            <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-3">
+              {searchResults.length > 0 ? (
+                <ul className="space-y-1">
+                  {searchResults.map((result) => (
+                    <li key={result.slug} className="text-[11px]">
+                      <Link
+                        to={`/articulo/${result.slug}`}
+                        className="flex items-center justify-between gap-2 rounded px-2 py-1.5 hover:bg-slate-900/60 transition-colors"
+                      >
+                        <span className="text-slate-300">{result.title}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">{result.sectionTitle}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-[11px] text-slate-500">Sin coincidencias. Prueba términos como: SSI, orcid, economy, pipelines o zenodo.</p>
+              )}
+            </div>
+          )}
         </section>
 
         {/* Full Module Index */}
