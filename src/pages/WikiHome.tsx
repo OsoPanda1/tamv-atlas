@@ -63,6 +63,9 @@ export default function WikiHome() {
               <span className="px-2 py-1 border border-blue-500/30 rounded bg-slate-900/80 text-blue-300">{totalArticles} artículos</span>
               <span className="px-2 py-1 border border-emerald-500/30 rounded bg-slate-900/80 text-emerald-300">7 federaciones</span>
               <span className="px-2 py-1 border border-purple-500/30 rounded bg-slate-900/80 text-purple-300">48+ nodos</span>
+              <Link to="/stream" className="px-2 py-1 border border-cyan-500/40 rounded bg-cyan-500/10 text-cyan-200 hover:border-cyan-300 transition-colors">
+                Civilization Stream →
+              </Link>
             </div>
           </div>
         </section>
