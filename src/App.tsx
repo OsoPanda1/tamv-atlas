@@ -32,6 +32,7 @@ const WIKI_MODULES: WikiModule[] = [
   { id: 10, code: "GOV", path: "/modulo/10", label: "Módulo 10 · Gobernanza & Ética", description: "Normas, principios y modelo de poder distribuido." },
   { id: 11, code: "REFS", path: "/modulo/11", label: "Módulo 11 · Referencias", description: "Bibliografía, DOIs, ORCID, Zenodo y anexos." },
   { id: 12, code: "XR-AI", path: "/modulo/12", label: "Módulo 12 · Metaverso / XR / IA", description: "Isabella AI, DreamSpaces, Kórima, DEKATEOTL." },
+  { id: 13, code: "OMEGA", path: "/modulo/13", label: "Módulo Ω · Filosofía e innovación", description: "Manifiesto TAMV, posicionamiento e inteligencia editorial viva." },
 ];
 
 const wikiPageModules = import.meta.glob<{ default: ComponentType }>("./pages/wiki/**/*.tsx", {
@@ -154,7 +155,7 @@ const AppShell = ({ children }: { children: ReactNode }) => (
       <aside className="hidden lg:block col-span-2 border-r border-slate-800 bg-slate-950/90 backdrop-blur-sm text-[11px]">
         <div className="px-4 py-3 border-b border-slate-800">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">Atlas TAMV · ISNI</p>
-          <p className="text-[9px] text-slate-500">13 módulos · ~60 artículos · Infraestructura viva</p>
+          <p className="text-[9px] text-slate-500">14 módulos · ~66 artículos · Infraestructura viva</p>
         </div>
         <nav className="overflow-y-auto h-[calc(100vh-88px)] scrollbar-thin">
           <ul className="py-2">

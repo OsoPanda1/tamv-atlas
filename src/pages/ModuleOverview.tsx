@@ -18,7 +18,7 @@ export default function ModuleOverview() {
     return (
       <div className="pt-8 lg:pt-0 px-6">
         <h1 className="text-2xl font-bold text-foreground mb-3">Módulo no encontrado</h1>
-        <p className="text-muted-foreground mb-6">Selecciona un módulo válido entre 0 y 12.</p>
+        <p className="text-muted-foreground mb-6">Selecciona un módulo válido dentro del rango disponible.</p>
         <Link to="/" className="text-primary hover:underline">Volver al resumen</Link>
       </div>
     );
@@ -40,7 +40,7 @@ export default function ModuleOverview() {
   return (
     <div className="pt-8 lg:pt-0 px-6 pb-10">
       <div className="mb-8 space-y-3">
-        <p className="text-xs font-mono text-primary mb-2">Módulo {moduleIndex} de 12</p>
+        <p className="text-xs font-mono text-primary mb-2">Módulo {moduleIndex} de {wikiStructure.length - 1}</p>
         <h1 className="text-3xl font-bold text-foreground text-glow-cyan">{section.title}</h1>
         <p className="text-sm text-muted-foreground">
           Página {currentPage}/{totalPages} · Mostrando {pageItems.length} de {section.children.length} capítulos.
