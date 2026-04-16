@@ -22,6 +22,7 @@ export const wikiStructure: WikiSection[] = [
       { slug: "origen-proposito", title: "Origen, propósito y misión" },
       { slug: "biografia-ceo", title: "Biografía del CEO" },
       { slug: "humanismo-en-codigo", title: "Humanismo en código" },
+      { slug: "fusion-wikis-externas", title: "Fusión de wikis externas" },
     ],
   },
   {
@@ -158,6 +159,19 @@ export const wikiStructure: WikiSection[] = [
       { slug: "economia-cuantica", title: "Economía cuántica y TEE" },
       { slug: "roadmap-civilizatorio", title: "Roadmap civilizatorio" },
       { slug: "dekateotl-seguridad", title: "DEKATEOTL: 11 capas de seguridad" },
+    ],
+  },
+  {
+    id: "modulo-omega",
+    title: "Ω · Filosofía, Innovación y Valor Civilizatorio",
+    icon: "🜂",
+    children: [
+      { slug: "manifiesto-tamv", title: "Manifiesto TAMV: una civilización escrita en código" },
+      { slug: "filosofia-dekateotl", title: "Filosofía de diseño: DEKATEOTL, dignidad y vergüenza" },
+      { slug: "isabella-secretaria", title: "Isabella Villaseñor: secretaria del fin de las excusas" },
+      { slug: "wiki-vale-mas", title: "Por qué esta wiki vale más que su código" },
+      { slug: "tamv-vs-industria", title: "TAMV vs la industria: un espejo incómodo" },
+      { slug: "wiki-viva", title: "Wiki viva: cuando la documentación despliega mundos" },
     ],
   },
 ];
