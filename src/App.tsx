@@ -7,6 +7,7 @@ import WikiHome from "@/pages/WikiHome";
 import ModuleOverview from "@/pages/ModuleOverview";
 import NotFound from "@/pages/NotFound";
 import CivilizationStreamPage from "@/pages/CivilizationStreamPage";
+import Auditoria from "@/pages/Auditoria";
 import { wikiStructure } from "@/data/wikiStructure";
 import { articleBySlug, getAdjacentArticles } from "@/lib/wikiNavigation";
 
@@ -191,6 +192,16 @@ const AppShell = ({ children }: { children: ReactNode }) => (
                 <span className="text-[9px] text-slate-500 line-clamp-1">Timeline por módulos, filtros por rol y Flow Lens.</span>
               </Link>
             </li>
+            <li>
+              <Link
+                to="/auditoria"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-accent/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-accent">AUDIT-MAX</span>
+                <span className="text-[10px] text-slate-200">Auditoría Máxima v1.0</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Dashboard de avance + blindaje legal UNESCO/GDPR/ICCPR/UNDRIP.</span>
+              </Link>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -211,6 +222,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/resumen" element={<WikiHome />} />
             <Route path="/stream" element={<CivilizationStreamPage />} />
+            <Route path="/auditoria" element={<Auditoria />} />
             <Route path="/modulo/:id" element={<ModuleOverview />} />
             <Route path="/articulo/:slug" element={<ArticleRouter />} />
             <Route path="/wiki/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
