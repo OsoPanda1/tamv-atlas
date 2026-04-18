@@ -38,6 +38,14 @@ export default function DocumentacionEstandares() {
         <li><WikiLink href="https://www.openaire.eu">OpenAIRE</WikiLink> — Open Access Infrastructure for Research in Europe</li>
         <li><WikiLink href="https://zenodo.org">Zenodo</WikiLink> — Repositorio de acceso abierto del CERN</li>
       </ul>
+
+      <WikiH2>Blindaje ético y jurídico</WikiH2>
+      <ul className="list-disc list-inside space-y-2 text-secondary-foreground mb-6 text-sm">
+        <li><WikiLink href="https://www.unesco.org/en/artificial-intelligence/recommendation-ethics">UNESCO Recommendation on the Ethics of AI</WikiLink> — diversidad, explicabilidad y supervisión humana</li>
+        <li><WikiLink href="https://www.ohchr.org/en/instruments-mechanisms/instruments/international-covenant-civil-and-political-rights">ICCPR</WikiLink> — libertad de expresión y no discriminación por lengua</li>
+        <li><WikiLink href="https://www.ohchr.org/en/indigenous-peoples/un-declaration-rights-indigenous-peoples">UNDRIP</WikiLink> — derechos culturales y soberanía sobre conocimientos indígenas</li>
+        <li><WikiLink href="https://gdpr-info.eu/">GDPR</WikiLink> — tratamiento de datos personales, bases legales y derechos del titular</li>
+      </ul>
     </div>
   );
 }

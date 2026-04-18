@@ -22,6 +22,28 @@ export default function GobernanzaDatos() {
       <WikiP>
         Toda la documentación del ecosistema sigue estándares de versionado semántico, identificación con DOI y licenciamiento abierto (CC BY 4.0). Los documentos son modulares, versionables y diseñados para URLs amigables que funcionan como IDs en el grafo de conocimiento.
       </WikiP>
+
+      <WikiH2>SSoT, canon y autoridad editorial</WikiH2>
+      <WikiCard title="Single Source of Truth" accent="orange">
+        Atlas opera como <strong>fuente única autorizada</strong> para definiciones de arquitectura, políticas, modelos de IA,
+        datasets, contratos semánticos y decisiones de despliegue. Cuando existe divergencia entre repos, presentaciones,
+        chats o documentos dispersos, la referencia válida debe reconducirse al canon wiki versionado.
+      </WikiCard>
+
+      <WikiP>
+        Este principio permite auditar el ecosistema completo: qué se decidió, por qué se aprobó, qué norma lo respalda y qué
+        artefactos técnicos quedan afectados. La wiki no es un resumen; es el registro vivo de gobierno del sistema.
+      </WikiP>
+
+      <WikiH2>Capas de control</WikiH2>
+      <WikiCard accent="cyan">
+        <ul className="space-y-2">
+          <li><strong>Editorial:</strong> redacción, revisión, aprobación y publicación con trazabilidad.</li>
+          <li><strong>Técnica:</strong> versionado, contratos JSON-LD, eventos, APIs y CI/CD constitucional.</li>
+          <li><strong>Jurídica:</strong> prevalencia del español canónico, derechos culturales y control de interpretación.</li>
+          <li><strong>Ética:</strong> evaluación de impacto, dignidad digital y cumplimiento UNESCO / ICCPR / UNDRIP.</li>
+        </ul>
+      </WikiCard>
     </div>
   );
 }
