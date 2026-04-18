@@ -34,7 +34,7 @@ Estrategia "Umbrella": **Research and Development (R&D)** para agrupar:
 3. Arquitectura MD-X4 / MD-X5.
 4. Gobernanza de 7 federaciones.
 
----
+### Seguridad PQC híbrida
 
 ## 2) API backend funcional real (Kernel Identity API)
 
@@ -142,7 +142,7 @@ Se implementa firma operativa de bloques (`/v1/signature/sign`) y verificación 
 
 La lógica de firma, trazabilidad y validación desacopla identidad institucional del frontend y permite despliegues federados multi-nodo con controles de disponibilidad y seguridad de red en Kubernetes.
 
----
+Backend standalone:
 
 ## 5) Build frontend
 

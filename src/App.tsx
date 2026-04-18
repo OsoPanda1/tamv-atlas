@@ -8,6 +8,8 @@ import ModuleOverview from "@/pages/ModuleOverview";
 import NotFound from "@/pages/NotFound";
 import CivilizationStreamPage from "@/pages/CivilizationStreamPage";
 import Auditoria from "@/pages/Auditoria";
+import IdentidadDemo from "@/pages/IdentidadDemo";
+import InvestigacionNodo001 from "@/pages/InvestigacionNodo001";
 import DynamicWikiHome from "@/pages/wiki/WikiHome";
 import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
@@ -214,6 +216,26 @@ const AppShell = ({ children }: { children: ReactNode }) => (
                 <span className="text-[9px] text-slate-500 line-clamp-1">Dashboard de avance + blindaje legal UNESCO/GDPR/ICCPR/UNDRIP.</span>
               </Link>
             </li>
+            <li>
+              <Link
+                to="/identidad-demo"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-primary/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-primary">SSI-FLOW</span>
+                <span className="text-[10px] text-slate-200">Demo identidad E2E</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Firma y verificación de credenciales UTAMV con DID.</span>
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/investigacion/nodo-001"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-primary/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-primary">RESEARCH-001</span>
+                <span className="text-[10px] text-slate-200">Informe Nodo 001</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Matriz de evidencia y verificaciones pendientes.</span>
+              </Link>
+            </li>
           </ul>
         </nav>
       </aside>
@@ -238,6 +260,8 @@ const App = () => (
             <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
             <Route path="/stream" element={<CivilizationStreamPage />} />
             <Route path="/auditoria" element={<Auditoria />} />
+            <Route path="/identidad-demo" element={<IdentidadDemo />} />
+            <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
             <Route path="/modulo/:id" element={<ModuleOverview />} />
             <Route path="/articulo/:slug" element={<ArticleRouter />} />
             <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
