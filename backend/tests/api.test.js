@@ -59,3 +59,12 @@ test('GET /v1/audit/metrics returns federated metrics payload', async () => {
   assert.equal(Array.isArray(data.federations), true);
   assert.equal(Array.isArray(data.productionAxes), true);
 });
+
+
+test('GET /v1/research/nodo-001 returns research dossier', async () => {
+  const response = await fetch(`${base}/v1/research/nodo-001`);
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(data.id, 'tamv-rd-nodo-001-genesis');
+  assert.equal(Array.isArray(data.claims), true);
+});

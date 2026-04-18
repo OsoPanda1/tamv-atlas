@@ -24,6 +24,7 @@ Código: `backend/src/server.js`
 - `POST /v1/signature/verify`
 - `POST /v1/pids/reconcile`
 - `GET /v1/audit/metrics`
+- `GET /v1/research/nodo-001`
 
 ### Seguridad PQC híbrida
 
@@ -122,3 +123,6 @@ npm run reconcile:pids
 - `/auditoria` consume métricas reales del backend (`/v1/audit/metrics`) con React Query.
 - `/identidad-demo` ejecuta flujo E2E de firma y verificación de credencial UTAMV usando la API soberana.
 - `/wiki` incluye índice canónico 0–11 para navegación estable y enlazable.
+
+
+- `/investigacion/nodo-001` integra el informe de investigación (matriz de reclamos vs evidencia + checklist de validación) consumiendo `GET /v1/research/nodo-001`.

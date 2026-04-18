@@ -7,6 +7,22 @@ export interface AuditMetricFederation {
   production: number;
 }
 
+
+export interface ResearchDossierResponse {
+  id: string;
+  version: string;
+  title: string;
+  executiveSummary: string;
+  claims: Array<{
+    claim: string;
+    source: string;
+    verification: "self_reported" | "externally_visible" | "not_verified";
+    notes: string;
+  }>;
+  pendingChecks: Array<{ priority: "high" | "medium" | "low"; task: string }>;
+  recommendations: string[];
+}
+
 export interface AuditMetricsResponse {
   checkedAt: string;
   productionAxes: Array<{ axis: string; actual: number; objetivo: number }>;
@@ -61,4 +77,15 @@ export async function verifyCitizenCredential(payload: unknown, signature: unkno
   }
 
   return response.json();
+}
+
+
+export async function fetchResearchDossier(): Promise<ResearchDossierResponse> {
+  const response = await fetch(`${backendBaseUrl}/v1/research/nodo-001`);
+
+  if (!response.ok) {
+    throw new Error(`Unable to load research dossier (${response.status})`);
+  }
+
+  return response.json() as Promise<ResearchDossierResponse>;
 }

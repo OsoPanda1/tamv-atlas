@@ -5,6 +5,7 @@ import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
 import { reconcilePids } from './pidReconciler.js';
 import { buildAuditMetrics } from './auditMetrics.js';
+import { buildNodo001ResearchDossier } from './researchDossier.js';
 
 const signingEngine = await buildSigningEngine(config.signing.seed, config.signing.mode);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
@@ -114,6 +115,11 @@ const server = createServer(async (req, res) => {
     }
   }
 
+
+
+  if (req.method === 'GET' && url.pathname === '/v1/research/nodo-001') {
+    return writeJson(res, 200, buildNodo001ResearchDossier());
+  }
 
   if (req.method === 'GET' && url.pathname === '/v1/audit/metrics') {
     try {
