@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import ExecutionCenterBoard from "@/components/control/ExecutionCenterBoard";
 import {
   Bar,
   BarChart,
@@ -79,9 +80,10 @@ const RISK_MATRIX = [
   { id: "R-06", risk: "Falta consentimiento UNDRIP", impact: "ALTO", probability: "MEDIA", mitigation: "Protocolo de consulta previa territorial RDM" },
 ];
 
-type Tab = "executive" | "federations" | "production" | "legal" | "roadmap" | "risks";
+type Tab = "control" | "executive" | "federations" | "production" | "legal" | "roadmap" | "risks";
 
 const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: "control", label: "Control EOCT", icon: "🧠" },
   { id: "executive", label: "Resumen Ejecutivo", icon: "📊" },
   { id: "federations", label: "Federaciones", icon: "🌐" },
   { id: "production", label: "Producción", icon: "⚙️" },
@@ -116,7 +118,7 @@ const ProgressBar = ({ value, color = "hsl(var(--primary))" }: { value: number; 
 );
 
 export default function Auditoria() {
-  const [activeTab, setActiveTab] = useState<Tab>("executive");
+  const [activeTab, setActiveTab] = useState<Tab>("control");
   const [selectedFed, setSelectedFed] = useState<string | null>(null);
 
   const globalAvg = useMemo(() => {
@@ -179,6 +181,12 @@ export default function Auditoria() {
       </header>
 
       <div className="p-6 max-w-7xl mx-auto space-y-6">
+        {activeTab === "control" && (
+          <section className="animate-in fade-in duration-500">
+            <ExecutionCenterBoard />
+          </section>
+        )}
+
         {/* ─── EXECUTIVE ─── */}
         {activeTab === "executive" && (
           <section className="space-y-6 animate-in fade-in duration-500">
