@@ -42,7 +42,7 @@ const articles: ArticleSummary[] = wikiStructure.flatMap((section, moduleIndex) 
     title: page.title,
     summary: `Síntesis de ${page.title} dentro de ${section.title}, orientada a lectura guiada por rol, profundidad y flujo civilizatorio TAMV.`,
     tags: [
-      section.id.replaceAll("-", " "),
+      section.id.replace(/-/g, " "),
       moduleIndex <= 1 ? "isni" : "tamv",
       moduleIndex >= 9 ? "gobernanza" : "arquitectura",
       page.slug,

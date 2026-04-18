@@ -27,7 +27,7 @@ const articles: ArticleSummary[] = wikiStructure.flatMap((section, moduleIndex) 
     slug: page.slug,
     title: page.title,
     summary: `Contenido del ${section.title} para navegación avanzada, flujo civilizatorio y lectura por rol.`,
-    tags: [section.id.replaceAll("-", " "), moduleIndex >= 4 ? "ssi" : "isni", moduleIndex >= 10 ? "gobernanza" : "arquitectura"],
+    tags: [section.id.replace(/-/g, " "), moduleIndex >= 4 ? "ssi" : "isni", moduleIndex >= 10 ? "gobernanza" : "arquitectura"],
     moduleId: moduleIndex,
     moduleSlug: section.id,
     moduleTitle: section.title,
