@@ -1,110 +1,154 @@
-# TAMV · Infraestructura Civilizatoria Digital
+# TAMV Digital Nexus · Atlas + Backend de Identidad Soberana
 
-**Estado general:** ✅ Phase 1 completada (65% funcional production-ready)  
-**Siguiente meta:** Phase 2 (35 horas estimadas restantes)
+Repositorio unificado para el núcleo documental/visual de TAMV y una implementación funcional de backend orientada a producción con despliegue Kubernetes.
 
-TAMV (The Awakening Metaverse Vision) integra identidad soberana, seguridad cuántica, economía ética, datos verificables y experiencias inmersivas XR en una infraestructura civilizatoria para LATAM.
+## Estado actual
 
----
-
-## 📚 Documentación maestra
-
-1. **[TAMV-SISTEMA-CIVILIZATORIO.md](./TAMV-SISTEMA-CIVILIZATORIO.md)**  
-   Visión civilizatoria completa (doble memoria, economía, gobernanza, ética, LATAM).
-
-2. **[TAMV-IMPLEMENTACION-TECNICA.md](./TAMV-IMPLEMENTACION-TECNICA.md)**  
-   Arquitectura, servicios, APIs, seguridad, base de datos, observabilidad y despliegue.
-
-3. **[TAMV-HARDENED-BACKEND-SETUP.md](./TAMV-HARDENED-BACKEND-SETUP.md)**  
-   Guía de estructura y setup para backend endurecido de QuantumPods.
+- Frontend Atlas (Vite + React) operativo.
+- API backend funcional para identidad institucional, DID y firma/verificación criptográfica.
+- Manifiestos de Kubernetes para producción (deployment, service, ingress, HPA, network policy, PDB).
 
 ---
 
-## 🚀 Resumen de Commit de avance (Phase 1)
+## 1) Protocolo TAMV-RG-2026 (Referencia institucional)
 
-### Features implementadas
+Este repo integra el **Protocolo de Identidad y Posicionamiento Institucional (TAMV-RG-2026)** para fortalecer indexación en ResearchGate, Zenodo y grafos académicos:
 
-- ✅ Courses/UTAMV Service
-- ✅ Notifications Service
-- ✅ Analytics Service
-- ✅ Compliance Service
-- ✅ Backup Service
-- ✅ Database schema extendido
+### División recomendada (ResearchGate)
 
-### Arquitectura aplicada
+Estrategia "Umbrella": **Research and Development (R&D)** para agrupar:
+- Arquitectura distribuida y sistemas autónomos.
+- Soberanía digital e identidad autosoberana.
+- Infraestructura educativa XR/UTAMV.
 
-- ✅ 5 principios de bloqueo
-- ✅ Procesamiento asíncrono por colas
-- ✅ Cache-first reads con Redis
-- ✅ BookPI como ledger inmutable
-- ✅ Actualizaciones realtime por WebSocket
+### Tríada de PIDs
 
-### Testing reportado
+- **DOI (Zenodo):** base de citación permanente (prefijo 10.5281).
+- **ORCID:** enlace entre autoría e institución.
+- **ISNI:** diferenciación institucional soberana.
 
-- ✅ 42 unit tests
-- ✅ 20 integration tests
-- ✅ 14 property-based tests
-- ✅ 10 E2E tests
-- ✅ 5 suites de carga
+### Mapa estructural unificado
 
-### Métricas objetivo/estado
-
-- ✅ Latencia P95 < 80ms
-- ✅ Error rate < 1%
-- ✅ Uptime 99.5%
-- ✅ Throughput > 200 tx/s
-- ✅ Escalabilidad: 1,000+ usuarios concurrentes
+1. Módulo 0 (humanismo en código + génesis).
+2. Fundamentos ISNI / SSI / DID `did:tamv`.
+3. Arquitectura MD-X4 / MD-X5.
+4. Gobernanza de 7 federaciones.
 
 ---
 
-## ⚡ Quick Start
+## 2) API backend funcional real (Kernel Identity API)
+
+Ruta: `backend/src/server.js`
+
+### Endpoints disponibles
+
+- `GET /healthz` → salud del servicio.
+- `GET /v1/identity/org` → JSON-LD institucional (ISNI/ORCID/Zenodo).
+- `GET /v1/identity/did/:suffix` → DID Document generado dinámicamente.
+- `POST /v1/signature/sign` → firma un payload federado.
+- `POST /v1/signature/verify` → valida firma del payload.
+
+### Seguridad criptográfica (híbrida)
+
+La implementación runtime usa **Ed25519 (Node.js core)** para operación inmediata y agrega metadatos de ruta de migración a **ML-DSA (Dilithium)** según FIPS 204/NIST.
+
+> Nota técnica: en este repo la capa PQC se deja preparada en gobernanza y contrato API para una migración controlada sin downtime.
+
+### Variables de entorno
+
+Ejemplo en `backend/.env.example`:
+
+- `TAMV_ISNI`
+- `TAMV_ORCID`
+- `TAMV_ZENODO_RECORD`
+- `TAMV_SIGNING_SEED`
+- `TAMV_DID_SERVICE_ENDPOINT`
+
+### Ejecutar API local
+
+```bash
+npm run api:start
+```
+
+### Probar API
+
+```bash
+npm run api:test
+```
+
+---
+
+## 3) Kubernetes para producción y despliegue
+
+Ruta: `infra/k8s/`
+
+### Manifiestos incluidos
+
+- `namespace.yaml`
+- `configmap.yaml`
+- `secret.example.yaml`
+- `deployment.yaml`
+- `service.yaml`
+- `ingress.yaml`
+- `hpa.yaml`
+- `networkpolicy.yaml`
+- `pdb.yaml`
+
+### Flujo sugerido
+
+1. Crear namespace y configuración:
+```bash
+kubectl apply -f infra/k8s/namespace.yaml
+kubectl apply -f infra/k8s/configmap.yaml
+kubectl apply -f infra/k8s/secret.example.yaml
+```
+2. Desplegar API:
+```bash
+kubectl apply -f infra/k8s/deployment.yaml
+kubectl apply -f infra/k8s/service.yaml
+kubectl apply -f infra/k8s/ingress.yaml
+kubectl apply -f infra/k8s/hpa.yaml
+kubectl apply -f infra/k8s/networkpolicy.yaml
+kubectl apply -f infra/k8s/pdb.yaml
+```
+
+---
+
+## 4) ANEXO TÉCNICO · Núcleo híbrido PQC + Identidad programable
+
+### 4.1 Firma soberana
+
+Se implementa firma operativa de bloques (`/v1/signature/sign`) y verificación (`/v1/signature/verify`) con perfil criptográfico híbrido listo para evolución PQC.
+
+### 4.2 JSON-LD + ISNI
+
+`/v1/identity/org` publica esquema semántico compatible con `schema.org`, integrando ISNI, ORCID y Zenodo para indexación académica y machine readability.
+
+### 4.3 DID `did:tamv`
+
+`/v1/identity/did/:suffix` genera DID Documents con:
+- `verificationMethod`
+- `serviceEndpoint` de resolución ISNI
+- controlador autosoberano por namespace federado
+
+### 4.4 Orquestación y antifragilidad
+
+La lógica de firma, trazabilidad y validación desacopla identidad institucional del frontend y permite despliegues federados multi-nodo con controles de disponibilidad y seguridad de red en Kubernetes.
+
+---
+
+## 5) Build frontend
 
 ```bash
 npm install
 npm run dev
-```
-
-Build/preview:
-
-```bash
 npm run build
-npm run preview
 ```
 
 ---
 
-## 🎯 Para cada audiencia
+## 6) Próximo paso recomendado
 
-- **Ciudadanía:** identidad soberana, protección y trazabilidad.
-- **Creadores:** monetización ética y reputación verificable.
-- **Instituciones/empresas:** interoperabilidad + cumplimiento.
-- **Aliados/inversionistas:** modelo escalable, gobierno y métricas.
-
----
-
-## 🛡️ Ventajas competitivas
-
-- Infraestructura civilizatoria (no solo app social).
-- Seguridad multicapa (Zero Trust + roadmap PQC).
-- IA con guardrails y explicabilidad operativa.
-- Diseño federado para crecimiento territorial.
-
----
-
-## 🧭 Próxima fase
-
-- 🔄 XR advanced features
-- 🔄 Mobile API optimization
-- 🔄 AI recommendations
-- 🔄 WebSocket events hardening
-- 🔄 Frontend components
-- 🔄 Integración y pruebas finales
-
----
-
-## 🤝 Colaboración y soporte
-
-- Issues: `https://github.com/tu-usuario/tamv/issues`
-- Discussions: `https://github.com/tu-usuario/tamv/discussions`
-- Email: `dev@tamv.io`
-
+- Conectar `backend/src/pqcHybrid.js` con librería ML-DSA productiva (cuando el stack objetivo y requisitos de compliance estén cerrados).
+- Publicar imagen de `backend/Dockerfile` en GHCR y activar pipeline CI/CD para `infra/k8s`.
+- Integrar reconciliación automática DOI/ORCID/ISNI en jobs programados.
