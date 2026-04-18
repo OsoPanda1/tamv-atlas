@@ -30,6 +30,21 @@ export default function EticaPrivacidad() {
       <WikiP>
         La soberanía digital en TAMV significa que cada territorio, organización o persona tiene control real sobre su infraestructura, datos y reglas de operación. No se trata de aislamiento sino de autonomía con interoperabilidad: cada nodo se conecta al ecosistema global manteniendo su independencia.
       </WikiP>
+
+      <WikiH2>Blindaje internacional aplicable</WikiH2>
+      <WikiCard title="Marcos de referencia integrados" accent="orange">
+        <ul className="space-y-2">
+          <li><strong>UNESCO AI Ethics:</strong> diversidad cultural, explicabilidad, supervisión humana y mitigación de sesgos.</li>
+          <li><strong>GDPR / RGPD:</strong> minimización, base legal, transparencia y derechos del titular cuando exista dato personal.</li>
+          <li><strong>ICCPR:</strong> no discriminación por lengua y defensa del derecho a participar en el entorno digital en la lengua propia.</li>
+          <li><strong>UNDRIP:</strong> respeto a pueblos originarios, consentimiento informado y soberanía sobre datos culturales.</li>
+        </ul>
+      </WikiCard>
+
+      <WikiP>
+        En TAMV, estos marcos no se agregan al final como cumplimiento decorativo: condicionan diseño de interfaz, políticas de
+        datos, decisiones algorítmicas, etiquetado lingüístico, auditorías de IA y despliegues territoriales sensibles.
+      </WikiP>
     </div>
   );
 }
