@@ -1,128 +1,183 @@
-# TAMV Digital Nexus · Atlas + Backend Soberano Productivo
+# TAMV Digital Nexus · Atlas + Backend de Identidad Soberana
 
-Repositorio unificado para frontend Atlas, backend de identidad soberana y despliegue enterprise sobre Kubernetes con pipeline GHCR + CI/CD.
+Repositorio unificado para el núcleo documental/visual de TAMV y una implementación funcional de backend orientada a producción con despliegue Kubernetes.
 
-## Estado técnico
+## Estado actual
 
-- ✅ Frontend Atlas operativo (Vite + React).
-- ✅ Backend Identity API operativo con firma híbrida (Ed25519 + ML-DSA cuando está disponible en runtime).
-- ✅ Pipeline GitHub Actions para test, build, publish en GHCR y despliegue k8s.
-- ✅ Job programado (CronJob) para reconciliación automática DOI/ORCID/ISNI.
+- Frontend Atlas (Vite + React) operativo.
+- API backend funcional para identidad institucional, DID y firma/verificación criptográfica.
+- Manifiestos de Kubernetes para producción (deployment, service, ingress, HPA, network policy, PDB).
 
 ---
 
-## Backend API (producción)
+## 1) Protocolo TAMV-RG-2026 (Referencia institucional)
 
-Código: `backend/src/server.js`
+Este repo integra el **Protocolo de Identidad y Posicionamiento Institucional (TAMV-RG-2026)** para fortalecer indexación en ResearchGate, Zenodo y grafos académicos:
 
-### Endpoints
+### División recomendada (ResearchGate)
 
-- `GET /healthz`
-- `GET /v1/identity/org`
-- `GET /v1/identity/did/:suffix`
-- `POST /v1/signature/sign`
-- `POST /v1/signature/verify`
-- `POST /v1/pids/reconcile`
-- `GET /v1/audit/metrics`
-- `GET /v1/research/nodo-001`
+Estrategia "Umbrella": **Research and Development (R&D)** para agrupar:
+- Arquitectura distribuida y sistemas autónomos.
+- Soberanía digital e identidad autosoberana.
+- Infraestructura educativa XR/UTAMV.
+
+### Tríada de PIDs
+
+- **DOI (Zenodo):** base de citación permanente (prefijo 10.5281).
+- **ORCID:** enlace entre autoría e institución.
+- **ISNI:** diferenciación institucional soberana.
+
+### Mapa estructural unificado
+
+1. Módulo 0 (humanismo en código + génesis).
+2. Fundamentos ISNI / SSI / DID `did:tamv`.
+3. Arquitectura MD-X4 / MD-X5.
+4. Gobernanza de 7 federaciones.
 
 ### Seguridad PQC híbrida
 
-Implementación en `backend/src/pqcHybrid.js`:
+## 2) API backend funcional real (Kernel Identity API)
 
-- Firma Ed25519 activa por defecto para compatibilidad universal.
-- Integración real con librería productiva **@noble/post-quantum** para perfil **ML-DSA**.
-- Modos disponibles por variable `TAMV_SIGNING_MODE`:
-  - `hybrid`
-  - `mldsa`
-  - `ed25519`
+Ruta: `backend/src/server.js`
 
-> Si el runtime no puede inicializar ML-DSA y el modo es `hybrid`, el sistema degrada de forma segura a Ed25519. Si el modo es `mldsa`, falla explícitamente para evitar falsa conformidad criptográfica.
+### Endpoints disponibles
+
+- `GET /healthz` → salud del servicio.
+- `GET /v1/identity/org` → JSON-LD institucional (ISNI/ORCID/Zenodo).
+- `GET /v1/identity/did/:suffix` → DID Document generado dinámicamente.
+- `GET /v1/pids/status` → validación en tiempo real contra ORCID, Zenodo e ISNI.
+- `POST /v1/signature/sign` → firma un payload federado.
+- `POST /v1/signature/verify` → valida firma del payload.
+
+### Seguridad criptográfica (híbrida)
+
+La implementación runtime usa **Ed25519 (Node.js core)** para operación inmediata y agrega metadatos de ruta de migración a **ML-DSA (Dilithium)** según FIPS 204/NIST.
+
+> Nota técnica: en este repo la capa PQC se deja preparada en gobernanza y contrato API para una migración controlada sin downtime.
 
 ### Variables de entorno
 
-Archivo base: `backend/.env.example`
+Ejemplo en `backend/.env.example`:
+
+- `TAMV_ISNI`
+- `TAMV_ORCID`
+- `TAMV_ZENODO_RECORD`
+- `TAMV_SIGNING_SEED`
+- `TAMV_DID_SERVICE_ENDPOINT`
+
+### Ejecutar API local
+
+```bash
+npm run api:start
+```
+
+Para que la wiki consulte la API en desarrollo desde otro host/puerto:
+
+```bash
+VITE_IDENTITY_API_BASE_URL=http://localhost:8080 npm run dev
+```
+
+### Probar API
+
+```bash
+npm run api:test
+```
 
 ---
 
-## Reconciliación automática de PIDs
+## 3) Kubernetes para producción y despliegue
 
-Implementación:
+Ruta: `infra/k8s/`
 
-- Lógica: `backend/src/pidReconciler.js`
-- Job manual: `backend/src/jobs/pidReconcileJob.js`
-- Endpoint API: `POST /v1/pids/reconcile`
-- Scheduler en cluster: `infra/k8s/cronjob-pid-reconcile.yaml`
+### Manifiestos incluidos
 
-Valida formato local de ISNI/ORCID/DOI/Zenodo y verifica conectividad contra ORCID y Zenodo para detectar drift documental.
+- `namespace.yaml`
+- `configmap.yaml`
+- `secret.example.yaml`
+- `deployment.yaml`
+- `service.yaml`
+- `ingress.yaml`
+- `hpa.yaml`
+- `networkpolicy.yaml`
+- `pdb.yaml`
 
----
+### Flujo sugerido
 
-## Kubernetes (producción)
-
-Directorio: `infra/k8s/`
-
-- Namespace, configmap, secret template
-- Deployment + service + ingress
-- HPA + network policy + PDB
-- CronJob de reconciliación PIDs
-
-Aplicación:
-
+1. Crear namespace y configuración:
 ```bash
 kubectl apply -f infra/k8s/namespace.yaml
 kubectl apply -f infra/k8s/configmap.yaml
 kubectl apply -f infra/k8s/secret.example.yaml
+```
+2. Desplegar API:
+```bash
 kubectl apply -f infra/k8s/deployment.yaml
 kubectl apply -f infra/k8s/service.yaml
+kubectl apply -f infra/k8s/ingress.yaml
 kubectl apply -f infra/k8s/hpa.yaml
 kubectl apply -f infra/k8s/networkpolicy.yaml
 kubectl apply -f infra/k8s/pdb.yaml
-kubectl apply -f infra/k8s/ingress.yaml
-kubectl apply -f infra/k8s/cronjob-pid-reconcile.yaml
 ```
 
 ---
 
-## CI/CD y GHCR
+## 4) ANEXO TÉCNICO · Núcleo híbrido PQC + Identidad programable
 
-Workflow: `.github/workflows/backend-cicd.yml`
+### 4.1 Firma soberana
 
-Flujo:
+Se implementa firma operativa de bloques (`/v1/signature/sign`) y verificación (`/v1/signature/verify`) con perfil criptográfico híbrido listo para evolución PQC.
 
-1. Corre pruebas de backend.
-2. Construye imagen `backend/Dockerfile`.
-3. Publica en GHCR:
-   - `ghcr.io/<owner>/<repo>/tamv-identity-api:<sha>`
-   - `ghcr.io/<owner>/<repo>/tamv-identity-api:latest`
-4. Despliega manifiestos en k8s usando `KUBE_CONFIG_B64`.
+### 4.2 JSON-LD + ISNI
 
----
+`/v1/identity/org` publica esquema semántico compatible con `schema.org`, integrando ISNI, ORCID y Zenodo para indexación académica y machine readability.
 
-## Comandos locales
+### 4.3 DID `did:tamv`
 
-```bash
-npm run api:start
-npm run api:test
-```
+`/v1/identity/did/:suffix` genera DID Documents con:
+- `verificationMethod`
+- `serviceEndpoint` de resolución ISNI
+- controlador autosoberano por namespace federado
+
+### 4.4 Orquestación y antifragilidad
+
+La lógica de firma, trazabilidad y validación desacopla identidad institucional del frontend y permite despliegues federados multi-nodo con controles de disponibilidad y seguridad de red en Kubernetes.
 
 Backend standalone:
 
-```bash
-cd backend
-npm install
-npm test
-npm run reconcile:pids
-```
+## 5) Build frontend
 
+```bash
+npm install
+npm run dev
+npm run build
+```
 
 ---
 
-## Integración frontend real
+## 6) Próximo paso recomendado
 
-- `/auditoria` consume métricas reales del backend (`/v1/audit/metrics`) con React Query.
-- `/identidad-demo` ejecuta flujo E2E de firma y verificación de credencial UTAMV usando la API soberana.
-- `/wiki` incluye índice canónico 0–11 para navegación estable y enlazable.
+- Conectar `backend/src/pqcHybrid.js` con librería ML-DSA productiva (cuando el stack objetivo y requisitos de compliance estén cerrados).
+- Publicar imagen de `backend/Dockerfile` en GHCR y activar pipeline CI/CD para `infra/k8s`.
+- Integrar reconciliación automática DOI/ORCID/ISNI en jobs programados.
 
+---
 
-- `/investigacion/nodo-001` integra el informe de investigación (matriz de reclamos vs evidencia + checklist de validación) consumiendo `GET /v1/research/nodo-001`.
+## 7) Unificación de repositorios OsoPanda1 → TAMV Digital Nexus
+
+Para consolidar repos en este monorepo federado se incluye:
+
+- Script operacional: `scripts/unify_osopanda_repos.sh`
+- Playbook de ejecución y contingencias: `docs/REPO_UNIFICATION_PLAYBOOK.md`
+
+Flujo mínimo recomendado:
+
+```bash
+# 1) Discovery y manifiesto (sin importar todavía)
+./scripts/unify_osopanda_repos.sh --import-mode none --github-token "$GITHUB_TOKEN"
+
+# 2) Ensayo seguro del lote
+./scripts/unify_osopanda_repos.sh --import-mode squash --dry-run --max-repos 10
+
+# 3) Importación real con estado reanudable
+./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json
+```

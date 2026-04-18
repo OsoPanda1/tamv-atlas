@@ -23,7 +23,6 @@ export const config = {
     orcid: process.env.TAMV_ORCID,
     zenodoRecord: process.env.TAMV_ZENODO_RECORD,
     doiPrefix: process.env.TAMV_DOI_PREFIX ?? '10.5281',
-    reconcileTimeoutMs: Number(process.env.PID_RECONCILE_TIMEOUT_MS ?? 5000),
   },
   organization: {
     name: process.env.TAMV_ORG_NAME,
@@ -41,6 +40,5 @@ export const config = {
   },
   signing: {
     seed: process.env.TAMV_SIGNING_SEED ?? 'tamv-kernel-isabella-2026',
-    mode: process.env.TAMV_SIGNING_MODE ?? 'hybrid',
   },
 };

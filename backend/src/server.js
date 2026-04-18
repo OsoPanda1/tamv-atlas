@@ -3,11 +3,9 @@ import { randomUUID } from 'node:crypto';
 import { config } from './config.js';
 import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
-import { reconcilePids } from './pidReconciler.js';
-import { buildAuditMetrics } from './auditMetrics.js';
-import { buildNodo001ResearchDossier } from './researchDossier.js';
+import { loadPidStatus } from './pidConnectors.js';
 
-const signingEngine = await buildSigningEngine(config.signing.seed, config.signing.mode);
+const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
 
 function parseJsonBody(req) {
@@ -40,7 +38,7 @@ function writeJson(res, statusCode, payload) {
     'cache-control': 'no-store',
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET,POST,OPTIONS',
-    'access-control-allow-headers': 'content-type,authorization',
+    'access-control-allow-headers': 'content-type',
   });
   res.end(JSON.stringify(payload));
 }
@@ -48,18 +46,15 @@ function writeJson(res, statusCode, payload) {
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
-
   if (req.method === 'OPTIONS') {
     return writeJson(res, 200, { ok: true });
   }
-
 
   if (req.method === 'GET' && url.pathname === '/healthz') {
     return writeJson(res, 200, {
       ok: true,
       service: 'tamv-identity-api',
       environment: config.environment,
-      signingMode: signingEngine.profile.activeAlgorithm,
       timestamp: new Date().toISOString(),
     });
   }
@@ -76,6 +71,17 @@ const server = createServer(async (req, res) => {
       signingEngine.exportPublicKeyPem(),
     );
     return writeJson(res, 200, didDocument);
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/pids/status') {
+    try {
+      const data = await loadPidStatus(config);
+      return writeJson(res, 200, data);
+    } catch (error) {
+      return writeJson(res, 502, {
+        error: error instanceof Error ? error.message : 'PID upstream error',
+      });
+    }
   }
 
   if (req.method === 'POST' && url.pathname === '/v1/signature/sign') {
@@ -103,45 +109,13 @@ const server = createServer(async (req, res) => {
   if (req.method === 'POST' && url.pathname === '/v1/signature/verify') {
     try {
       const body = await parseJsonBody(req);
-      const verification = signingEngine.verifyPayload(body.payload, body.signature);
+      const valid = signingEngine.verifyPayload(body.payload, body.signature);
       return writeJson(res, 200, {
-        ...verification,
+        valid,
         checkedAt: new Date().toISOString(),
       });
     } catch (error) {
       return writeJson(res, 400, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-  }
-
-
-
-  if (req.method === 'GET' && url.pathname === '/v1/research/nodo-001') {
-    return writeJson(res, 200, buildNodo001ResearchDossier());
-  }
-
-  if (req.method === 'GET' && url.pathname === '/v1/audit/metrics') {
-    try {
-      const pidReport = await reconcilePids(config);
-      const metrics = buildAuditMetrics({
-        pidReport,
-        signingProfile: signingEngine.profile,
-      });
-      return writeJson(res, 200, metrics);
-    } catch (error) {
-      return writeJson(res, 500, {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-  }
-
-  if (req.method === 'POST' && url.pathname === '/v1/pids/reconcile') {
-    try {
-      const report = await reconcilePids(config);
-      return writeJson(res, report.passed ? 200 : 503, report);
-    } catch (error) {
-      return writeJson(res, 500, {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }

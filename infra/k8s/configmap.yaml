@@ -17,5 +17,3 @@ data:
   TAMV_DID_METHOD: "tamv"
   TAMV_DID_REGION: "rdm"
   TAMV_DID_SERVICE_ENDPOINT: "https://isni.tamv.online/resolve"
-  TAMV_SIGNING_MODE: "hybrid"
-  PID_RECONCILE_TIMEOUT_MS: "5000"

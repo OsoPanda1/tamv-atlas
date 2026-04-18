@@ -32,6 +32,12 @@ POST   /api/msr
 GET    /api/bookpi
 POST   /api/bookpi`}</WikiCode>
 
+      <WikiCard title="Estado actual implementado en este repositorio" accent="green">
+        Endpoints productivos ya operativos: <code>GET /healthz</code>, <code>GET /v1/identity/org</code>,
+        <code>GET /v1/identity/did/:suffix</code>, <code>GET /v1/pids/status</code>, <code>POST /v1/signature/sign</code> y
+        <code>POST /v1/signature/verify</code>.
+      </WikiCard>
+
       <WikiH2>Modelo de datos mínimo (persistencia)</WikiH2>
       <WikiP>
         En base de datos, ISNI/SNI se representa como un núcleo de entidades y vínculos. El patrón recomendado combina
