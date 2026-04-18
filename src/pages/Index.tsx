@@ -24,6 +24,24 @@ const ACCESS_LEVELS = [
   { role: "Gobierno / Institución", icon: "🏛️", color: "cyan", desc: "Gobernanza, identidad territorial, Smart City", features: ["Dashboard territorial", "Identidad soberana", "Indicadores", "Interoperabilidad"] },
 ];
 
+const FEDERATION_WIKI_SLUGS: Record<string, string> = {
+  "FED-01": "fed-01-isni-identidad-soberana",
+  "FED-02": "fed-02-mdx-kernel",
+  "FED-03": "fed-03-isabella",
+  "FED-04": "fed-04-utamv",
+  "FED-05": "fed-05-rdm-territorial",
+  "FED-06": "fed-06-bookpi-etica",
+  "FED-07": "fed-07-integracion-global",
+};
+
+const ROLE_WIKI_SLUGS: Record<string, string> = {
+  "Ciudadano / Usuario": "rol-ciudadano",
+  Desarrollador: "rol-desarrollador",
+  "Empresario / Partner": "rol-partner",
+  "Academia / Investigador": "rol-academia",
+  "Gobierno / Institución": "rol-gobierno",
+};
+
 /* ─────── THREE.JS NETWORK ─────── */
 const initNetwork = (container: HTMLDivElement) => {
   const width = container.clientWidth;
@@ -253,7 +271,11 @@ const Index = () => {
           </h2>
 
           {FEDERATIONS.map((fed) => (
-            <div key={fed.id} className="group cursor-pointer p-2.5 border border-blue-500/10 hover:border-blue-500/40 transition-all bg-slate-900/40 rounded-sm">
+            <Link
+              key={fed.id}
+              to={`/wiki/federaciones/${FEDERATION_WIKI_SLUGS[fed.id]}`}
+              className="block group cursor-pointer p-2.5 border border-blue-500/10 hover:border-blue-500/40 transition-all bg-slate-900/40 rounded-sm"
+            >
               <div className="flex items-center gap-2 mb-1">
                 <span className="w-2 h-2 rounded-full" style={{ backgroundColor: fed.color, boxShadow: `0 0 8px ${fed.color}` }} />
                 <span className="text-[9px] font-bold" style={{ color: fed.color }}>{fed.id}</span>
@@ -268,7 +290,7 @@ const Index = () => {
                 ))}
                 <span className="text-[8px] text-slate-600 ml-1">{fed.nodes}</span>
               </div>
-            </div>
+            </Link>
           ))}
         </aside>
 
@@ -381,7 +403,7 @@ const Index = () => {
               {ACCESS_LEVELS.map(level => (
                 <Link
                   key={level.role}
-                  to="/resumen"
+                  to={`/wiki/roles/${ROLE_WIKI_SLUGS[level.role]}`}
                   className="flex items-start gap-2 p-2 rounded bg-slate-950/50 border border-slate-800 hover:border-blue-500/30 transition-colors group"
                 >
                   <span className="text-sm mt-0.5">{level.icon}</span>

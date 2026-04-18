@@ -8,6 +8,8 @@ import ModuleOverview from "@/pages/ModuleOverview";
 import NotFound from "@/pages/NotFound";
 import CivilizationStreamPage from "@/pages/CivilizationStreamPage";
 import Auditoria from "@/pages/Auditoria";
+import DynamicWikiHome from "@/pages/wiki/WikiHome";
+import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
 import { articleBySlug, getAdjacentArticles } from "@/lib/wikiNavigation";
 
@@ -184,6 +186,16 @@ const AppShell = ({ children }: { children: ReactNode }) => (
             </li>
             <li>
               <Link
+                to="/wiki"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-emerald-500/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-emerald-400">WIKI-GEN</span>
+                <span className="text-[10px] text-slate-200">Wiki dinámica TAMV</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Secciones y subpáginas autogeneradas por esquema.</span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/stream"
                 className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-blue-500/70 hover:bg-slate-900/60 transition-colors"
               >
@@ -221,11 +233,14 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/resumen" element={<WikiHome />} />
+            <Route path="/wiki" element={<DynamicWikiHome />} />
+            <Route path="/wiki/:sectionId" element={<WikiPage />} />
+            <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
             <Route path="/stream" element={<CivilizationStreamPage />} />
             <Route path="/auditoria" element={<Auditoria />} />
             <Route path="/modulo/:id" element={<ModuleOverview />} />
             <Route path="/articulo/:slug" element={<ArticleRouter />} />
-            <Route path="/wiki/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
+            <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AppShell>
