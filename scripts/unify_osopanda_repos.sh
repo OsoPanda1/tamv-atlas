@@ -6,12 +6,6 @@ TARGET_REPO="tamv-digital-nexus"
 PREFIX_ROOT="federation"
 MANIFEST_PATH="docs/repo-unification-manifest.json"
 IMPORT_MODE="none"
-REPOS_FILE=""
-STATE_FILE=".tamv-unify-state.json"
-MAX_REPOS=0
-INCLUDE_FORKS="false"
-INCLUDE_ARCHIVED="false"
-DRY_RUN="false"
 PER_PAGE=100
 API_URL="https://api.github.com"
 
@@ -26,12 +20,6 @@ Opciones:
   --prefix-root <path>            Carpeta raíz de importación en este repo (default: ${PREFIX_ROOT})
   --manifest <path>               Ruta de salida del manifiesto JSON (default: ${MANIFEST_PATH})
   --import-mode <none|squash>     none: solo manifiesto, squash: importa con git subtree --squash
-  --repos-file <path>             JSON local con repos (evita llamadas a GitHub API)
-  --state-file <path>             Estado de progreso de importación para reintentos
-  --max-repos <n>                 Limita la cantidad de repos a procesar (0 = sin límite)
-  --include-forks                 Incluye forks en el manifiesto/import
-  --include-archived              Incluye repos archivados en el manifiesto/import
-  --dry-run                       No ejecuta git subtree ni cambios de git remotes
   --github-token <token>          Token GitHub opcional (mejora rate limits)
   --help                          Muestra esta ayuda
 
@@ -41,9 +29,6 @@ Ejemplos:
 
   # Descubrir e importar todos los repos con historial compactado
   $(basename "$0") --import-mode squash --prefix-root federation
-
-  # Importar desde manifiesto local en modo simulación
-  $(basename "$0") --repos-file docs/repos.json --import-mode squash --dry-run
 USAGE
 }
 
@@ -62,12 +47,6 @@ while [[ $# -gt 0 ]]; do
         exit 1
       fi
       ;;
-    --repos-file) REPOS_FILE="$2"; shift 2 ;;
-    --state-file) STATE_FILE="$2"; shift 2 ;;
-    --max-repos) MAX_REPOS="$2"; shift 2 ;;
-    --include-forks) INCLUDE_FORKS="true"; shift ;;
-    --include-archived) INCLUDE_ARCHIVED="true"; shift ;;
-    --dry-run) DRY_RUN="true"; shift ;;
     --github-token) GITHUB_TOKEN="$2"; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     *)
@@ -92,7 +71,6 @@ if [[ "$IMPORT_MODE" == "squash" ]] && ! command -v git >/dev/null 2>&1; then
 fi
 
 mkdir -p "$(dirname "$MANIFEST_PATH")"
-mkdir -p "$(dirname "$STATE_FILE")"
 
 headers=("-H" "Accept: application/vnd.github+json")
 if [[ -n "$GITHUB_TOKEN" ]]; then
@@ -127,46 +105,18 @@ fetch_page() {
 }
 
 all_repos='[]'
-if [[ -n "$REPOS_FILE" ]]; then
-  if [[ ! -f "$REPOS_FILE" ]]; then
-    echo "ERROR: --repos-file no existe: $REPOS_FILE" >&2
-    exit 1
+page=1
+while :; do
+  payload="$(fetch_page "$page")"
+  count="$(jq 'length' <<<"$payload")"
+  if [[ "$count" -eq 0 ]]; then
+    break
   fi
-  if ! jq -e . >/dev/null 2>&1 "$REPOS_FILE"; then
-    echo "ERROR: --repos-file no contiene JSON válido: $REPOS_FILE" >&2
-    exit 1
-  fi
-  all_repos="$(cat "$REPOS_FILE")"
-else
-  page=1
-  while :; do
-    payload="$(fetch_page "$page")"
-    count="$(jq 'length' <<<"$payload")"
-    if [[ "$count" -eq 0 ]]; then
-      break
-    fi
-    all_repos="$(jq -s 'add' <(printf '%s' "$all_repos") <(printf '%s' "$payload"))"
-    ((page+=1))
-  done
-fi
+  all_repos="$(jq -s 'add' <(printf '%s' "$all_repos") <(printf '%s' "$payload"))"
+  ((page+=1))
+done
 
-if [[ "$MAX_REPOS" -lt 0 ]]; then
-  echo "ERROR: --max-repos debe ser >= 0" >&2
-  exit 1
-fi
-
-filtered="$(jq \
-  --arg target "$TARGET_REPO" \
-  --argjson includeForks "$INCLUDE_FORKS" \
-  --argjson includeArchived "$INCLUDE_ARCHIVED" \
-  --argjson maxRepos "$MAX_REPOS" '
-  [ .[]
-    | select(.name != $target)
-    | select($includeForks or (.fork == false))
-    | select($includeArchived or (.archived == false))
-  ]
-  | if $maxRepos > 0 then .[:$maxRepos] else . end
-' <<<"$all_repos")"
+filtered="$(jq --arg target "$TARGET_REPO" '[.[] | select(.name != $target and .fork == false)]' <<<"$all_repos")"
 
 manifest="$(jq --arg owner "$OWNER" --arg target "$TARGET_REPO" --arg prefix "$PREFIX_ROOT" '
 {
@@ -200,46 +150,23 @@ fi
 repo_count="$(jq -r '.repo_count' "$MANIFEST_PATH")"
 echo "Iniciando importación squash de ${repo_count} repositorios en ${PREFIX_ROOT}/..."
 
-if [[ ! -f "$STATE_FILE" ]]; then
-  printf '%s\n' '{"completed":[]}' > "$STATE_FILE"
-fi
-
 while IFS= read -r row; do
   name="$(jq -r '.name' <<<"$row")"
   default_branch="$(jq -r '.default_branch' <<<"$row")"
   clone_url="$(jq -r '.clone_url' <<<"$row")"
   prefix="$(jq -r '.import_prefix' <<<"$row")"
 
-  if jq -e --arg name "$name" '.completed | index($name)' "$STATE_FILE" >/dev/null; then
-    echo "[SKIP] ${name} ya estaba marcado como completado en ${STATE_FILE}"
-    continue
-  fi
-
   if git ls-tree -d --name-only HEAD "$prefix" | grep -q "^${prefix}$"; then
     echo "[SKIP] ${name} ya existe en ${prefix}"
-    tmp_state="$(mktemp)"
-    jq --arg name "$name" '.completed += [$name] | .completed |= unique' "$STATE_FILE" > "$tmp_state"
-    mv "$tmp_state" "$STATE_FILE"
     continue
   fi
 
   tmp_remote="tmp-${name}-$(date +%s)"
   echo "[ADD] ${name} -> ${prefix} (branch ${default_branch})"
-  if [[ "$DRY_RUN" == "true" ]]; then
-    echo "[DRY-RUN] git remote add \"$tmp_remote\" \"$clone_url\""
-    echo "[DRY-RUN] git fetch \"$tmp_remote\" \"$default_branch\""
-    echo "[DRY-RUN] git subtree add --prefix \"$prefix\" \"$tmp_remote\" \"$default_branch\" --squash ..."
-    echo "[DRY-RUN] git remote remove \"$tmp_remote\""
-  else
-    git remote add "$tmp_remote" "$clone_url"
-    git fetch "$tmp_remote" "$default_branch"
-    git subtree add --prefix "$prefix" "$tmp_remote" "$default_branch" --squash -m "chore(unify): importar ${name} en ${prefix}"
-    git remote remove "$tmp_remote"
-  fi
-
-  tmp_state="$(mktemp)"
-  jq --arg name "$name" '.completed += [$name] | .completed |= unique' "$STATE_FILE" > "$tmp_state"
-  mv "$tmp_state" "$STATE_FILE"
+  git remote add "$tmp_remote" "$clone_url"
+  git fetch "$tmp_remote" "$default_branch"
+  git subtree add --prefix "$prefix" "$tmp_remote" "$default_branch" --squash -m "chore(unify): importar ${name} en ${prefix}"
+  git remote remove "$tmp_remote"
 done < <(jq -c '.repos[]' "$MANIFEST_PATH")
 
 echo "Importación finalizada. Revisa git status y ejecuta pruebas antes de commit."

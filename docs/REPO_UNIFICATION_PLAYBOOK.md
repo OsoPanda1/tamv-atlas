@@ -15,13 +15,9 @@ Script: `scripts/unify_osopanda_repos.sh`
 
 Capacidades:
 - Discovery vía API de GitHub (`/users/:owner/repos`).
-- Discovery alterno desde archivo local (`--repos-file`) para entornos con red restringida.
 - Filtro automático para excluir el repo destino (`tamv-digital-nexus`).
-- Filtros avanzados para forks/archivados y límite de volumen (`--include-forks`, `--include-archived`, `--max-repos`).
 - Manifiesto JSON con metadatos de cada repo.
 - Importación opcional con `git subtree --squash` hacia `federation/<repo>`.
-- Estado de progreso persistente (`--state-file`) para reanudar lotes largos.
-- Simulación completa (`--dry-run`) sin tocar git history.
 
 ## 3) Protocolo operativo recomendado
 
@@ -49,36 +45,15 @@ Si se requiere autenticación (límites de API o privados):
 ./scripts/unify_osopanda_repos.sh --import-mode none --github-token "$GITHUB_TOKEN"
 ```
 
-Si hay bloqueo de red saliente y ya tienes un JSON local de repos:
-
-```bash
-./scripts/unify_osopanda_repos.sh \
-  --repos-file docs/repos-source.json \
-  --import-mode none
-```
-
 ### Fase C — Importación controlada
 
 ```bash
-./scripts/unify_osopanda_repos.sh \
-  --import-mode squash \
-  --prefix-root federation \
-  --state-file .tamv-unify-state.json
+./scripts/unify_osopanda_repos.sh --import-mode squash --prefix-root federation
 ```
 
 Resultado:
 - Importa cada repo en `federation/<nombre-repo>`.
 - Evita sobrescribir carpetas ya existentes (las salta).
-- Permite reanudar importación sin repetir repos ya completados.
-
-Prueba previa (sin modificaciones):
-
-```bash
-./scripts/unify_osopanda_repos.sh \
-  --import-mode squash \
-  --dry-run \
-  --max-repos 10
-```
 
 ### Fase D — Validación posterior
 
@@ -118,7 +93,7 @@ Síntoma:
 Respuesta:
 1. `git status` para identificar estado.
 2. `git reset --hard HEAD` para volver al último commit limpio.
-3. Reejecutar script usando el mismo `--state-file` para continuar.
+3. Reejecutar script.
 
 ## Escenario E3 — Colisiones de estructura
 
@@ -139,16 +114,6 @@ Respuesta:
 1. Confirmar token con alcance de lectura.
 2. Registrar incidencia en manifiesto (campo pendiente en backlog).
 3. Continuar con import de repos accesibles.
-
-## Escenario E5 — Conflictos de rama durante integración
-
-Síntoma:
-- Merge conflict al integrar la rama de unificación.
-
-Respuesta:
-1. Resolver conflictos en archivos raíz de orquestación (`README.md`, `package.json`, `infra/*`, `backend/*`) priorizando la versión más reciente del trunk para runtime.
-2. Mantener los artefactos de unificación (`scripts/*`, `docs/*`) y volver a ejecutar validaciones.
-3. Confirmar que el manifiesto y estado de importación siguen consistentes antes del commit final.
 
 ## 5) Siguiente paso sugerido (post-unificación)
 

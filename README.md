@@ -45,6 +45,7 @@ Ruta: `backend/src/server.js`
 - `GET /healthz` → salud del servicio.
 - `GET /v1/identity/org` → JSON-LD institucional (ISNI/ORCID/Zenodo).
 - `GET /v1/identity/did/:suffix` → DID Document generado dinámicamente.
+- `GET /v1/pids/status` → validación en tiempo real contra ORCID, Zenodo e ISNI.
 - `POST /v1/signature/sign` → firma un payload federado.
 - `POST /v1/signature/verify` → valida firma del payload.
 
@@ -68,6 +69,12 @@ Ejemplo en `backend/.env.example`:
 
 ```bash
 npm run api:start
+```
+
+Para que la wiki consulte la API en desarrollo desde otro host/puerto:
+
+```bash
+VITE_IDENTITY_API_BASE_URL=http://localhost:8080 npm run dev
 ```
 
 ### Probar API
