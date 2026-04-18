@@ -7,13 +7,13 @@ import HexagonalPipeline from "@/components/HexagonalPipeline";
 
 /* ─────── FEDERATION & NODE DATA ─────── */
 const FEDERATIONS = [
-  { id: "FED-01", name: "ISNI / Identidad Soberana", color: "#60a5fa", nodes: 8, desc: "Infraestructura de nombres, PIDs, DIDs y SSI" },
-  { id: "FED-02", name: "MD-X Kernel Operativo", color: "#a78bfa", nodes: 7, desc: "Observabilidad MD-X4 y evolución MD-X5" },
-  { id: "FED-03", name: "Isabella Villaseñor AI", color: "#34d399", nodes: 7, desc: "Conciencia operativa, ética y seguridad cognitiva" },
-  { id: "FED-04", name: "UTAMV Academia", color: "#fbbf24", nodes: 6, desc: "Campus digital, AI Core, credenciales verificables" },
-  { id: "FED-05", name: "RDM Territorial", color: "#f472b6", nodes: 7, desc: "Pueblos digitales, Smart Destinations, XR/4D" },
-  { id: "FED-06", name: "BookPI / Ética", color: "#fb923c", nodes: 6, desc: "Ledger de evidencia, dignidad digital, gobernanza" },
-  { id: "FED-07", name: "Integración Global", color: "#2dd4bf", nodes: 7, desc: "Odoo, ORCID, Zenodo, GitHub, OpenAIRE, AVIXA" },
+  { id: "FED-01", name: "ISNI / Identidad Soberana", color: "hsl(var(--chart-1))", nodes: 8, desc: "Infraestructura de nombres, PIDs, DIDs y SSI" },
+  { id: "FED-02", name: "MD-X Kernel Operativo", color: "hsl(var(--chart-2))", nodes: 7, desc: "Observabilidad MD-X4 y evolución MD-X5" },
+  { id: "FED-03", name: "Isabella Villaseñor AI", color: "hsl(var(--chart-3))", nodes: 7, desc: "Conciencia operativa, ética y seguridad cognitiva" },
+  { id: "FED-04", name: "UTAMV Academia", color: "hsl(var(--chart-4))", nodes: 6, desc: "Campus digital, AI Core, credenciales verificables" },
+  { id: "FED-05", name: "RDM Territorial", color: "hsl(var(--chart-5))", nodes: 7, desc: "Pueblos digitales, Smart Destinations, XR/4D" },
+  { id: "FED-06", name: "BookPI / Ética", color: "hsl(var(--primary))", nodes: 6, desc: "Ledger de evidencia, dignidad digital, gobernanza" },
+  { id: "FED-07", name: "Integración Global", color: "hsl(var(--accent))", nodes: 7, desc: "Odoo, ORCID, Zenodo, GitHub, OpenAIRE, AVIXA" },
 ];
 
 const ACCESS_LEVELS = [
@@ -239,15 +239,15 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 overflow-x-hidden font-mono selection:bg-blue-500/30 relative">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden font-mono selection:bg-primary/30 relative">
       {/* Matrix rain background */}
       <div className="fixed inset-0 z-0">
         <MatrixRain color="blue" />
       </div>
-      <div className="fixed inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/40 to-slate-950/80 z-[1]" />
+      <div className="fixed inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80 z-[1]" />
 
       {/* Top bar */}
-      <header className="relative z-20 border-b border-blue-500/20 bg-slate-950/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[10px] tracking-[0.2em] uppercase">
+      <header className="relative z-20 border-b border-primary/20 bg-background/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[10px] tracking-[0.2em] uppercase">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#4ade80] animate-pulse" />
           <span className="text-blue-300/80">TAMV·ONLINE</span>

@@ -3,7 +3,14 @@ import { CivilizationStream } from "@/components/atlas/CivilizationStream";
 import { wikiStructure } from "@/data/wikiStructure";
 import type { ArticleSummary, Depth, ModuleMeta } from "@/components/atlas/types";
 
-const modulePalette = ["#60a5fa", "#a78bfa", "#34d399", "#fbbf24", "#f472b6", "#2dd4bf"];
+const modulePalette = [
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+  "hsl(var(--primary))",
+];
 
 const modules: ModuleMeta[] = wikiStructure.map((section, moduleIndex) => ({
   id: moduleIndex,
@@ -41,18 +48,21 @@ const articles: ArticleSummary[] = wikiStructure.flatMap((section, moduleIndex) 
       gobierno: moduleIndex >= 9 ? 4 : 1,
     },
     depth: mapDepth(moduleIndex),
-  }))
+  })),
 );
 
 export default function CivilizationStreamPage() {
   return (
-    <div className="px-4 py-6 md:px-8 lg:px-10 space-y-4">
+    <div className="px-4 py-6 md:px-8 lg:px-10 space-y-4 bg-background text-foreground min-h-full">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className="text-[11px] font-mono text-cyan-400">ATLAS / CIVILIZATION STREAM</p>
-          <h1 className="text-2xl font-semibold text-slate-100">Paginación avanzada y Flow Lens</h1>
+          <p className="text-[11px] font-mono text-primary">ATLAS / CIVILIZATION STREAM</p>
+          <h1 className="text-2xl font-semibold text-foreground">Paginación avanzada y Flow Lens</h1>
         </div>
-        <Link to="/resumen" className="text-xs border border-slate-700 px-3 py-1.5 rounded text-slate-300 hover:border-cyan-400 hover:text-cyan-200 transition-colors">
+        <Link
+          to="/resumen"
+          className="text-xs border border-border px-3 py-1.5 rounded text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+        >
           Volver a Resumen
         </Link>
       </div>

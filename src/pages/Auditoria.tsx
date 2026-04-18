@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAuditMetrics } from "@/lib/tamvApi";
 import { Link } from "react-router-dom";
 import ExecutionCenterBoard from "@/components/control/ExecutionCenterBoard";
 import {
@@ -34,7 +36,7 @@ interface FederationAudit {
   description: string;
 }
 
-const FEDERATIONS_AUDIT: FederationAudit[] = [
+const DEFAULT_FEDERATIONS_AUDIT: FederationAudit[] = [
   { id: "FED-01", name: "ISNI / Identidad Soberana", color: "hsl(199, 89%, 48%)", nodes: 128, conceptual: 90, wiring: 45, production: 60, description: "PIDs · DIDs · ORCID · Zenodo" },
   { id: "FED-02", name: "MD-X Kernel Operativo", color: "hsl(270, 70%, 60%)", nodes: 256, conceptual: 85, wiring: 40, production: 55, description: "MD-X4/X5 · Deca-V · QC-TAMV-01" },
   { id: "FED-03", name: "Isabella Villaseñor AI", color: "hsl(142, 71%, 45%)", nodes: 64, conceptual: 80, wiring: 35, production: 50, description: "Pipeline hexagonal · 10 capas · SHAME" },
@@ -44,7 +46,7 @@ const FEDERATIONS_AUDIT: FederationAudit[] = [
   { id: "FED-07", name: "Integración Global", color: "hsl(174, 72%, 50%)", nodes: 224, conceptual: 80, wiring: 35, production: 50, description: "Odoo · GitHub · OpenAIRE · AVIXA" },
 ];
 
-const PRODUCTION_AXES = [
+const DEFAULT_PRODUCTION_AXES = [
   { axis: "Frontend Atlas", actual: 60, objetivo: 90 },
   { axis: "Integración Backend", actual: 25, objetivo: 80 },
   { axis: "Infra Endurecida", actual: 30, objetivo: 85 },
@@ -55,7 +57,7 @@ const PRODUCTION_AXES = [
   { axis: "Observabilidad", actual: 35, objetivo: 85 },
 ];
 
-const LEGAL_FRAMEWORKS = [
+const DEFAULT_LEGAL_FRAMEWORKS = [
   { id: "UNESCO-AI", name: "UNESCO AI Ethics", coverage: 65, status: "in_progress", desc: "Principios, EIA, RAM aplicados al pipeline Isabella" },
   { id: "GDPR", name: "GDPR / RGPD", coverage: 70, status: "in_progress", desc: "PrOnto/GConsent · bases legales · DPIA" },
   { id: "ICCPR", name: "ICCPR · Derechos Lingüísticos", coverage: 80, status: "active", desc: "Español como lengua canónica · Art. 2, 26, 27" },
@@ -64,14 +66,14 @@ const LEGAL_FRAMEWORKS = [
   { id: "FAIR", name: "FAIR Data Principles", coverage: 75, status: "active", desc: "Findable · Accessible · Interoperable · Reusable" },
 ];
 
-const ROADMAP_PHASES = [
+const DEFAULT_ROADMAP_PHASES = [
   { fase: "Q2 2026", actual: 35, target: 55, milestone: "Wiki canónica + Atlas 3D + buscador" },
   { fase: "Q3 2026", actual: 0, target: 70, milestone: "Backend FastAPI + JWT + RLS multi-rol" },
   { fase: "Q4 2026", actual: 0, target: 85, milestone: "K8s producción + CI/CD Deca-V + observabilidad" },
   { fase: "Q1 2027", actual: 0, target: 95, milestone: "Federación 177 repos + UNESCO compliance certificado" },
 ];
 
-const RISK_MATRIX = [
+const DEFAULT_RISK_MATRIX = [
   { id: "R-01", risk: "Ausencia wiring backend real", impact: "ALTO", probability: "ALTA", mitigation: "FastAPI + Supabase Edge Functions OLA-A" },
   { id: "R-02", risk: "Falta CI/CD Deca-V activo", impact: "ALTO", probability: "MEDIA", mitigation: "GitHub Actions con npm run audit:deca-v" },
   { id: "R-03", risk: "Sin RLS en tablas sensibles", impact: "CRÍTICO", probability: "BAJA", mitigation: "Habilitar RLS + has_role() security definer" },
@@ -121,17 +123,35 @@ export default function Auditoria() {
   const [activeTab, setActiveTab] = useState<Tab>("control");
   const [selectedFed, setSelectedFed] = useState<string | null>(null);
 
+  const auditQuery = useQuery({
+    queryKey: ["audit-metrics"],
+    queryFn: fetchAuditMetrics,
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+  });
+
+  const productionAxes = auditQuery.data?.productionAxes ?? DEFAULT_PRODUCTION_AXES;
+  const federationsAudit =
+    auditQuery.data?.federations?.map((f) => ({
+      ...f,
+      color: "hsl(var(--chart-1))",
+      description: `Nodos activos: ${f.nodes}`,
+    })) ?? DEFAULT_FEDERATIONS_AUDIT;
+  const legalFrameworks = auditQuery.data?.legalFrameworks ?? DEFAULT_LEGAL_FRAMEWORKS;
+  const roadmapPhases = auditQuery.data?.roadmapPhases ?? DEFAULT_ROADMAP_PHASES;
+  const riskMatrix = auditQuery.data?.riskMatrix ?? DEFAULT_RISK_MATRIX;
+
   const globalAvg = useMemo(() => {
-    const sum = PRODUCTION_AXES.reduce((acc, x) => acc + x.actual, 0);
-    return Math.round(sum / PRODUCTION_AXES.length);
-  }, []);
+    const sum = productionAxes.reduce((acc, x) => acc + x.actual, 0);
+    return Math.round(sum / productionAxes.length);
+  }, [productionAxes]);
 
   const fedAvg = useMemo(() => {
-    const sum = FEDERATIONS_AUDIT.reduce((acc, f) => acc + (f.conceptual + f.wiring + f.production) / 3, 0);
-    return Math.round(sum / FEDERATIONS_AUDIT.length);
-  }, []);
+    const sum = federationsAudit.reduce((acc, f) => acc + (f.conceptual + f.wiring + f.production) / 3, 0);
+    return Math.round(sum / federationsAudit.length);
+  }, [federationsAudit]);
 
-  const totalNodes = FEDERATIONS_AUDIT.reduce((acc, f) => acc + f.nodes, 0);
+  const totalNodes = federationsAudit.reduce((acc, f) => acc + f.nodes, 0);
 
   return (
     <div className="min-h-full bg-background text-foreground">
@@ -146,6 +166,9 @@ export default function Auditoria() {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            {auditQuery.isFetching ? (
+              <span className="px-2 py-1 rounded-full bg-muted text-[10px] text-muted-foreground font-mono">SYNC BACKEND…</span>
+            ) : null}
             <span className="px-3 py-1.5 rounded-full bg-primary/10 border border-primary/30 text-primary text-[11px] font-mono">
               KERNEL · MD-X5 · ONLINE
             </span>
@@ -202,7 +225,7 @@ export default function Auditoria() {
                 <h3 className="text-sm font-semibold text-foreground mb-1">Avance por Eje de Producción</h3>
                 <p className="text-[11px] text-muted-foreground mb-4 font-mono">ACTUAL vs OBJETIVO 2027</p>
                 <ResponsiveContainer width="100%" height={300}>
-                  <RadarChart data={PRODUCTION_AXES}>
+                  <RadarChart data={productionAxes}>
                     <PolarGrid stroke="hsl(var(--border))" />
                     <PolarAngleAxis dataKey="axis" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
                     <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 9 }} />
@@ -218,7 +241,7 @@ export default function Auditoria() {
                 <h3 className="text-sm font-semibold mb-1">Madurez por Federación</h3>
                 <p className="text-[11px] text-muted-foreground mb-4 font-mono">CONCEPTUAL · WIRING · PRODUCCIÓN</p>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={FEDERATIONS_AUDIT}>
+                  <BarChart data={federationsAudit}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                     <XAxis dataKey="id" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
                     <YAxis domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
@@ -251,7 +274,7 @@ export default function Auditoria() {
         {activeTab === "federations" && (
           <section className="space-y-4 animate-in fade-in duration-500">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {FEDERATIONS_AUDIT.map((fed) => {
+              {federationsAudit.map((fed) => {
                 const avg = Math.round((fed.conceptual + fed.wiring + fed.production) / 3);
                 const active = selectedFed === fed.id;
                 return (
@@ -312,7 +335,7 @@ export default function Auditoria() {
             <div className="rounded-xl border border-border bg-card/50 p-5">
               <h3 className="text-sm font-semibold mb-4">Brecha Actual vs Objetivo (8 ejes)</h3>
               <ResponsiveContainer width="100%" height={400}>
-                <BarChart data={PRODUCTION_AXES} layout="vertical">
+                <BarChart data={productionAxes} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis type="number" domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
                   <YAxis type="category" dataKey="axis" width={140} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
@@ -325,7 +348,7 @@ export default function Auditoria() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {PRODUCTION_AXES.map((axis) => {
+              {productionAxes.map((axis) => {
                 const gap = axis.objetivo - axis.actual;
                 return (
                   <div key={axis.axis} className="rounded-lg border border-border bg-card/40 p-4">
@@ -361,7 +384,7 @@ export default function Auditoria() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {LEGAL_FRAMEWORKS.map((fw) => (
+              {legalFrameworks.map((fw) => (
                 <div key={fw.id} className="rounded-xl border border-border bg-card/50 p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
@@ -413,7 +436,7 @@ export default function Auditoria() {
             <div className="rounded-xl border border-border bg-card/50 p-5">
               <h3 className="text-sm font-semibold mb-4">Roadmap a Producción Endurecida</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={ROADMAP_PHASES}>
+                <BarChart data={roadmapPhases}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                   <XAxis dataKey="fase" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} />
                   <YAxis domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
@@ -426,7 +449,7 @@ export default function Auditoria() {
             </div>
 
             <div className="space-y-3">
-              {ROADMAP_PHASES.map((phase, idx) => (
+              {roadmapPhases.map((phase, idx) => (
                 <div key={phase.fase} className="rounded-xl border border-border bg-card/50 p-4 flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-primary/10 border border-primary/30 flex items-center justify-center text-primary font-mono text-xs flex-shrink-0">
                     Q{idx + 1}
@@ -454,7 +477,7 @@ export default function Auditoria() {
             </div>
 
             <div className="space-y-3">
-              {RISK_MATRIX.map((risk) => (
+              {riskMatrix.map((risk) => (
                 <div key={risk.id} className="rounded-xl border border-border bg-card/50 p-4">
                   <div className="flex items-start justify-between gap-4 mb-2 flex-wrap">
                     <div className="flex-1">
