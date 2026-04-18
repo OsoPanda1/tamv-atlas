@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { get } from 'node:http';
 
 process.env.NODE_ENV = 'test';
 process.env.TAMV_ORCID = '0009-0008-5050-1539';
@@ -47,4 +48,54 @@ test('sign + verify cycle should be valid', async () => {
   assert.equal(verifyRes.status, 200);
   const verification = await verifyRes.json();
   assert.equal(verification.valid, true);
+});
+
+test('GET /v1/pids/status returns aggregated provider state', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    globalThis.fetch = async (url) => {
+      if (url.includes('/person')) {
+        return Response.json({
+          name: {
+            'given-names': { value: 'Edwin' },
+            'family-name': { value: 'Castillo Trejo' },
+          },
+        });
+      }
+      if (url.includes('/works')) {
+        return Response.json({ group: [] });
+      }
+      if (url.includes('zenodo.org/api/records/')) {
+        return Response.json({
+          doi: '10.5281/zenodo.19436662',
+          metadata: { title: 'Canon TAMV', publication_date: '2026-04-01' },
+          links: { html: 'https://zenodo.org/records/19436662' },
+        });
+      }
+      if (url.includes('isni.org/isni/')) {
+        return new Response('ok', { status: 200 });
+      }
+      return new Response('not-found', { status: 404 });
+    };
+
+    const response = await new Promise((resolve, reject) => {
+      get(`${base}/v1/pids/status`, (res) => {
+        let body = '';
+        res.on('data', (chunk) => {
+          body += chunk;
+        });
+        res.on('end', () => {
+          resolve({ statusCode: res.statusCode, body });
+        });
+      }).on('error', reject);
+    });
+
+    assert.equal(response.statusCode, 200);
+    const data = JSON.parse(response.body);
+    assert.equal(data.records.orcid.reachable, true);
+    assert.equal(data.records.zenodo.reachable, true);
+    assert.equal(data.records.isni.reachable, true);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });

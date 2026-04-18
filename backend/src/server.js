@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { config } from './config.js';
 import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
+import { loadPidStatus } from './pidConnectors.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
@@ -35,12 +36,19 @@ function writeJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET,POST,OPTIONS',
+    'access-control-allow-headers': 'content-type',
   });
   res.end(JSON.stringify(payload));
 }
 
 const server = createServer(async (req, res) => {
   const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
+
+  if (req.method === 'OPTIONS') {
+    return writeJson(res, 200, { ok: true });
+  }
 
   if (req.method === 'GET' && url.pathname === '/healthz') {
     return writeJson(res, 200, {
@@ -63,6 +71,17 @@ const server = createServer(async (req, res) => {
       signingEngine.exportPublicKeyPem(),
     );
     return writeJson(res, 200, didDocument);
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/pids/status') {
+    try {
+      const data = await loadPidStatus(config);
+      return writeJson(res, 200, data);
+    } catch (error) {
+      return writeJson(res, 502, {
+        error: error instanceof Error ? error.message : 'PID upstream error',
+      });
+    }
   }
 
   if (req.method === 'POST' && url.pathname === '/v1/signature/sign') {

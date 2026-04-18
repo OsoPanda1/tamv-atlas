@@ -1,6 +1,6 @@
 export function buildOrganizationIdentity(config, signingProfile) {
   const orcidUrl = `https://orcid.org/${config.pids.orcid}`;
-  const zenodoUrl = `https://zenodo.org/record/${config.pids.zenodoRecord}`;
+  const zenodoUrl = `https://zenodo.org/records/${config.pids.zenodoRecord}`;
 
   return {
     '@context': 'https://schema.org',
