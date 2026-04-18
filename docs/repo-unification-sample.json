@@ -1,0 +1,24 @@
+[
+  {
+    "name": "sample-one",
+    "default_branch": "main",
+    "private": false,
+    "archived": false,
+    "fork": false,
+    "pushed_at": "2026-01-01T00:00:00Z",
+    "clone_url": "https://github.com/OsoPanda1/sample-one.git",
+    "ssh_url": "git@github.com:OsoPanda1/sample-one.git",
+    "html_url": "https://github.com/OsoPanda1/sample-one"
+  },
+  {
+    "name": "tamv-digital-nexus",
+    "default_branch": "main",
+    "private": false,
+    "archived": false,
+    "fork": false,
+    "pushed_at": "2026-01-01T00:00:00Z",
+    "clone_url": "https://github.com/OsoPanda1/tamv-digital-nexus.git",
+    "ssh_url": "git@github.com:OsoPanda1/tamv-digital-nexus.git",
+    "html_url": "https://github.com/OsoPanda1/tamv-digital-nexus"
+  }
+]

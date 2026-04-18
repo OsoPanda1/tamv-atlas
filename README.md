@@ -159,3 +159,25 @@ npm run build
 - Conectar `backend/src/pqcHybrid.js` con librería ML-DSA productiva (cuando el stack objetivo y requisitos de compliance estén cerrados).
 - Publicar imagen de `backend/Dockerfile` en GHCR y activar pipeline CI/CD para `infra/k8s`.
 - Integrar reconciliación automática DOI/ORCID/ISNI en jobs programados.
+
+---
+
+## 7) Unificación de repositorios OsoPanda1 → TAMV Digital Nexus
+
+Para consolidar repos en este monorepo federado se incluye:
+
+- Script operacional: `scripts/unify_osopanda_repos.sh`
+- Playbook de ejecución y contingencias: `docs/REPO_UNIFICATION_PLAYBOOK.md`
+
+Flujo mínimo recomendado:
+
+```bash
+# 1) Discovery y manifiesto (sin importar todavía)
+./scripts/unify_osopanda_repos.sh --import-mode none --github-token "$GITHUB_TOKEN"
+
+# 2) Ensayo seguro del lote
+./scripts/unify_osopanda_repos.sh --import-mode squash --dry-run --max-repos 10
+
+# 3) Importación real con estado reanudable
+./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json
+```
