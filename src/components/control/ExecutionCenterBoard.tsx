@@ -80,9 +80,9 @@ export default function ExecutionCenterBoard() {
           <div className="flex items-center gap-2 text-sm font-semibold text-slate-200"><Filter className="w-4 h-4" /> Filtros de backlog</div>
 
           <div className="grid md:grid-cols-3 gap-3 text-xs">
-            <FilterSelect label="Dominio" value={domain} onChange={setDomain} options={["ALL", "feature", "technical", "security", "ux", "integration"]} />
-            <FilterSelect label="Prioridad" value={priority} onChange={setPriority} options={["ALL", "P0", "P1", "P2", "P3"]} />
-            <FilterSelect label="Estado" value={status} onChange={setStatus} options={["ALL", "TODO", "IN_PROGRESS", "BLOCKED", "DONE"]} />
+            <FilterSelect label="Dominio" value={domain} onChange={(v) => setDomain(v as typeof domain)} options={["ALL", "feature", "technical", "security", "ux", "integration"]} />
+            <FilterSelect label="Prioridad" value={priority} onChange={(v) => setPriority(v as typeof priority)} options={["ALL", "P0", "P1", "P2", "P3"]} />
+            <FilterSelect label="Estado" value={status} onChange={(v) => setStatus(v as typeof status)} options={["ALL", "TODO", "IN_PROGRESS", "BLOCKED", "DONE"]} />
           </div>
 
           <div className="max-h-[420px] overflow-auto space-y-3 pr-1">
