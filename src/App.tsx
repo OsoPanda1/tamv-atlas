@@ -2,6 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentType, ReactNode } from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes, useParams } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import AuthPage from "@/pages/Auth";
+import { Button } from "@/components/ui/button";
+import { LogIn, LogOut } from "lucide-react";
 import Index from "@/pages/Index";
 import WikiHome from "@/pages/WikiHome";
 import ModuleOverview from "@/pages/ModuleOverview";
@@ -143,6 +148,37 @@ function LegacyWikiRouter() {
   return <Navigate to={`/articulo/${article.slug}`} replace />;
 }
 
+function AuthHeaderControls() {
+  const { user, signOut, roles } = useAuth();
+  if (!user) {
+    return (
+      <Link
+        to="/auth"
+        className="inline-flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 normal-case tracking-normal"
+      >
+        <LogIn className="w-3 h-3" /> Iniciar sesión
+      </Link>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2 normal-case tracking-normal text-[10px]">
+      <span className="text-muted-foreground">{user.email}</span>
+      {roles[0] && (
+        <span className="px-1.5 py-0.5 rounded bg-primary/10 text-primary font-mono">
+          {roles[0]}
+        </span>
+      )}
+      <button
+        onClick={() => signOut()}
+        className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+        aria-label="Cerrar sesión"
+      >
+        <LogOut className="w-3 h-3" /> salir
+      </button>
+    </div>
+  );
+}
+
 const AppShell = ({ children }: { children: ReactNode }) => (
   <div className="min-h-screen bg-slate-950 text-slate-200">
     <header className="border-b border-blue-500/20 bg-slate-950/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[11px] tracking-[0.25em] uppercase">
@@ -151,8 +187,8 @@ const AppShell = ({ children }: { children: ReactNode }) => (
         <span className="text-slate-400">TAMV·ONLINE // Digital Civilization System v1.0</span>
       </div>
       <div className="flex items-center gap-4">
-        <span className="text-blue-400/80">Kernel: MD-X · ISNI · UTAMV · Isabella</span>
-        <span className="text-slate-500 hidden md:inline">DOI: 10.5281/ZENODO.19564367</span>
+        <span className="text-blue-400/80 hidden md:inline">Kernel: MD-X · ISNI · UTAMV · Isabella</span>
+        <AuthHeaderControls />
       </div>
     </header>
 
@@ -249,27 +285,38 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AppShell>
+    <AuthProvider>
+      <TooltipProvider>
+        <Sonner />
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/resumen" element={<WikiHome />} />
-            <Route path="/wiki" element={<DynamicWikiHome />} />
-            <Route path="/wiki/:sectionId" element={<WikiPage />} />
-            <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
-            <Route path="/stream" element={<CivilizationStreamPage />} />
-            <Route path="/auditoria" element={<Auditoria />} />
-            <Route path="/identidad-demo" element={<IdentidadDemo />} />
-            <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
-            <Route path="/modulo/:id" element={<ModuleOverview />} />
-            <Route path="/articulo/:slug" element={<ArticleRouter />} />
-            <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route
+              path="*"
+              element={
+                <AppShell>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/resumen" element={<WikiHome />} />
+                    <Route path="/wiki" element={<DynamicWikiHome />} />
+                    <Route path="/wiki/:sectionId" element={<WikiPage />} />
+                    <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
+                    <Route path="/stream" element={<CivilizationStreamPage />} />
+                    <Route path="/auditoria" element={<Auditoria />} />
+                    <Route path="/identidad-demo" element={<IdentidadDemo />} />
+                    <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
+                    <Route path="/modulo/:id" element={<ModuleOverview />} />
+                    <Route path="/articulo/:slug" element={<ArticleRouter />} />
+                    <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppShell>
+              }
+            />
           </Routes>
-        </AppShell>
-      </BrowserRouter>
-    </TooltipProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

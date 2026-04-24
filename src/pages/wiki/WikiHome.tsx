@@ -1,88 +1,119 @@
+import { useState } from "react";
+import { useWikiArticles, useWikiModules } from "@/hooks/useWikiArticles";
+import { ArticleCard } from "@/components/wiki/ArticleCard";
+import { PaginationBar } from "@/components/wiki/PaginationBar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, X } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ChevronRight, FolderTree, Layers, Network } from "lucide-react";
-import { WIKI_SECTIONS } from "@/data/wikiSchema";
-import { wikiStructure } from "@/data/wikiStructure";
 
-const canonicalModules = wikiStructure.filter((section) => {
-  const code = Number.parseInt(section.title, 10);
-  return Number.isFinite(code) && code >= 0 && code <= 11;
-});
+export default function DynamicWikiHome() {
+  const { modules, loading: modulesLoading } = useWikiModules();
+  const [search, setSearch] = useState("");
+  const [moduleId, setModuleId] = useState<string | undefined>(undefined);
+  const [page, setPage] = useState(1);
 
-export default function WikiHome() {
-  const sectionsWithChildren = WIKI_SECTIONS.filter((section) => section.children?.length).length;
+  const { articles, total, totalPages, loading } = useWikiArticles({
+    moduleId,
+    search,
+    page,
+    pageSize: 12,
+  });
+
+  const handleSearch = (value: string) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  const handleModule = (id: string | undefined) => {
+    setModuleId(id);
+    setPage(1);
+  };
 
   return (
-    <div className="min-h-full bg-background text-foreground">
-      <div className="mx-auto max-w-6xl px-6 py-10 space-y-8">
-        <header className="rounded-2xl border border-border bg-gradient-to-br from-primary/10 to-card p-6 md:p-8">
-          <p className="text-xs font-mono uppercase tracking-[0.25em] text-primary">TAMV Wiki Engine</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight">Wiki TAMV Atlas · Estructura Generativa</h1>
-          <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
-            Mapa maestro dinámico para producir páginas reales desde el blueprint civilizatorio:
-            capítulos, módulos, federaciones, roles, blindaje legal y roadmap.
-          </p>
+    <div className="px-6 py-8 md:px-8 lg:px-10 space-y-6">
+      <header className="rounded-xl border border-border bg-card/40 p-5">
+        <p className="text-[11px] font-mono uppercase tracking-[0.18em] text-primary/80">
+          WIKI-GEN · Atlas TAMV
+        </p>
+        <h1 className="text-2xl font-semibold text-foreground mt-1">Wiki dinámica TAMV</h1>
+        <p className="text-sm text-muted-foreground mt-2">
+          {total} artículos publicados a través de {modules.length} módulos. Búsqueda full-text en
+          español + filtros por módulo y rol.
+        </p>
 
-          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="rounded-lg border border-border bg-card/80 p-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground"><FolderTree className="w-4 h-4" /> Secciones</div>
-              <div className="text-xl font-semibold mt-1">{WIKI_SECTIONS.length}</div>
-            </div>
-            <div className="rounded-lg border border-border bg-card/80 p-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground"><Layers className="w-4 h-4" /> Secciones con subpáginas</div>
-              <div className="text-xl font-semibold mt-1">{sectionsWithChildren}</div>
-            </div>
-            <div className="rounded-lg border border-border bg-card/80 p-3">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground"><Network className="w-4 h-4" /> Federaciones conectadas</div>
-              <div className="text-xl font-semibold mt-1">7</div>
-            </div>
-          </div>
-        </header>
-
-        <section className="rounded-xl border border-border bg-card/40 p-5">
-          <h2 className="text-lg font-semibold">Índice canónico módulos 0–11</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Primera versión operativa de la malla académica con slugs estables para navegación e indexación.
-          </p>
-          <div className="mt-4 grid gap-2 md:grid-cols-2">
-            {canonicalModules.map((section) => (
-              <Link
-                key={section.id}
-                to={`/wiki/${section.id}`}
-                className="rounded-lg border border-border px-3 py-2 text-sm hover:border-primary/60 hover:text-primary transition-colors"
+        <div className="mt-4 flex flex-col md:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={search}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder='Buscar (ej: "soberanía", "DID", "VC")'
+              className="pl-9 pr-9 bg-background"
+            />
+            {search && (
+              <button
+                onClick={() => handleSearch("")}
+                aria-label="Limpiar búsqueda"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
-                <span className="font-mono text-xs text-muted-foreground mr-2">{section.icon}</span>
-                {section.title}
-              </Link>
-            ))}
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
-        </section>
+        </div>
 
-        <section className="grid gap-4 md:grid-cols-2">
-          {WIKI_SECTIONS.map((section) => (
-            <Link
-              key={section.id}
-              to={`/wiki/${section.id}`}
-              className="group rounded-xl border border-border bg-card/40 p-4 hover:border-primary/60 transition-all"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors">
-                    {section.title}
-                  </h2>
-                  <p className="mt-1 text-sm text-muted-foreground">{section.description}</p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1" />
-              </div>
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          <Button
+            variant={moduleId === undefined ? "default" : "outline"}
+            size="sm"
+            onClick={() => handleModule(undefined)}
+          >
+            Todos
+          </Button>
+          {modulesLoading
+            ? Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-8 w-24" />)
+            : modules.map((m) => (
+                <Button
+                  key={m.id}
+                  variant={moduleId === m.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => handleModule(m.id)}
+                  title={m.description ?? ""}
+                >
+                  {m.title.replace(/^Módulo [^·]+· /, "")}
+                </Button>
+              ))}
+        </div>
+      </header>
 
-              <div className="mt-3 text-xs text-muted-foreground">
-                {section.children?.length
-                  ? `Incluye ${section.children.length} subpáginas auto-generables.`
-                  : "Sección principal lista para volcado documental."}
-              </div>
-            </Link>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-40 w-full" />
           ))}
-        </section>
-      </div>
+        </div>
+      ) : articles.length === 0 ? (
+        <div className="rounded-xl border border-border bg-card/40 p-10 text-center">
+          <p className="text-muted-foreground">
+            No hay artículos para esta combinación de filtros.
+          </p>
+          <Link to="/wiki" className="text-primary hover:underline text-sm mt-2 inline-block">
+            Limpiar filtros
+          </Link>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {articles.map((a) => {
+              const mod = modules.find((m) => m.id === a.module_id);
+              return <ArticleCard key={a.id} article={a} moduleSlug={mod?.slug} />;
+            })}
+          </div>
+          <PaginationBar page={page} totalPages={totalPages} onChange={setPage} />
+        </>
+      )}
     </div>
   );
 }
