@@ -285,27 +285,38 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <AppShell>
+    <AuthProvider>
+      <TooltipProvider>
+        <Sonner />
+        <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/resumen" element={<WikiHome />} />
-            <Route path="/wiki" element={<DynamicWikiHome />} />
-            <Route path="/wiki/:sectionId" element={<WikiPage />} />
-            <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
-            <Route path="/stream" element={<CivilizationStreamPage />} />
-            <Route path="/auditoria" element={<Auditoria />} />
-            <Route path="/identidad-demo" element={<IdentidadDemo />} />
-            <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
-            <Route path="/modulo/:id" element={<ModuleOverview />} />
-            <Route path="/articulo/:slug" element={<ArticleRouter />} />
-            <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/auth" element={<AuthPage />} />
+            <Route
+              path="*"
+              element={
+                <AppShell>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/resumen" element={<WikiHome />} />
+                    <Route path="/wiki" element={<DynamicWikiHome />} />
+                    <Route path="/wiki/:sectionId" element={<WikiPage />} />
+                    <Route path="/wiki/:sectionId/:slug" element={<WikiPage />} />
+                    <Route path="/stream" element={<CivilizationStreamPage />} />
+                    <Route path="/auditoria" element={<Auditoria />} />
+                    <Route path="/identidad-demo" element={<IdentidadDemo />} />
+                    <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
+                    <Route path="/modulo/:id" element={<ModuleOverview />} />
+                    <Route path="/articulo/:slug" element={<ArticleRouter />} />
+                    <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </AppShell>
+              }
+            />
           </Routes>
-        </AppShell>
-      </BrowserRouter>
-    </TooltipProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
