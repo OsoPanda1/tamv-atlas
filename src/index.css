@@ -63,6 +63,8 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Inter', sans-serif;
+    background-image: radial-gradient(circle at top, hsl(199 89% 48% / 0.08), transparent 45%);
+    min-height: 100vh;
   }
 
   code, pre, .font-mono {
@@ -93,7 +95,12 @@
     background: hsl(222 47% 5%);
   }
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(222 30% 20%);
+    background: linear-gradient(180deg, hsl(199 89% 48% / 0.45), hsl(222 30% 20%));
     border-radius: 3px;
+  }
+  .focus-visible-neon:focus-visible {
+    outline: 2px solid hsl(199 89% 48% / 0.7);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px hsl(199 89% 48% / 0.2);
   }
 }
