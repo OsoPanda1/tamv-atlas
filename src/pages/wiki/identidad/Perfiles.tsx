@@ -10,7 +10,7 @@ export default function Perfiles() {
       <WikiTable
         headers={["Tipo", "Ejemplo", "Identificador", "Gobernanza"]}
         rows={[
-          ["Persona", "Edwin O. Castillo Trejo", "ORCID / did:tamv:person", "Auto-soberana"],
+          ["Persona", "Titular del ORCID 0009-0008-5050-1539", "ORCID / did:tamv:person", "Auto-soberana"],
           ["Organización", "TAMV Online Network", "ISNI / ROR / did:tamv:org", "Estatuto TAMV"],
           ["Territorio", "Real del Monte", "did:tamv:territory", "Nodo RDM-TOS"],
           ["Proyecto", "UTAMV Campus", "DOI / did:tamv:project", "Federación GOV"],

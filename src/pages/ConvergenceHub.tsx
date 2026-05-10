@@ -18,7 +18,7 @@ type HubPayload = {
 };
 
 const EXTERNAL_LINKS = [
-  { label: "ORCID · Edwin O. Castillo Trejo", href: "https://orcid.org/0009-0008-5050-1539", group: "identidad" },
+  { label: "ORCID · Perfil verificado", href: "https://orcid.org/0009-0008-5050-1539", group: "identidad" },
   { label: "OpenAIRE · Búsqueda TAMV", href: "https://explore.openaire.eu/search/result?pid=10.5281/zenodo.20071455", group: "ciencia abierta" },
   { label: "Zenodo · Comunidad TAMV", href: "https://zenodo.org/communities/tamvonline-oficial/", group: "ciencia abierta" },
   { label: "GitHub · OsoPanda1", href: "https://github.com/OsoPanda1", group: "código" },
