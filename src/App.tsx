@@ -15,6 +15,7 @@ import CivilizationStreamPage from "@/pages/CivilizationStreamPage";
 import Auditoria from "@/pages/Auditoria";
 import IdentidadDemo from "@/pages/IdentidadDemo";
 import InvestigacionNodo001 from "@/pages/InvestigacionNodo001";
+import WikiBridge from "@/pages/WikiBridge";
 import DynamicWikiHome from "@/pages/wiki/WikiHome";
 import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
@@ -305,6 +306,8 @@ const App = () => (
                     <Route path="/auditoria" element={<Auditoria />} />
                     <Route path="/identidad-demo" element={<IdentidadDemo />} />
                     <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
+                  <Route path="/wiki-bridge" element={<WikiBridge />} />
+                  <Route path="/groupsio/wiki/:slug" element={<WikiBridge />} />
                     <Route path="/modulo/:id" element={<ModuleOverview />} />
                     <Route path="/articulo/:slug" element={<ArticleRouter />} />
                     <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />

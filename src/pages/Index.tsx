@@ -4,6 +4,7 @@ import * as THREE from "three";
 import MatrixRain from "@/components/MatrixRain";
 import DNAPulse from "@/components/DNAPulse";
 import HexagonalPipeline from "@/components/HexagonalPipeline";
+import ConvergenceHub from "@/components/atlas/ConvergenceHub";
 
 /* ─────── FEDERATION & NODE DATA ─────── */
 const FEDERATIONS = [
@@ -333,6 +334,9 @@ const Index = () => {
             </div>
           </div>
 
+          {/* Convergence Hub + Pipeline + DNA */}
+          <ConvergenceHub />
+
           {/* Hexagonal Pipeline + DNA */}
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2 border border-blue-500/15 rounded-lg bg-slate-900/30 p-2 h-[220px] relative overflow-hidden">
@@ -449,7 +453,7 @@ const Index = () => {
               { href: "https://github.com/OsoPanda1", label: "GitHub" },
               { href: "https://tamvonline-oficial.odoo.com", label: "Odoo Portal" },
               { href: "https://www.avixa.org", label: "AVIXA" },
-              { href: "https://groups.io/g/TAMVONLINE-ECOSISTEM-LATAM", label: "Groups.io Wiki" },
+              { href: "/wiki-bridge?source=groupsio&target=/resumen", label: "Groups.io Wiki" },
             ].map(link => (
               <a key={link.label} href={link.href} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[9px] text-slate-400 hover:text-blue-300 transition-colors">
                 <span className="w-1 h-1 rounded-full bg-blue-500/40" />
