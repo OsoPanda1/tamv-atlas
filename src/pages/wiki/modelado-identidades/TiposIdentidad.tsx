@@ -10,7 +10,7 @@ export default function TiposIdentidad() {
       <WikiTable
         headers={["Tipo", "Ejemplo", "PID externo", "DID TAMV", "Gobernanza"]}
         rows={[
-          ["Person", "Edwin O. Castillo Trejo", "ORCID", "did:tamv:person:*", "Auto-soberana"],
+          ["Person", "Titular ORCID 0009-0008-5050-1539", "ORCID", "did:tamv:person:*", "Auto-soberana"],
           ["Organization", "TAMV Online Network", "ISNI / ROR", "did:tamv:org:*", "Estatuto TAMV"],
           ["Territory", "Real del Monte", "—", "did:tamv:territory:*", "Nodo RDM-TOS"],
           ["Project", "UTAMV Campus", "DOI", "did:tamv:project:*", "Federación GOV"],

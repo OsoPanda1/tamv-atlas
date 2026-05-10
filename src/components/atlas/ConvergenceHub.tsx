@@ -53,7 +53,7 @@ export default function ConvergenceHub() {
     const cards: IdentityCard[] = [
       { label: "ORCID", value: "0009-0008-5050-1539", href: "https://orcid.org/0009-0008-5050-1539", verified: true },
       { label: "ISNI", value: "TAMV-ONLINE-0001", href: "https://isni.org", verified: true },
-      { label: "Bio", value: "Edwin O. Castillo Trejo · Arquitecto autodidacta y fundador TAMV", href: "/wiki/modulo-cero/biografia-ceo", verified: true },
+      { label: "Bio", value: "Titular ORCID 0009-0008-5050-1539 · Perfil de identidad soberana", href: "/wiki/modulo-cero/biografia-ceo", verified: true },
       { label: "Works", value: "Resumen de trabajos indexados ORCID/OpenAIRE", href: "/wiki/modelado-identidades/integracion-pids", verified: true },
     ];
     localStorage.setItem(ORCID_CACHE_KEY, JSON.stringify(cards));
