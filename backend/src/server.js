@@ -4,6 +4,7 @@ import { config } from './config.js';
 import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
 import { loadPidStatus } from './pidConnectors.js';
+import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
@@ -80,6 +81,31 @@ const server = createServer(async (req, res) => {
     } catch (error) {
       return writeJson(res, 502, {
         error: error instanceof Error ? error.message : 'PID upstream error',
+      });
+    }
+  }
+
+
+  if (req.method === 'POST' && url.pathname === '/v1/fusion/plan') {
+    try {
+      const body = await parseJsonBody(req);
+      const plan = await discoverFusionPlan(body.owner ?? 'OsoPanda1');
+      return writeJson(res, 200, plan);
+    } catch (error) {
+      return writeJson(res, 502, {
+        error: error instanceof Error ? error.message : 'Fusion plan failed',
+      });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/fusion/run') {
+    try {
+      const body = await parseJsonBody(req);
+      const result = await executeFusion(body.owner ?? 'OsoPanda1');
+      return writeJson(res, 200, result);
+    } catch (error) {
+      return writeJson(res, 502, {
+        error: error instanceof Error ? error.message : 'Fusion execution failed',
       });
     }
   }
