@@ -89,3 +89,35 @@ export async function fetchResearchDossier(): Promise<ResearchDossierResponse> {
 
   return response.json() as Promise<ResearchDossierResponse>;
 }
+
+export interface RepoFusionPlan {
+  generated_at_utc: string;
+  owner: string;
+  repo_count: number;
+  repos: Array<{
+    name: string;
+    default_branch: string;
+    html_url: string;
+    import_prefix: string;
+  }>;
+}
+
+export async function requestFusionPlan(owner = 'OsoPanda1'): Promise<RepoFusionPlan> {
+  const response = await fetch(`${backendBaseUrl}/v1/fusion/plan`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ owner }),
+  });
+  if (!response.ok) throw new Error(`Fusion plan failed (${response.status})`);
+  return response.json() as Promise<RepoFusionPlan>;
+}
+
+export async function runRepoFusion(owner = 'OsoPanda1') {
+  const response = await fetch(`${backendBaseUrl}/v1/fusion/run`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ owner }),
+  });
+  if (!response.ok) throw new Error(`Fusion run failed (${response.status})`);
+  return response.json();
+}

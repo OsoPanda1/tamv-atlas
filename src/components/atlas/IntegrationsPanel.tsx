@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Github, RefreshCw, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import { requestFusionPlan, runRepoFusion } from "@/lib/tamvApi";
 
 interface RepoRow {
   full_name: string;
@@ -22,6 +23,8 @@ export default function IntegrationsPanel() {
   const [loadingRepos, setLoadingRepos] = useState(true);
   const [syncing, setSyncing] = useState(false);
   const [orcidLoading, setOrcidLoading] = useState(false);
+  const [fusionPlanning, setFusionPlanning] = useState(false);
+  const [fusionRunning, setFusionRunning] = useState(false);
 
   const loadRepos = async () => {
     setLoadingRepos(true);
@@ -48,6 +51,32 @@ export default function IntegrationsPanel() {
     if (error) return toast.error(`Error: ${error.message}`);
     toast.success(`Sincronizados ${(data as { count?: number })?.count ?? 0} repos OsoPanda1`);
     loadRepos();
+  };
+
+
+  const planAndShowFusion = async () => {
+    setFusionPlanning(true);
+    try {
+      const plan = await requestFusionPlan('OsoPanda1');
+      toast.success(`Plan detectado: ${plan.repo_count} repos para federar`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo construir plan de fusión');
+    } finally {
+      setFusionPlanning(false);
+    }
+  };
+
+  const runFusionNow = async () => {
+    if (!isAdmin) return toast.error('Se requiere rol admin para ejecutar fusión');
+    setFusionRunning(true);
+    try {
+      await runRepoFusion('OsoPanda1');
+      toast.success('Fusión ejecutada. Revisa manifiesto y cambios en git.');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'No se pudo ejecutar la fusión');
+    } finally {
+      setFusionRunning(false);
+    }
   };
 
   const triggerOrcidFetch = async () => {
@@ -86,6 +115,22 @@ export default function IntegrationsPanel() {
           >
             <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
             {syncing ? "Sincronizando…" : "Sync GitHub"}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={planAndShowFusion}
+            disabled={fusionPlanning}
+          >
+            {fusionPlanning ? 'Planificando…' : 'Plan Fusión'}
+          </Button>
+          <Button
+            size="sm"
+            onClick={runFusionNow}
+            disabled={fusionRunning || !isAdmin}
+            title={isAdmin ? 'Clonar/fusionar repos en este proyecto' : 'Requiere rol admin'}
+          >
+            {fusionRunning ? 'Fusionando…' : 'Ejecutar Fusión'}
           </Button>
         </div>
       </div>

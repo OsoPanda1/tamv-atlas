@@ -1,183 +1,58 @@
-# TAMV Digital Nexus · Atlas + Backend de Identidad Soberana
+# TAMV Atlas — Avance Real
 
-Repositorio unificado para el núcleo documental/visual de TAMV y una implementación funcional de backend orientada a producción con despliegue Kubernetes.
+TAMV Atlas es una base funcional para consolidar el ecosistema TAMV MD‑X4 en una experiencia operable para despliegue en Lovable:
 
-## Estado actual
+- **Frontend Atlas/Wiki** en React + Vite con rutas de módulos civilizatorios.
+- **Capa federada inicial (7+ capas conceptual-operables)** para identidad, protocolos, memoria, guardianía, XR y economía.
+- **Contratos tipados y motor de integración** para trazabilidad (`MSR`) y narrativa (`BookPI`) de eventos críticos.
 
-- Frontend Atlas (Vite + React) operativo.
-- API backend funcional para identidad institucional, DID y firma/verificación criptográfica.
-- Manifiestos de Kubernetes para producción (deployment, service, ingress, HPA, network policy, PDB).
+## Avance implementado en este corte
 
----
+Se añadió un núcleo funcional de orquestación (`AtlasKernel`) que permite:
 
-## 1) Protocolo TAMV-RG-2026 (Referencia institucional)
+1. Crear usuarios y registrar su alta en memoria (`identity.user.created`).
+2. Asignar membresías con trazabilidad (`economy.membership.assigned`).
+3. Ejecutar protocolos con lógica quant-inspired de “evaluar rutas y colapsar decisión”.
+4. Emitir señales de guardianía cuando el riesgo ético supera el umbral.
+5. Crear DreamSpaces XR persistentes mínimos con permisos base.
+6. Registrar movimientos de economía interna en ledger con eventos auditables.
 
-Este repo integra el **Protocolo de Identidad y Posicionamiento Institucional (TAMV-RG-2026)** para fortalecer indexación en ResearchGate, Zenodo y grafos académicos:
+## Estructura añadida
 
-### División recomendada (ResearchGate)
+- `src/lib/federated/types.ts`: contratos de dominio federado.
+- `src/lib/federated/atlasKernel.ts`: núcleo de integración funcional.
+- `src/test/federated/atlasKernel.test.ts`: pruebas unitarias del flujo integral.
 
-Estrategia "Umbrella": **Research and Development (R&D)** para agrupar:
-- Arquitectura distribuida y sistemas autónomos.
-- Soberanía digital e identidad autosoberana.
-- Infraestructura educativa XR/UTAMV.
-
-### Tríada de PIDs
-
-- **DOI (Zenodo):** base de citación permanente (prefijo 10.5281).
-- **ORCID:** enlace entre autoría e institución.
-- **ISNI:** diferenciación institucional soberana.
-
-### Mapa estructural unificado
-
-1. Módulo 0 (humanismo en código + génesis).
-2. Fundamentos ISNI / SSI / DID `did:tamv`.
-3. Arquitectura MD-X4 / MD-X5.
-4. Gobernanza de 7 federaciones.
-
-### Seguridad PQC híbrida
-
-## 2) API backend funcional real (Kernel Identity API)
-
-Ruta: `backend/src/server.js`
-
-### Endpoints disponibles
-
-- `GET /healthz` → salud del servicio.
-- `GET /v1/identity/org` → JSON-LD institucional (ISNI/ORCID/Zenodo).
-- `GET /v1/identity/did/:suffix` → DID Document generado dinámicamente.
-- `GET /v1/pids/status` → validación en tiempo real contra ORCID, Zenodo e ISNI.
-- `POST /v1/signature/sign` → firma un payload federado.
-- `POST /v1/signature/verify` → valida firma del payload.
-
-### Seguridad criptográfica (híbrida)
-
-La implementación runtime usa **Ed25519 (Node.js core)** para operación inmediata y agrega metadatos de ruta de migración a **ML-DSA (Dilithium)** según FIPS 204/NIST.
-
-> Nota técnica: en este repo la capa PQC se deja preparada en gobernanza y contrato API para una migración controlada sin downtime.
-
-### Variables de entorno
-
-Ejemplo en `backend/.env.example`:
-
-- `TAMV_ISNI`
-- `TAMV_ORCID`
-- `TAMV_ZENODO_RECORD`
-- `TAMV_SIGNING_SEED`
-- `TAMV_DID_SERVICE_ENDPOINT`
-
-### Ejecutar API local
-
-```bash
-npm run api:start
-```
-
-Para que la wiki consulte la API en desarrollo desde otro host/puerto:
-
-```bash
-VITE_IDENTITY_API_BASE_URL=http://localhost:8080 npm run dev
-```
-
-### Probar API
-
-```bash
-npm run api:test
-```
-
----
-
-## 3) Kubernetes para producción y despliegue
-
-Ruta: `infra/k8s/`
-
-### Manifiestos incluidos
-
-- `namespace.yaml`
-- `configmap.yaml`
-- `secret.example.yaml`
-- `deployment.yaml`
-- `service.yaml`
-- `ingress.yaml`
-- `hpa.yaml`
-- `networkpolicy.yaml`
-- `pdb.yaml`
-
-### Flujo sugerido
-
-1. Crear namespace y configuración:
-```bash
-kubectl apply -f infra/k8s/namespace.yaml
-kubectl apply -f infra/k8s/configmap.yaml
-kubectl apply -f infra/k8s/secret.example.yaml
-```
-2. Desplegar API:
-```bash
-kubectl apply -f infra/k8s/deployment.yaml
-kubectl apply -f infra/k8s/service.yaml
-kubectl apply -f infra/k8s/ingress.yaml
-kubectl apply -f infra/k8s/hpa.yaml
-kubectl apply -f infra/k8s/networkpolicy.yaml
-kubectl apply -f infra/k8s/pdb.yaml
-```
-
----
-
-## 4) ANEXO TÉCNICO · Núcleo híbrido PQC + Identidad programable
-
-### 4.1 Firma soberana
-
-Se implementa firma operativa de bloques (`/v1/signature/sign`) y verificación (`/v1/signature/verify`) con perfil criptográfico híbrido listo para evolución PQC.
-
-### 4.2 JSON-LD + ISNI
-
-`/v1/identity/org` publica esquema semántico compatible con `schema.org`, integrando ISNI, ORCID y Zenodo para indexación académica y machine readability.
-
-### 4.3 DID `did:tamv`
-
-`/v1/identity/did/:suffix` genera DID Documents con:
-- `verificationMethod`
-- `serviceEndpoint` de resolución ISNI
-- controlador autosoberano por namespace federado
-
-### 4.4 Orquestación y antifragilidad
-
-La lógica de firma, trazabilidad y validación desacopla identidad institucional del frontend y permite despliegues federados multi-nodo con controles de disponibilidad y seguridad de red en Kubernetes.
-
-Backend standalone:
-
-## 5) Build frontend
+## Cómo correr en local
 
 ```bash
 npm install
 npm run dev
+```
+
+## Checks de calidad
+
+```bash
+npm run test
 npm run build
 ```
 
+## Despliegue en Lovable
+
+1. Conecta el repositorio en Lovable.
+2. Define variables de entorno (si aplica backend externo):
+   - `VITE_TAMV_BACKEND_URL`
+3. Usa comando de build:
+   - `npm run build`
+4. Publica el artefacto de Vite (`dist/`).
+
+## Siguiente iteración recomendada
+
+- Exponer `AtlasKernel` como API real (`/auth`, `/users`, `/protocols`, `/economy`, `/xr`) en backend.
+- Integrar persistencia (Postgres/Supabase) en vez de memoria en proceso.
+- Acoplar stream XR en tiempo real (WS/SSE) para render declarativo de eventos Guardian.
+- Completar videollamadas/streaming social con señalización WebRTC.
+
 ---
 
-## 6) Próximo paso recomendado
-
-- Conectar `backend/src/pqcHybrid.js` con librería ML-DSA productiva (cuando el stack objetivo y requisitos de compliance estén cerrados).
-- Publicar imagen de `backend/Dockerfile` en GHCR y activar pipeline CI/CD para `infra/k8s`.
-- Integrar reconciliación automática DOI/ORCID/ISNI en jobs programados.
-
----
-
-## 7) Unificación de repositorios OsoPanda1 → TAMV Digital Nexus
-
-Para consolidar repos en este monorepo federado se incluye:
-
-- Script operacional: `scripts/unify_osopanda_repos.sh`
-- Playbook de ejecución y contingencias: `docs/REPO_UNIFICATION_PLAYBOOK.md`
-
-Flujo mínimo recomendado:
-
-```bash
-# 1) Discovery y manifiesto (sin importar todavía)
-./scripts/unify_osopanda_repos.sh --import-mode none --github-token "$GITHUB_TOKEN"
-
-# 2) Ensayo seguro del lote
-./scripts/unify_osopanda_repos.sh --import-mode squash --dry-run --max-repos 10
-
-# 3) Importación real con estado reanudable
-./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json
-```
+Este README refleja el **avance real actual**: una base técnica funcional y testeada para seguir ensamblando TAMV como plataforma civilizatoria XR‑nativa.
