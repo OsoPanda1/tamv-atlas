@@ -4,26 +4,26 @@ export default function BiografiaCeo() {
   return (
     <div>
       <WikiBreadcrumb section="modulo-cero" page="biografia-ceo" />
-      <WikiH1>Biografía del CEO</WikiH1>
+      <WikiH1>Biografía de liderazgo TAMV</WikiH1>
 
       <WikiCard accent="cyan">
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="w-14 h-14 rounded-lg bg-primary/10 border border-primary/30 flex items-center justify-center text-xl font-bold text-primary font-mono shrink-0">AV</div>
           <div>
-            <div className="font-semibold text-foreground">Edwin Oswaldo Castillo Trejo</div>
-            <div className="text-primary font-mono text-xs mb-1">"Anubis Villaseñor"</div>
-            <div className="text-xs text-muted-foreground">Pachuca, Hidalgo, 1983 · ORCID: 0009-0008-5050-1539</div>
+            <div className="font-semibold text-foreground">Titular ORCID 0009-0008-5050-1539</div>
+            <div className="text-primary font-mono text-xs mb-1">"Perfil soberano TAMV"</div>
+            <div className="text-xs text-muted-foreground">Perfil con trazabilidad pública · ORCID: 0009-0008-5050-1539</div>
           </div>
         </div>
       </WikiCard>
 
       <WikiP>
-        Edwin Oswaldo Castillo Trejo es arquitecto de ecosistemas digitales, desarrollador independiente y fundador de TAMV Online Network y TAMV Enterprise. Operando bajo el seudónimo profesional Anubis Villaseñor, es autor intelectual de la arquitectura MD‑X4 / MD‑X4 Quantum, del Modelo de las 7 Federaciones, de la IA ética Isabella Villaseñor, del ledger BookPI y de más de 35 subsistemas que conforman el ecosistema TAMV.
+        Titular ORCID 0009-0008-5050-1539 es arquitecto de ecosistemas digitales, desarrollador independiente y fundador de TAMV Online Network y TAMV Enterprise. Operando bajo el seudónimo profesional Anubis Villaseñor, es autor intelectual de la arquitectura MD‑X4 / MD‑X4 Quantum, del Modelo de las 7 Federaciones, de la IA ética Isabella Villaseñor, del ledger BookPI y de más de 35 subsistemas que conforman el ecosistema TAMV.
       </WikiP>
 
       <WikiH2>Génesis de la resistencia</WikiH2>
       <WikiP>
-        La praxis tecnológica de Castillo Trejo no nace del privilegio corporativo, sino de una respuesta defensiva ante la violencia sistémica en el entorno digital. Tras enfrentar robo de identidad, hostigamiento digital y violencia simbólica, convierte esas experiencias en el eje de una arquitectura antifrágil centrada en la protección de la dignidad humana.
+        La praxis tecnológica del liderazgo TAMV no nace del privilegio corporativo, sino de una respuesta defensiva ante violencia sistémica en el entorno digital. Tras enfrentar robo de identidad, hostigamiento digital y violencia simbólica, convierte esas experiencias en el eje de una arquitectura antifrágil centrada en la protección de la dignidad humana.
       </WikiP>
 
       <WikiCard title="Arquitectura Anubis — Filosofía de referencia" accent="orange">
@@ -32,7 +32,7 @@ export default function BiografiaCeo() {
 
       <WikiH2>Trayectoria</WikiH2>
       <WikiP>
-        CEO y Arquitecto Responsable de TAMV Enterprise/TAMV Online Network desde 2020. Ha liderado más de 21,600 horas de desarrollo independiente, cristalizadas en un ecosistema civilizatorio que integra IA soberana, metaverso, blockchain ético y sistema operativo territorial. Su trayectoria abarca desde la artesanía y el trabajo manual hasta la arquitectura de software, IA aplicada y sistemas territoriales soberanos.
+        Liderazgo técnico y estratégico de TAMV Enterprise/TAMV Online Network desde 2020. Ha liderado más de 21,600 horas de desarrollo independiente, cristalizadas en un ecosistema civilizatorio que integra IA soberana, metaverso, blockchain ético y sistema operativo territorial. Su trayectoria abarca desde la artesanía y el trabajo manual hasta la arquitectura de software, IA aplicada y sistemas territoriales soberanos.
       </WikiP>
 
       <WikiH2>Reconocimientos y registros</WikiH2>

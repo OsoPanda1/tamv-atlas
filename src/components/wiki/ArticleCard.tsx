@@ -17,6 +17,9 @@ const accessVariant: Record<string, "default" | "secondary" | "destructive" | "o
   gobierno: "default",
   admin: "destructive",
 };
+const sanitizeIdentityText = (value: string) => value
+  .replace(/Pablo\s+Eliseo\s+Becerra\s+Garc[ií]a/gi, "Titular ORCID 0009-0008-5050-1539")
+  .replace(/biograf[ií]a\s+del\s+ceo/gi, "Biografía de liderazgo TAMV");
 
 export function ArticleCard({ article, moduleSlug }: ArticleCardProps) {
   const href = moduleSlug
@@ -30,12 +33,12 @@ export function ArticleCard({ article, moduleSlug }: ArticleCardProps) {
         <CardHeader>
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base text-foreground group-hover:text-primary transition-colors line-clamp-2">
-              {article.title}
+              {sanitizeIdentityText(article.title)}
             </CardTitle>
             {restricted && <Lock className="w-4 h-4 text-muted-foreground shrink-0" aria-hidden />}
           </div>
           <CardDescription className="line-clamp-2 text-muted-foreground">
-            {article.summary}
+            {sanitizeIdentityText(article.summary)}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-1.5 items-center">
