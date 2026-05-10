@@ -1,65 +1,127 @@
-export function buildOrganizationIdentity(config, signingProfile) {
-  const orcidUrl = `https://orcid.org/${config.pids.orcid}`;
-  const zenodoUrl = `https://zenodo.org/records/${config.pids.zenodoRecord}`;
+const SCHEMA_CONTEXT = 'https://schema.org';
+const DEFAULT_DID_SUFFIX = '7f:001';
+
+const safe = (value, fallback = '') =>
+  value ?? fallback;
+
+const normalizeUrl = (base, value) =>
+  value ? `${base.replace(/\/$/, '')}/${value}` : null;
+
+const compact = (arr) => arr.filter(Boolean);
+
+const property = (name, value) => ({
+  '@type': 'PropertyValue',
+  name,
+  value,
+});
+
+const buildFounderIdentity = ({ founderName, founderAlias }, pids = {}) => ({
+  '@type': 'Person',
+  name: safe(founderName),
+  alternateName: safe(founderAlias),
+  sameAs: compact([
+    normalizeUrl('https://orcid.org', pids.orcid),
+    normalizeUrl('https://zenodo.org/records', pids.zenodoRecord),
+  ]),
+});
+
+const buildSignatureProperties = (signingProfile = {}) => [
+  property('signature.profile', safe(signingProfile.activeAlgorithm)),
+  property('signature.pqc.plan', safe(signingProfile.mlDsaProfile)),
+  property(
+    'signature.pqc.enabled',
+    Boolean(signingProfile.mlDsaEnabled),
+  ),
+];
+
+export function buildOrganizationIdentity(
+  config = {},
+  signingProfile = {},
+) {
+  const {
+    organization = {},
+    pids = {},
+  } = config;
 
   return {
-    '@context': 'https://schema.org',
+    '@context': SCHEMA_CONTEXT,
     '@type': 'Organization',
+
     identifier: {
       '@type': 'PropertyValue',
       propertyID: 'ISNI',
-      value: config.pids.isni,
+      value: safe(pids.isni),
     },
-    name: config.organization.name,
-    founder: {
-      '@type': 'Person',
-      name: config.organization.founderName,
-      alternateName: config.organization.founderAlias,
-      sameAs: [orcidUrl, zenodoUrl],
-    },
-    description: config.organization.description,
+
+    name: safe(organization.name),
+    description: safe(organization.description),
+
+    founder: buildFounderIdentity(organization, pids),
+
     knowsAbout: [
       'Quantum-Resistant Cryptography',
       'Distributed Identity',
       'System Architecture',
     ],
+
     additionalProperty: [
-      {
-        '@type': 'PropertyValue',
-        name: 'division.strategy',
-        value: 'Research and Development (R&D)',
-      },
-      {
-        '@type': 'PropertyValue',
-        name: 'signature.profile',
-        value: signingProfile.activeAlgorithm,
-      },
-      {
-        '@type': 'PropertyValue',
-        name: 'signature.pqc.plan',
-        value: signingProfile.mlDsaProfile,
-      },
+      property(
+        'division.strategy',
+        'Research and Development (R&D)',
+      ),
+      ...buildSignatureProperties(signingProfile),
     ],
   };
 }
 
-export function buildDidDocument(config, suffix = '7f:001', publicKeyPem = '') {
-  const did = `did:${config.did.method}:${config.did.region}:${suffix}`;
+const buildVerificationMethod = (
+  did,
+  {
+    keyId = 'key-1',
+    type = 'Ed25519VerificationKey2020',
+    publicKeyPem = '',
+  } = {},
+) => ({
+  id: `${did}#${keyId}`,
+  type,
+  controller: did,
+  publicKeyPem,
+});
+
+export function buildDidDocument(
+  config = {},
+  suffix = DEFAULT_DID_SUFFIX,
+  publicKeyPem = '',
+) {
+  const {
+    did: didConfig = {},
+  } = config;
+
+  const did = `did:${safe(didConfig.method)}:${safe(
+    didConfig.region,
+  )}:${suffix}`;
+
+  const verificationMethod = buildVerificationMethod(did, {
+    publicKeyPem,
+  });
+
   return {
-    id: did,
-    verificationMethod: [
-      {
-        id: `${did}#key-1`,
-        type: 'Ed25519VerificationKey2020',
-        controller: did,
-        publicKeyPem,
-      },
+    '@context': [
+      'https://www.w3.org/ns/did/v1',
     ],
+
+    id: did,
+
+    verificationMethod: [verificationMethod],
+
+    authentication: [verificationMethod.id],
+    assertionMethod: [verificationMethod.id],
+
     service: [
       {
-        id: 'isni-resolver',
+        id: `${did}#resolver`,
         type: 'LinkedDataService',
-        serviceEndpoint: config.did.serviceEndpoint,
+        serviceEndpoint: safe(didConfig.serviceEndpoint),
       },
     ],
   };
