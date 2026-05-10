@@ -14,29 +14,112 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_requests: {
+        Row: {
+          created_at: string
+          id: string
+          reason: string | null
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reason?: string | null
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      article_versions: {
+        Row: {
+          article_id: string
+          created_at: string
+          edit_reason: string | null
+          edited_by: string | null
+          id: string
+          new_body: string | null
+          previous_body: string | null
+        }
+        Insert: {
+          article_id: string
+          created_at?: string
+          edit_reason?: string | null
+          edited_by?: string | null
+          id?: string
+          new_body?: string | null
+          previous_body?: string | null
+        }
+        Update: {
+          article_id?: string
+          created_at?: string
+          edit_reason?: string | null
+          edited_by?: string | null
+          id?: string
+          new_body?: string | null
+          previous_body?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "article_versions_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "wiki_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_metrics: {
         Row: {
-          actual: number
-          axis: string
+          actor: string | null
+          actual: number | null
+          axis: string | null
+          event_type: string | null
+          federation_id: string | null
           id: string
           measured_at: string
-          objetivo: number
+          objetivo: number | null
+          payload: Json | null
           source: string
         }
         Insert: {
-          actual: number
-          axis: string
+          actor?: string | null
+          actual?: number | null
+          axis?: string | null
+          event_type?: string | null
+          federation_id?: string | null
           id?: string
           measured_at?: string
-          objetivo: number
+          objetivo?: number | null
+          payload?: Json | null
           source?: string
         }
         Update: {
-          actual?: number
-          axis?: string
+          actor?: string | null
+          actual?: number | null
+          axis?: string | null
+          event_type?: string | null
+          federation_id?: string | null
           id?: string
           measured_at?: string
-          objetivo?: number
+          objetivo?: number | null
+          payload?: Json | null
           source?: string
         }
         Relationships: []
