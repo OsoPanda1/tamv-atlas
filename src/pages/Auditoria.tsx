@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchAuditMetrics } from "@/lib/tamvApi";
 import { Link } from "react-router-dom";
 import ExecutionCenterBoard from "@/components/control/ExecutionCenterBoard";
+import IntegrationsPanel from "@/components/atlas/IntegrationsPanel";
 import {
   Bar,
   BarChart,
@@ -205,7 +206,8 @@ export default function Auditoria() {
 
       <div className="p-6 max-w-7xl mx-auto space-y-6">
         {activeTab === "control" && (
-          <section className="animate-in fade-in duration-500">
+          <section className="animate-in fade-in duration-500 space-y-6">
+            <IntegrationsPanel />
             <ExecutionCenterBoard />
           </section>
         )}
