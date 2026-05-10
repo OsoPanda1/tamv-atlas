@@ -2,8 +2,17 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Github, RefreshCw, UserCircle2 } from "lucide-react";
+import {
+  Github,
+  RefreshCw,
+  UserCircle2,
+  Shield,
+  GitMerge,
+  ActivitySquare,
+  DatabaseZap,
+} from "lucide-react";
 import { toast } from "sonner";
+import { motion } from "framer-motion";
 import { requestFusionPlan, runRepoFusion } from "@/lib/tamvApi";
 
 interface RepoRow {
@@ -19,6 +28,7 @@ interface RepoRow {
 export default function IntegrationsPanel() {
   const { hasMinRole, session } = useAuth();
   const isAdmin = hasMinRole("admin");
+
   const [repos, setRepos] = useState<RepoRow[]>([]);
   const [loadingRepos, setLoadingRepos] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -28,11 +38,15 @@ export default function IntegrationsPanel() {
 
   const loadRepos = async () => {
     setLoadingRepos(true);
+
     const { data } = await supabase
       .from("github_repos")
-      .select("full_name, description, language, stars, forks, open_issues, pushed_at")
+      .select(
+        "full_name, description, language, stars, forks, open_issues, pushed_at"
+      )
       .order("pushed_at", { ascending: false })
       .limit(20);
+
     setRepos((data ?? []) as RepoRow[]);
     setLoadingRepos(false);
   };
@@ -43,37 +57,56 @@ export default function IntegrationsPanel() {
 
   const triggerGithubSync = async () => {
     if (!session) return toast.error("Inicia sesión como admin");
+
     setSyncing(true);
+
     const { data, error } = await supabase.functions.invoke("github-sync", {
       body: {},
     });
+
     setSyncing(false);
-    if (error) return toast.error(`Error: ${error.message}`);
-    toast.success(`Sincronizados ${(data as { count?: number })?.count ?? 0} repos OsoPanda1`);
+
+    if (error) return toast.error(error.message);
+
+    toast.success(
+      `Sincronizados ${(data as { count?: number })?.count ?? 0} repos`
+    );
+
     loadRepos();
   };
 
-
   const planAndShowFusion = async () => {
     setFusionPlanning(true);
+
     try {
-      const plan = await requestFusionPlan('OsoPanda1');
-      toast.success(`Plan detectado: ${plan.repo_count} repos para federar`);
+      const plan = await requestFusionPlan("OsoPanda1");
+      toast.success(`${plan.repo_count} repos detectados`);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'No se pudo construir plan de fusión');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "No se pudo construir plan"
+      );
     } finally {
       setFusionPlanning(false);
     }
   };
 
   const runFusionNow = async () => {
-    if (!isAdmin) return toast.error('Se requiere rol admin para ejecutar fusión');
+    if (!isAdmin)
+      return toast.error("Se requiere rol admin");
+
     setFusionRunning(true);
+
     try {
-      await runRepoFusion('OsoPanda1');
-      toast.success('Fusión ejecutada. Revisa manifiesto y cambios en git.');
+      await runRepoFusion("OsoPanda1");
+      toast.success("Fusión ejecutada");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'No se pudo ejecutar la fusión');
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Error en fusión"
+      );
     } finally {
       setFusionRunning(false);
     }
@@ -81,93 +114,170 @@ export default function IntegrationsPanel() {
 
   const triggerOrcidFetch = async () => {
     setOrcidLoading(true);
-    const { data, error } = await supabase.functions.invoke("orcid-fetch", { body: {} });
+
+    const { data, error } =
+      await supabase.functions.invoke("orcid-fetch", {
+        body: {},
+      });
+
     setOrcidLoading(false);
-    if (error) return toast.error(`Error: ${error.message}`);
-    toast.success(`ORCID resuelto: ${(data as { display_name?: string })?.display_name ?? "ok"}`);
+
+    if (error) return toast.error(error.message);
+
+    toast.success(
+      `ORCID: ${(data as { display_name?: string })?.display_name ?? "ok"}`
+    );
   };
 
-  return (
-    <section className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">Integraciones operativas</h2>
-          <p className="text-xs text-muted-foreground mt-1">
-            Sincroniza repos de GitHub (OsoPanda1) y resuelve perfiles ORCID al grafo de identidad.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={orcidLoading}
-            onClick={triggerOrcidFetch}
-            className="gap-1"
-          >
-            <UserCircle2 className="w-3.5 h-3.5" /> {orcidLoading ? "Resolviendo…" : "Sync ORCID"}
-          </Button>
-          <Button
-            size="sm"
-            disabled={syncing || !isAdmin}
-            onClick={triggerGithubSync}
-            className="gap-1"
-            title={isAdmin ? "Sincronizar repos OsoPanda1" : "Requiere rol admin"}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
-            {syncing ? "Sincronizando…" : "Sync GitHub"}
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={planAndShowFusion}
-            disabled={fusionPlanning}
-          >
-            {fusionPlanning ? 'Planificando…' : 'Plan Fusión'}
-          </Button>
-          <Button
-            size="sm"
-            onClick={runFusionNow}
-            disabled={fusionRunning || !isAdmin}
-            title={isAdmin ? 'Clonar/fusionar repos en este proyecto' : 'Requiere rol admin'}
-          >
-            {fusionRunning ? 'Fusionando…' : 'Ejecutar Fusión'}
-          </Button>
-        </div>
-      </div>
+  const metrics = [
+    {
+      label: "Repos",
+      value: loadingRepos ? "..." : repos.length,
+      icon: Github,
+    },
+    {
+      label: "Nivel",
+      value: isAdmin ? "ADMIN" : "LIMITED",
+      icon: Shield,
+    },
+    {
+      label: "Estado",
+      value: "ONLINE",
+      icon: ActivitySquare,
+    },
+    {
+      label: "Sync",
+      value: syncing ? "RUNNING" : "READY",
+      icon: DatabaseZap,
+    },
+  ];
 
-      <div className="grid gap-2">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Github className="w-3.5 h-3.5" />
-          <span>Repos sincronizados ({loadingRepos ? "…" : repos.length})</span>
+  return (
+    <section className="relative overflow-hidden rounded-3xl border border-cyan-500/20 bg-slate-950/80 p-8 backdrop-blur-3xl">
+      {/* fondo */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.12),transparent_45%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:24px_24px]" />
+
+      <div className="relative z-10 space-y-8">
+        {/* encabezado */}
+        <div className="flex flex-col lg:flex-row justify-between gap-6">
+          <div>
+            <span className="text-cyan-300 text-xs uppercase tracking-[0.25em]">
+              Federation Integration Layer
+            </span>
+
+            <h2 className="mt-2 text-3xl font-semibold text-white">
+              Consola Operativa
+            </h2>
+
+            <p className="mt-3 text-sm text-slate-400 max-w-2xl">
+              Coordinación de sincronización académica,
+              federación de repositorios y resolución de
+              identidad distribuida.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={orcidLoading}
+              onClick={triggerOrcidFetch}
+            >
+              <UserCircle2 className="w-4 h-4 mr-2" />
+              {orcidLoading ? "Resolviendo..." : "Sync ORCID"}
+            </Button>
+
+            <Button
+              size="sm"
+              disabled={syncing || !isAdmin}
+              onClick={triggerGithubSync}
+            >
+              <RefreshCw
+                className={`w-4 h-4 mr-2 ${
+                  syncing ? "animate-spin" : ""
+                }`}
+              />
+              Sync GitHub
+            </Button>
+
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={fusionPlanning}
+              onClick={planAndShowFusion}
+            >
+              Plan Fusión
+            </Button>
+
+            <Button
+              size="sm"
+              disabled={fusionRunning || !isAdmin}
+              onClick={runFusionNow}
+            >
+              <GitMerge className="w-4 h-4 mr-2" />
+              Ejecutar
+            </Button>
+          </div>
         </div>
-        {repos.length === 0 && !loadingRepos && (
-          <p className="text-xs text-muted-foreground italic">
-            Sin repos aún. {isAdmin ? "Pulsa Sync GitHub." : "Un admin debe ejecutar la sincronización."}
-          </p>
-        )}
-        <ul className="grid md:grid-cols-2 gap-2">
-          {repos.map((r) => (
-            <li
-              key={r.full_name}
-              className="rounded-md border border-border/50 bg-background/40 p-3 text-xs space-y-1"
+
+        {/* métricas */}
+        <div className="grid md:grid-cols-4 gap-4">
+          {metrics.map((m) => {
+            const Icon = m.icon;
+
+            return (
+              <div
+                key={m.label}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400">
+                    {m.label}
+                  </span>
+                  <Icon className="w-4 h-4 text-cyan-300" />
+                </div>
+
+                <div className="mt-3 text-xl font-semibold text-white">
+                  {m.value}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* repos */}
+        <ul className="grid md:grid-cols-2 gap-4">
+          {repos.map((repo, i) => (
+            <motion.li
+              key={repo.full_name}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03 }}
+              className="rounded-2xl border border-white/10 bg-white/[0.025] p-5 hover:border-cyan-400/30 transition-all"
             >
               <a
-                href={`https://github.com/${r.full_name}`}
+                href={`https://github.com/${repo.full_name}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:underline font-mono text-[11px]"
+                className="font-mono text-cyan-300 hover:underline"
               >
-                {r.full_name}
+                {repo.full_name}
               </a>
-              {r.description && <p className="text-muted-foreground line-clamp-2">{r.description}</p>}
-              <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
-                {r.language && <span>{r.language}</span>}
-                <span>★ {r.stars}</span>
-                <span>⑂ {r.forks}</span>
-                <span>issues {r.open_issues}</span>
-                {r.pushed_at && <span>{new Date(r.pushed_at).toISOString().slice(0, 10)}</span>}
+
+              {repo.description && (
+                <p className="mt-2 text-xs text-slate-400 line-clamp-2">
+                  {repo.description}
+                </p>
+              )}
+
+              <div className="mt-4 flex flex-wrap gap-3 text-[11px] text-slate-500">
+                {repo.language && <span>{repo.language}</span>}
+                <span>★ {repo.stars}</span>
+                <span>Forks {repo.forks}</span>
+                <span>Issues {repo.open_issues}</span>
               </div>
-            </li>
+            </motion.li>
           ))}
         </ul>
       </div>
