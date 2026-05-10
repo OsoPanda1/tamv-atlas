@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ComponentType, ReactNode } from "react";
-import { BrowserRouter, Link, Navigate, Route, Routes, useParams } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, NavLink, Route, Routes, useLocation, useNavigate, useParams } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -180,11 +180,32 @@ function AuthHeaderControls() {
   );
 }
 
+function NavigationControls() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isRoot = location.pathname === "/";
+
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={() => navigate(-1)}
+      disabled={isRoot}
+      className="h-7 border-blue-500/30 bg-slate-900/60 text-[10px] uppercase tracking-[0.12em] text-slate-200 hover:bg-slate-800 disabled:opacity-50"
+      aria-label="Regresar a la página anterior"
+    >
+      ← Regresar
+    </Button>
+  );
+}
+
 const AppShell = ({ children }: { children: ReactNode }) => (
   <div className="min-h-screen bg-slate-950 text-slate-200">
     <header className="border-b border-blue-500/20 bg-slate-950/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[11px] tracking-[0.25em] uppercase">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#4ade80]" />
+        <NavigationControls />
         <span className="text-slate-400">TAMV·ONLINE // Digital Civilization System v1.0</span>
       </div>
       <div className="flex items-center gap-4">
@@ -203,25 +224,37 @@ const AppShell = ({ children }: { children: ReactNode }) => (
           <ul className="py-2">
             {WIKI_MODULES.map((mod) => (
               <li key={mod.id}>
-                <Link
+                <NavLink
                   to={mod.path}
-                  className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-blue-500/70 hover:bg-slate-900/60 transition-colors"
+                  className={({ isActive }) =>
+                    `flex flex-col gap-0.5 px-4 py-2 border-l-2 transition-colors ${
+                      isActive
+                        ? "border-blue-500 bg-slate-900/70"
+                        : "border-transparent hover:border-blue-500/70 hover:bg-slate-900/60"
+                    }`
+                  }
                 >
                   <span className="text-[9px] text-blue-400">{mod.code}</span>
                   <span className="text-[10px] text-slate-200">{mod.label}</span>
                   <span className="text-[9px] text-slate-500 line-clamp-1">{mod.description}</span>
-                </Link>
+                </NavLink>
               </li>
             ))}
             <li>
-              <Link
+              <NavLink
                 to="/hub"
-                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-primary/70 hover:bg-slate-900/60 transition-colors"
+                className={({ isActive }) =>
+                  `flex flex-col gap-0.5 px-4 py-2 border-l-2 transition-colors ${
+                    isActive
+                      ? "border-primary bg-slate-900/70"
+                      : "border-transparent hover:border-primary/70 hover:bg-slate-900/60"
+                  }`
+                }
               >
                 <span className="text-[9px] text-primary">CONV-HUB</span>
                 <span className="text-[10px] text-slate-200">Convergence Hub · ISNI</span>
                 <span className="text-[9px] text-slate-500 line-clamp-1">Zenodo · OpenAIRE · Figshare · ORCID en vivo.</span>
-              </Link>
+              </NavLink>
             </li>
             <li>
               <Link
