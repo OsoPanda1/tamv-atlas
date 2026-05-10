@@ -18,12 +18,12 @@ export default function BiografiaCeo() {
       <WikiCard accent="cyan">
         <div className="flex flex-col sm:flex-row gap-5">
           <div className="w-16 h-16 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center text-xl font-bold text-primary font-mono shrink-0">
-            AV
+            EC
           </div>
 
           <div>
             <div className="font-semibold text-foreground text-lg">
-              Anubis Villaseñor
+              Edwin Oswaldo Castillo Trejo
             </div>
 
             <div className="text-primary font-mono text-xs mb-2 tracking-wide">
@@ -48,10 +48,11 @@ export default function BiografiaCeo() {
       </WikiCard>
 
       <WikiP>
-        Anubis Villaseñor es desarrollador independiente, arquitecto de sistemas
-        digitales y fundador conceptual de TAMV Online Network, ecosistema
-        experimental orientado al diseño de infraestructuras territoriales
-        interoperables, identidad digital soberana y gobernanza computacional.
+        Edwin Oswaldo Castillo Trejo es desarrollador independiente, arquitecto
+        de sistemas digitales y fundador conceptual de TAMV Online Network,
+        ecosistema experimental orientado al diseño de infraestructuras
+        territoriales interoperables, identidad digital soberana y gobernanza
+        computacional.
       </WikiP>
 
       <WikiP>

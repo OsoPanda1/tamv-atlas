@@ -18,7 +18,7 @@ const accessVariant: Record<string, "default" | "secondary" | "destructive" | "o
   admin: "destructive",
 };
 const sanitizeIdentityText = (value: string) => value
-  .replace(/Pablo\s+Eliseo\s+Becerra\s+Garc[ií]a/gi, "Titular ORCID 0009-0008-5050-1539")
+  .replace(/Pablo\s+Eliseo\s+Becerra\s+Garc[ií]a/gi, "Edwin Oswaldo Castillo Trejo")
   .replace(/biograf[ií]a\s+del\s+ceo/gi, "Biografía de liderazgo TAMV");
 
 export function ArticleCard({ article, moduleSlug }: ArticleCardProps) {
