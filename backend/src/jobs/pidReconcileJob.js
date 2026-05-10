@@ -1,18 +1,61 @@
 import { config } from '../config.js';
 import { reconcilePids } from '../pidReconciler.js';
 
-async function main() {
-  const report = await reconcilePids(config);
-  // eslint-disable-next-line no-console
-  console.log(JSON.stringify(report, null, 2));
+const EXIT = Object.freeze({
+  SUCCESS: 0,
+  VALIDATION_FAILED: 1,
+  RUNTIME_ERROR: 2,
+});
 
-  if (!report.passed) {
-    process.exitCode = 1;
+const emit = (level, message, payload = null) => {
+  const entry = {
+    timestamp: new Date().toISOString(),
+    level,
+    message,
+    ...(payload && { payload }),
+  };
+
+  const output = JSON.stringify(entry);
+
+  if (level === 'error') {
+    console.error(output);
+  } else {
+    console.log(output);
+  }
+};
+
+const normalizeError = (error) => ({
+  name: error?.name || 'Error',
+  message: error?.message || 'Unknown error',
+  stack: error?.stack,
+});
+
+async function runReconciliation() {
+  emit('info', 'PID reconciliation started');
+
+  const report = await reconcilePids(config);
+
+  emit('info', 'PID reconciliation completed', report);
+
+  process.exitCode = report.passed
+    ? EXIT.SUCCESS
+    : EXIT.VALIDATION_FAILED;
+
+  return report;
+}
+
+async function main() {
+  try {
+    await runReconciliation();
+  } catch (error) {
+    emit(
+      'error',
+      'PID reconciliation job failed',
+      normalizeError(error),
+    );
+
+    process.exitCode = EXIT.RUNTIME_ERROR;
   }
 }
 
-main().catch((error) => {
-  // eslint-disable-next-line no-console
-  console.error('PID reconciliation job failed:', error);
-  process.exit(1);
-});
+main();
