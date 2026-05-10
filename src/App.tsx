@@ -15,7 +15,7 @@ import CivilizationStreamPage from "@/pages/CivilizationStreamPage";
 import Auditoria from "@/pages/Auditoria";
 import IdentidadDemo from "@/pages/IdentidadDemo";
 import InvestigacionNodo001 from "@/pages/InvestigacionNodo001";
-import WikiBridge from "@/pages/WikiBridge";
+import ConvergenceHub from "@/pages/ConvergenceHub";
 import DynamicWikiHome from "@/pages/wiki/WikiHome";
 import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
@@ -215,6 +215,16 @@ const AppShell = ({ children }: { children: ReactNode }) => (
             ))}
             <li>
               <Link
+                to="/hub"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-primary/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-primary">CONV-HUB</span>
+                <span className="text-[10px] text-slate-200">Convergence Hub · ISNI</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Zenodo · OpenAIRE · Figshare · ORCID en vivo.</span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/resumen"
                 className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-blue-500/70 hover:bg-slate-900/60 transition-colors"
               >
@@ -306,8 +316,7 @@ const App = () => (
                     <Route path="/auditoria" element={<Auditoria />} />
                     <Route path="/identidad-demo" element={<IdentidadDemo />} />
                     <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
-                  <Route path="/wiki-bridge" element={<WikiBridge />} />
-                  <Route path="/groupsio/wiki/:slug" element={<WikiBridge />} />
+                    <Route path="/hub" element={<ConvergenceHub />} />
                     <Route path="/modulo/:id" element={<ModuleOverview />} />
                     <Route path="/articulo/:slug" element={<ArticleRouter />} />
                     <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
