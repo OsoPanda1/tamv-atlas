@@ -83,7 +83,7 @@ export default function OrcidDoiIsni() {
       <WikiTable
         headers={["PID", "Propósito", "Valor TAMV"]}
         rows={[
-          ["ORCID", "Identificador de investigador", "0009-0008-5050-1539 (Edwin O. Castillo Trejo)"],
+          ["ORCID", "Identificador de investigador", "0009-0008-5050-1539 (perfil ORCID verificado)"],
           ["DOI", "Identificador de publicación", "10.5281/zenodo.19562517 (UTAMV White Paper)"],
           ["DOI", "Canon TAMV", "10.5281/zenodo.19436662"],
           ["DOI", "Biografía", "10.5281/zenodo.19411506"],
@@ -94,7 +94,7 @@ export default function OrcidDoiIsni() {
 
       <WikiH2>ORCID — Perfil del investigador</WikiH2>
       <WikiP>
-        El perfil ORCID de Edwin O. Castillo Trejo documenta su empleo como Director General de Proyectos y CEO Fundador de TAMV Online Network (2020-2026), su formación como Autodidact Software Architect y cinco trabajos publicados vinculados a OpenAIRE.
+        El perfil ORCID asociado documenta trayectoria profesional y publicaciones vinculadas al ecosistema OpenAIRE, con trazabilidad pública en su registro.
       </WikiP>
       <WikiCard accent="cyan">
         Perfil completo: <WikiLink href="https://orcid.org/0009-0008-5050-1539">orcid.org/0009-0008-5050-1539</WikiLink>

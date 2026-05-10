@@ -19,7 +19,7 @@ export default function IntegracionPids() {
       />
 
       <WikiH2>ORCID en TAMV</WikiH2>
-      <WikiP>El perfil ORCID de Edwin O. Castillo Trejo documenta empleo como Director General y CEO Fundador de TAMV Online Network (2020-2026), formación como Autodidact Software Architect, cinco publicaciones vinculadas a OpenAIRE, y grants bajo TAMV-HUBDEVS001.</WikiP>
+      <WikiP>El perfil ORCID asociado documenta empleo, formación y publicaciones vinculadas a OpenAIRE, además de grants relacionados al ecosistema TAMV.</WikiP>
 
       <WikiH2>DOI y Zenodo</WikiH2>
       <WikiP>Las publicaciones se registran en la comunidad Zenodo <WikiLink href="https://zenodo.org/communities/tamvonline-oficial/">tamvonline-oficial</WikiLink> bajo licencia CC BY 4.0. El white paper principal describe la arquitectura UTAMV y el Núcleo de IA Académica Core 2026.</WikiP>
