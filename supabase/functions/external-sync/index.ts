@@ -1,5 +1,5 @@
-// External Sync — fetches public metadata from Zenodo, OpenAIRE and Figshare
-// for the canonical TAMV ONLINE DOIs/records and returns a unified payload.
+// External Sync — fetches public metadata from Zenodo, OpenAIRE, Figshare,
+// ORCID and GitHub (OsoPanda1) for the canonical TAMV ONLINE ecosystem.
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -20,6 +20,7 @@ const FIGSHARE_RECORDS = [
 ];
 
 const ORCID = "0009-0008-5050-1539";
+const GH_USER = "OsoPanda1";
 
 async function safeJson(url: string, headers: Record<string, string> = {}) {
   try {
@@ -42,7 +43,7 @@ Deno.serve(async (req) => {
   const fHeaders = figshareToken ? { Authorization: `token ${figshareToken}` } : {};
   const oHeaders = openaireToken ? { Authorization: `Bearer ${openaireToken}` } : {};
 
-  const [zenodo, figshare, orcid, openaire] = await Promise.all([
+  const [zenodo, figshare, orcid, openaire, github] = await Promise.all([
     Promise.all(
       ZENODO_RECORDS.map(async (r) => {
         const res = await safeJson(`https://zenodo.org/api/records/${r.id}`, zHeaders);
@@ -75,6 +76,7 @@ Deno.serve(async (req) => {
     ),
     safeJson(`https://pub.orcid.org/v3.0/${ORCID}/record`),
     safeJson(`https://api.openaire.eu/search/publications?orcid=${ORCID}&format=json&size=20`, oHeaders),
+    safeJson(`https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`),
   ]);
 
   const orcidProfile = orcid.ok
@@ -97,11 +99,34 @@ Deno.serve(async (req) => {
       }
     : { ok: false, error: openaire.error };
 
+  const ghRepos = github.ok && Array.isArray(github.data)
+    ? github.data.map((r: Record<string, unknown>) => ({
+        name: r.name as string,
+        full_name: r.full_name as string,
+        description: (r.description as string) ?? null,
+        html_url: r.html_url as string,
+        language: (r.language as string) ?? null,
+        stars: r.stargazers_count as number,
+        forks: r.forks_count as number,
+        updated_at: r.updated_at as string,
+        topics: (r.topics as string[]) ?? [],
+      }))
+    : [];
+
+  const ghTotals = {
+    total: ghRepos.length,
+    stars: ghRepos.reduce((s, r) => s + (r.stars ?? 0), 0),
+    forks: ghRepos.reduce((s, r) => s + (r.forks ?? 0), 0),
+    languages: Array.from(new Set(ghRepos.map((r) => r.language).filter(Boolean))) as string[],
+  };
+
   const totals = {
     zenodo_views: zenodo.reduce((s, r) => s + (r.views ?? 0), 0),
     zenodo_downloads: zenodo.reduce((s, r) => s + (r.downloads ?? 0), 0),
     zenodo_ok: zenodo.filter((r) => r.ok).length,
     figshare_ok: figshare.filter((r) => r.ok).length,
+    github_repos: ghTotals.total,
+    github_stars: ghTotals.stars,
   };
 
   return new Response(
@@ -111,6 +136,7 @@ Deno.serve(async (req) => {
       openaire: openaireSummary,
       zenodo,
       figshare,
+      github: { repos: ghRepos, totals: ghTotals },
       totals,
     }),
     { headers: { ...corsHeaders, "Content-Type": "application/json" } }
