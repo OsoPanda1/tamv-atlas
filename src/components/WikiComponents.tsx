@@ -40,7 +40,7 @@ export function WikiBreadcrumb({ section, page }: { section: string; page: strin
   );
 }
 
-export function WikiCard({ title, children, accent = "cyan" }: { title?: string; children: ReactNode; accent?: "cyan" | "orange" | "green" }) {
+export function WikiCard({ title, children, accent = "cyan" }: { title?: string; children: ReactNode; accent?: "cyan" | "orange" | "green" | "blue" | "purple" }) {
   const borderColor = {
     cyan: "border-neon-cyan/30",
     orange: "border-neon-orange/30",
