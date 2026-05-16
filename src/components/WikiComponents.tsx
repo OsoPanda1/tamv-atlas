@@ -40,11 +40,13 @@ export function WikiBreadcrumb({ section, page }: { section: string; page: strin
   );
 }
 
-export function WikiCard({ title, children, accent = "cyan" }: { title?: string; children: ReactNode; accent?: "cyan" | "orange" | "green" }) {
+export function WikiCard({ title, children, accent = "cyan" }: { title?: string; children: ReactNode; accent?: "cyan" | "orange" | "green" | "blue" | "purple" }) {
   const borderColor = {
     cyan: "border-neon-cyan/30",
     orange: "border-neon-orange/30",
     green: "border-neon-green/30",
+    blue: "border-primary/30",
+    purple: "border-neon-purple/30",
   }[accent];
   return (
     <div className={`bg-card border ${borderColor} rounded-lg p-5 mb-4`}>

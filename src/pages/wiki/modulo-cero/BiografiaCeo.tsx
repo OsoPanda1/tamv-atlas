@@ -236,10 +236,8 @@ export default function BiografiaCeo() {
         indexados, documentación reproducible y evidencia empírica evaluable por
         terceros.
       </WikiP>
-    </div>
-  );
-}
-<WikiH2>Proyección institucional y posicionamiento potencial</WikiH2>
+
+      <WikiH2>Proyección institucional y posicionamiento potencial</WikiH2>
 
 <WikiP>
   La relevancia futura del trabajo desarrollado dentro del Atlas TAMV dependerá
@@ -298,9 +296,12 @@ export default function BiografiaCeo() {
   reales y sostener interoperabilidad demostrable con estándares externos.
 </WikiCard>
 
-<WikiP>
-  Bajo ese marco, el liderazgo asociado al Atlas podría evolucionar desde una
-  figura de experimentación independiente hacia un referente especializado en
-  diseño institucional digital, siempre condicionado por revisión crítica,
-  validación pública y contraste empírico continuo.
-</WikiP>
+      <WikiP>
+        Bajo ese marco, el liderazgo asociado al Atlas podría evolucionar desde una
+        figura de experimentación independiente hacia un referente especializado en
+        diseño institucional digital, siempre condicionado por revisión crítica,
+        validación pública y contraste empírico continuo.
+      </WikiP>
+    </div>
+  );
+}
