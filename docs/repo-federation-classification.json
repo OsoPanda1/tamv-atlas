@@ -1,0 +1,52 @@
+{
+  "run_id": "run-20260520T105029Z",
+  "generated_at_utc": "2026-05-20T10:50:29Z",
+  "source_manifest_path": "docs/repo-unification-manifest.json",
+  "tamv_internal_sha": "4974de954db1b6fcf825efd20ffad114a1e5b90f",
+  "reviews": [
+    {
+      "repo": "sample-one",
+      "default_branch": "main",
+      "clone_url": "https://github.com/OsoPanda1/sample-one.git",
+      "html_url": "https://github.com/OsoPanda1/sample-one",
+      "federation": "misc",
+      "r1_structural": {
+        "repo_type_guess": "unknown",
+        "archived": false,
+        "private": false
+      },
+      "r2_domain_semantics": {
+        "domain_guess": "misc",
+        "collision_risk": "medium"
+      },
+      "r3_operational_security": {
+        "build_status": "unknown",
+        "test_status": "unknown",
+        "security_status": "pending_review"
+      },
+      "module_state": "open"
+    },
+    {
+      "repo": "tamv-digital-nexus",
+      "default_branch": "main",
+      "clone_url": "https://github.com/OsoPanda1/tamv-digital-nexus.git",
+      "html_url": "https://github.com/OsoPanda1/tamv-digital-nexus",
+      "federation": "misc",
+      "r1_structural": {
+        "repo_type_guess": "unknown",
+        "archived": false,
+        "private": false
+      },
+      "r2_domain_semantics": {
+        "domain_guess": "misc",
+        "collision_risk": "medium"
+      },
+      "r3_operational_security": {
+        "build_status": "unknown",
+        "test_status": "unknown",
+        "security_status": "pending_review"
+      },
+      "module_state": "open"
+    }
+  ]
+}

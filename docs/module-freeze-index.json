@@ -1,0 +1,31 @@
+{
+  "run_id": "run-20260520T105029Z",
+  "generated_at_utc": "2026-05-20T10:50:29Z",
+  "tamv_internal_sha": "4974de954db1b6fcf825efd20ffad114a1e5b90f",
+  "modules": [
+    {
+      "repo": "sample-one",
+      "federation": "misc",
+      "module_state": "open",
+      "freeze_criteria": {
+        "classified": true,
+        "integration_contract_defined": false,
+        "tests_documented": false,
+        "critical_blockers_closed": false,
+        "closure_review_approved": false
+      }
+    },
+    {
+      "repo": "tamv-digital-nexus",
+      "federation": "misc",
+      "module_state": "open",
+      "freeze_criteria": {
+        "classified": true,
+        "integration_contract_defined": false,
+        "tests_documented": false,
+        "critical_blockers_closed": false,
+        "closure_review_approved": false
+      }
+    }
+  ]
+}
