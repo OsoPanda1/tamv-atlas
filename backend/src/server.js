@@ -5,9 +5,19 @@ import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
 import { loadPidStatus } from './pidConnectors.js';
 import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
+import { AtlasStore } from './atlasStore.js';
+import { AtlasKernelRuntime } from './atlasKernelRuntime.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
+const atlasKernel = new AtlasKernelRuntime();
+const atlasStoreConfig = {
+  supabaseUrl: process.env.SUPABASE_URL,
+  supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+};
+const hasPersistence = Boolean(atlasStoreConfig.supabaseUrl && atlasStoreConfig.supabaseServiceRoleKey);
+const atlasStore = hasPersistence ? new AtlasStore(atlasStoreConfig) : null;
+if (atlasStore) await atlasStore.init();
 
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -31,6 +41,30 @@ function parseJsonBody(req) {
       }
     });
   });
+}
+
+
+
+function setupSse(res) {
+  res.writeHead(200, {
+    'content-type': 'text/event-stream; charset=utf-8',
+    'cache-control': 'no-cache, no-transform',
+    connection: 'keep-alive',
+    'access-control-allow-origin': '*',
+  });
+  res.write(': connected\n\n');
+}
+
+function emitSse(res, event, payload) {
+  res.write(`event: ${event}\n`);
+  res.write(`data: ${JSON.stringify(payload)}\n\n`);
+}
+
+
+function requirePersistence(res) {
+  if (atlasStore) return true;
+  writeJson(res, 503, { error: 'Persistence backend unavailable. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.' });
+  return false;
 }
 
 function writeJson(res, statusCode, payload) {
@@ -144,6 +178,113 @@ const server = createServer(async (req, res) => {
       return writeJson(res, 400, {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
+    }
+  }
+
+
+  if (req.method === 'GET' && url.pathname === '/v1/auth/profile') {
+    return writeJson(res, 200, {
+      ok: true,
+      issuer: config.organization.name,
+      didMethod: config.did.method,
+      profile: signingEngine.profile,
+    });
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/users') {
+    if (!requirePersistence(res)) return;
+    try {
+      const users = await atlasStore.listUsers();
+      return writeJson(res, 200, { users });
+    } catch (error) {
+      return writeJson(res, 500, { error: error instanceof Error ? error.message : 'Failed to list users' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/users') {
+    if (!requirePersistence(res)) return;
+    try {
+      const body = await parseJsonBody(req);
+      const user = atlasKernel.createUser(body.handle, body.displayName);
+      const persisted = await atlasStore.createUser({ handle: user.handle, displayName: user.displayName });
+      return writeJson(res, 201, { user: persisted, kernelId: user.id });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Create user failed' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/protocols/execute') {
+    if (!requirePersistence(res)) return;
+    try {
+      const body = await parseJsonBody(req);
+      const execution = atlasKernel.executeProtocol(body.protocolId, body.actorId, body.paths ?? []);
+      const persisted = await atlasStore.recordProtocolExecution(execution);
+      await atlasStore.publishXrEvent('guardian.protocol.collapsed', { execution });
+      return writeJson(res, 201, { execution, persisted });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Protocol execution failed' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/economy/ledger') {
+    if (!requirePersistence(res)) return;
+    try {
+      const body = await parseJsonBody(req);
+      const entry = atlasKernel.postLedger(body.userId, Number(body.amount), body.reason);
+      const persisted = await atlasStore.recordEconomyEntry({ userId: body.userId, amount: Number(body.amount), reason: body.reason, kind: entry.kind });
+      return writeJson(res, 201, { entry: persisted });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Ledger post failed' });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/xr/stream') {
+    if (!requirePersistence(res)) return;
+    setupSse(res);
+    const unsubscribe = atlasStore.onXrEvent((event) => emitSse(res, 'guardian', event));
+    req.on('close', () => unsubscribe());
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/xr/events') {
+    if (!requirePersistence(res)) return;
+    try {
+      const body = await parseJsonBody(req);
+      const event = await atlasStore.publishXrEvent(body.eventType ?? 'xr.event', body.payload ?? {});
+      return writeJson(res, 201, { event });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Publish XR event failed' });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/xr/webrtc/stream') {
+    if (!requirePersistence(res)) return;
+    setupSse(res);
+    const roomId = url.searchParams.get('roomId');
+    const target = url.searchParams.get('targetId');
+    const unsubscribe = atlasStore.onSignal((signal) => {
+      if (roomId && signal.room_id !== roomId) return;
+      if (target && signal.target_id && signal.target_id !== target) return;
+      emitSse(res, 'signal', signal);
+    });
+    req.on('close', () => unsubscribe());
+    return;
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/xr/webrtc/signal') {
+    if (!requirePersistence(res)) return;
+    try {
+      const body = await parseJsonBody(req);
+      const signal = await atlasStore.createSignal({
+        roomId: body.roomId,
+        senderId: body.senderId,
+        targetId: body.targetId,
+        signalType: body.signalType,
+        payload: body.payload ?? {},
+      });
+      return writeJson(res, 201, { signal });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Signal publish failed' });
     }
   }
 
