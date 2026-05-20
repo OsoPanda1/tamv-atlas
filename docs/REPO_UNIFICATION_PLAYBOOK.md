@@ -129,3 +129,25 @@ Respuesta:
 ---
 
 Con este playbook, la unificación de los repos queda estandarizada y auditable para ejecución iterativa.
+
+
+## 6) Triple revisión + clasificación federada + freeze
+
+Script complementario: `scripts/classify_federation_repos.sh`
+
+### Fase F — Triple revisión automática inicial
+
+```bash
+./scripts/classify_federation_repos.sh
+```
+
+Resultado:
+- Genera `docs/repo-federation-classification.json` con resultados R1/R2/R3.
+- Registra `tamv_internal_sha` para trazabilidad interna.
+
+### Fase G — Índice de congelamiento modular
+
+Resultado:
+- Genera `docs/module-freeze-index.json` con estado por módulo (`open`, `in_review`, `frozen`).
+- Permite cerrar secciones sin seguir expandiendo alcance de manera indefinida.
+
