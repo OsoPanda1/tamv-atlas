@@ -1,0 +1,188 @@
+name: TAMV CI/CD · Sovereign Federated Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+concurrency:
+  group: tamv-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: 20
+  TAMV_CONSTITUTION_MODE: strict
+
+jobs:
+
+  bootstrap:
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - id: cache-key
+        run: echo "key=deps-${{ hashFiles('package-lock.json') }}" >> $GITHUB_OUTPUT
+
+      - run: npm ci --ignore-scripts
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ steps.cache-key.outputs.key }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: workspace
+          path: .
+
+  quality:
+    needs: bootstrap
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm run lint
+      - run: npm run check
+      - run: npm run check:architecture
+
+      - run: npm run lint:constitution
+      - run: npm run validate:execution-paths
+
+  tests:
+    needs: bootstrap
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        type: [unit, integration]
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm run test:${{ matrix.type }}
+
+  runtime-constitution:
+    needs: [quality, tests]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm run constitutional:runtime
+
+  real-flows:
+    needs: runtime-constitution
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm run validate:real-flows
+
+  security:
+    needs: real-flows
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm audit --audit-level=high
+
+      - run: npm run check:guard-usage
+
+  build:
+    needs: security
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ needs.bootstrap.outputs.cache-key }}
+
+      - run: npm run build
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace
+
+      - uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
