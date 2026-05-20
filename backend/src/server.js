@@ -9,11 +9,13 @@ import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
 import { AtlasStore } from './atlasStore.js';
 import { AtlasKernelRuntime } from './atlasKernelRuntime.js';
 import { createIsabellaEngine } from './isabellaEngine.js';
+import { createOmniKernelGateway } from './omniKernelGateway.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
 const atlasKernel = new AtlasKernelRuntime();
 const isabellaEngine = createIsabellaEngine();
+const omniKernelGateway = createOmniKernelGateway();
 const atlasStoreConfig = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
