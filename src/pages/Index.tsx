@@ -160,7 +160,7 @@ const Index = () => {
               ].map((m) => (
                 <div key={m.label}>
                   <div className="text-2xl font-semibold text-foreground tabular-nums">
-                    <MetricCounter value={m.value} />{m.suffix ?? ""}
+                    <CountUp value={m.value} />{m.suffix ?? ""}
                   </div>
                   <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1">
                     {m.label}
