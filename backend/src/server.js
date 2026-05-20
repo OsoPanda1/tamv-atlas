@@ -160,38 +160,6 @@ const server = createServer(async (req, res) => {
     }
   }
 
-  if (req.method === 'GET' && url.pathname === '/v1/omni/status') {
-    return writeJson(res, 200, omniKernelGateway.buildSystemStatus());
-  }
-
-  if (req.method === 'GET' && url.pathname.startsWith('/v1/omni/users/')) {
-    const isni = decodeURIComponent(url.pathname.replace('/v1/omni/users/', ''));
-    const user = omniKernelGateway.getUserMetrics(isni);
-    if (!user) return writeJson(res, 404, { error: 'Usuario no encontrado', isni });
-    return writeJson(res, 200, user);
-  }
-
-  if (req.method === 'POST' && url.pathname === '/v1/omni/users/register') {
-    try {
-      const body = await parseJsonBody(req);
-      if (!body.isni || !body.name) return writeJson(res, 400, { error: 'Missing required fields: isni, name' });
-      return writeJson(res, 201, omniKernelGateway.registerUser(body.isni, body.name));
-    } catch (error) {
-      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
-    }
-  }
-
-  if (req.method === 'POST' && url.pathname === '/v1/omni/process') {
-    try {
-      const body = await parseJsonBody(req);
-      if (!body.isni || !body.requestType || !body.payload) return writeJson(res, 400, { error: 'Missing required fields: isni, requestType, payload' });
-      const result = await omniKernelGateway.processRequest(body.isni, body.requestType, body.payload);
-      return writeJson(res, result.approved ? 200 : 403, result);
-    } catch (error) {
-      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
-    }
-  }
-
   if (req.method === 'GET' && url.pathname === '/v1/identity/org') {
     return writeJson(res, 200, orgIdentity);
   }
