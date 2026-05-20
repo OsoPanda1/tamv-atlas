@@ -1,7 +1,7 @@
 {
   "schema": "tamv.federation.triple-review.v1",
   "owner": "OsoPanda1",
-  "generatedAt": "2026-05-20T10:48:25.009Z",
+  "generatedAt": "2026-05-20T10:52:21.094Z",
   "totals": {
     "repositories": 2,
     "federations": 1,
@@ -58,10 +58,10 @@
       }
     ]
   },
-  "tamvInternalSha": "fd365d1ccfb4739bf672505cb52d51cb4fe3e34d74937cabd837d7709e205408",
+  "tamvInternalSha": "f8f2918bd2c9e6d6ac017346e3ea0726e12c5429ef333afd8361b011e98c4b6c",
   "registry": {
     "ledgerId": "tamv-online:OsoPanda1:20260520",
-    "signedAt": "2026-05-20T10:48:25.009Z",
+    "signedAt": "2026-05-20T10:52:21.094Z",
     "algorithm": "sha256"
   }
 }

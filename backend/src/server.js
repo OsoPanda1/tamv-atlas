@@ -85,6 +85,11 @@ async function loadFederationReview() {
   return JSON.parse(payload);
 }
 
+async function loadMarkdownConsolidationReport() {
+  const payload = await readFile('data/knowledge/markdown-consolidation-report.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
 
 function requirePersistence(res) {
   if (atlasStore) return true;
@@ -127,6 +132,15 @@ const server = createServer(async (req, res) => {
       return writeJson(res, 200, review);
     } catch (error) {
       return writeJson(res, 404, { error: 'Federation review not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/docs/consolidation') {
+    try {
+      const report = await loadMarkdownConsolidationReport();
+      return writeJson(res, 200, report);
+    } catch (error) {
+      return writeJson(res, 404, { error: 'Markdown consolidation report not generated yet', detail: error instanceof Error ? error.message : String(error) });
     }
   }
 
