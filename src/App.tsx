@@ -351,6 +351,7 @@ const App = () => (
                     <Route path="/identidad-demo" element={<IdentidadDemo />} />
                     <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
                     <Route path="/hub" element={<ConvergenceHub />} />
+                    <Route path="/fusion" element={<FusionRegistry />} />
                     <Route path="/modulo/:id" element={<ModuleOverview />} />
                     <Route path="/articulo/:slug" element={<ArticleRouter />} />
                     <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
