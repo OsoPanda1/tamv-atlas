@@ -1,26 +1,64 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth antialiased">
   <head>
+    <!-- Configuración Técnica Crítica -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <title>TAMV ATLAS · ISNI Wiki</title>
-    <meta name="description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE">
-    <meta name="author" content="TAMV Online Network" />
-    
-    
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta property="og:title" content="TAMV ATLAS · ISNI Wiki">
-  <meta name="twitter:title" content="TAMV ATLAS · ISNI Wiki">
-  <meta property="og:description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE">
-  <meta name="twitter:description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE">
-  <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/yZGN0LxVzIcW4XYomkTSG0bKFPo2/social-images/social-1778410608174-Gemini_Generated_Image_w1j9wnw1j9wnw1j9.webp">
-  <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/yZGN0LxVzIcW4XYomkTSG0bKFPo2/social-images/social-1778410608174-Gemini_Generated_Image_w1j9wnw1j9wnw1j9.webp">
-</head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#0f172a" /> <!-- Cambiar por el color principal de tu ecosistema -->
 
-  <body>
+    <!-- Identificadores Básicos -->
+    <title>TAMV ATLAS · ISNI Wiki</title>
+    <meta name="description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE" />
+    <meta name="author" content="TAMV Online Network" />
+    <link rel="canonical" href="https://tamv.online/atlas" /> <!-- Reemplaza con la URL real de producción -->
+
+    <!-- Iconos y Favicons de Nueva Generación -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Optimización de Carga y DNS Pre-fetching -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://storage.googleapis.com" />
+
+    <!-- Protocolo Open Graph (Facebook / LinkedIn / Discord) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://tamv.online/atlas" />
+    <meta property="og:title" content="TAMV ATLAS · ISNI Wiki" />
+    <meta property="og:description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE" />
+    <meta property="og:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/yZGN0LxVzIcW4XYomkTSG0bKFPo2/social-images/social-1778410608174-Gemini_Generated_Image_w1j9wnw1j9wnw1j9.webp" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Interfaz de gobernanza técnica del Ecosistema TAMV" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="TAMV·ONLINE" />
+
+    <!-- Tarjetas de Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@TAMVOnline" /> <!-- Reemplaza con tu cuenta si existe -->
+    <meta name="twitter:title" content="TAMV ATLAS · ISNI Wiki" />
+    <meta name="twitter:description" content="TAMV Atlas es el núcleo de conocimiento y gobernanza técnica del ecosistema TAMV·ONLINE" />
+    <meta name="twitter:image" content="https://storage.googleapis.com/gpt-engineer-file-uploads/yZGN0LxVzIcW4XYomkTSG0bKFPo2/social-images/social-1778410608174-Gemini_Generated_Image_w1j9wnw1j9wnw1j9.webp" />
+  </head>
+
+  <body class="bg-slate-900 text-slate-100 min-h-screen">
+    <!-- Respaldo para navegadores con JavaScript deshabilitado -->
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: sans-serif; background-color: #0f172a; color: #f8fafc;">
+        <h2>Se requiere JavaScript</h2>
+        <p>Para acceder al núcleo de conocimiento TAMV ATLAS, por favor habilita JavaScript en la configuración de tu navegador.</p>
+      </div>
+    </noscript>
+
+    <!-- Contenedor Principal de la Aplicación -->
     <div id="root"></div>
+
+    <!-- Script Principal (Módulo React / Vite) -->
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
