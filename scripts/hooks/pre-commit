@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+if [ -f data/bookpi/bookpi-block-latest.json ]; then
+  jq -e '.blockHash|test("^sha256:")' data/bookpi/bookpi-block-latest.json >/dev/null
+fi
+npm run lint:thcf >/dev/null

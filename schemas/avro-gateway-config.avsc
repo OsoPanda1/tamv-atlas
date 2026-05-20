@@ -1,0 +1,1 @@
+{"type":"record","name":"GatewayConfig","namespace":"tamv.mdx4","fields":[{"name":"version","type":"string"},{"name":"checksum","type":"string"},{"name":"author","type":"string"},{"name":"orcid","type":"string"},{"name":"doi","type":"string"},{"name":"defaultDailyLimit","type":"int"},{"name":"THCF_COHERENCE_THRESHOLD","type":"double"}]}

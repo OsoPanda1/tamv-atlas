@@ -18,7 +18,11 @@
     "unify:discover": "./scripts/unify_osopanda_repos.sh --import-mode none",
     "unify:dry-run": "./scripts/unify_osopanda_repos.sh --import-mode squash --dry-run",
     "unify:import": "./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json",
-    "federation:review": "node scripts/triple_review_osopanda_repos.mjs"
+    "federation:review": "node scripts/triple_review_osopanda_repos.mjs",
+    "data:validate": "node scripts/validate-data-schemas.mjs",
+    "lint:thcf": "node scripts/lint-thcf.mjs",
+    "bookpi:block": "bash scripts/build_bookpi.sh",
+    "chaos:test": "node scripts/chaos-test-config.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -95,6 +99,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.38.0",
     "vite": "^5.4.19",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "ajv": "^8.17.1",
+    "openapi3-ts": "^4.3.2"
   }
 }

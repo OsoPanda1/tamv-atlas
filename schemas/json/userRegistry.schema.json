@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tamv.online/schemas/userRegistry.schema.json",
+  "title": "UserRegistry",
+  "type": "object",
+  "required": ["isni", "credentials", "credentialBonuses", "createdAt", "tamvCredits"],
+  "properties": {
+    "isni": {"type": "string"},
+    "credentials": {"type": "array", "items": {"$ref": "credential.schema.json"}},
+    "credentialBonuses": {"type": "array", "items": {"type": "object"}},
+    "createdAt": {"type": "string", "format": "date-time"},
+    "tamvCredits": {"type": "number"}
+  },
+  "additionalProperties": true
+}

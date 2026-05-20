@@ -1,0 +1,13 @@
+{
+  "version": "5.0.0",
+  "checksum": "sha256:pending",
+  "author": "Edwin",
+  "orcid": "0009-0008-5050-1539",
+  "doi": "10.5281/zenodo.19436662",
+  "defaultDailyLimit": 1000,
+  "ENABLE_ANUBIS_SENTINEL": true,
+  "ENABLE_DEKATEORL_FILTER": true,
+  "MAX_ANOMALY_SCORE": 0.75,
+  "ENABLE_BOOKPI": true,
+  "THCF_COHERENCE_THRESHOLD": 0.75
+}
