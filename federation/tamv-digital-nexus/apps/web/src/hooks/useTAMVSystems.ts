@@ -1,6 +1,6 @@
 // ============================================================================
 // TAMV MD-X4™ - Custom Hooks for System Integration
-// React hooks for accessing all TAMV systems
+// React hooks for accessing all TAMV systems (Optimized Edition)
 // ============================================================================
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,45 +16,56 @@ import { economy, type Wallet, type Transaction, type LotteryDraw, type Membersh
 
 export function useKAOSAudio() {
   const kaos = getKAOSInstance();
-  const [isInitialized, setIsInitialized] = useState(false);
-  const [config, setConfig] = useState(kaos.getConfig());
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
+  const [config, setConfig] = useState(() => kaos.getConfig());
 
   useEffect(() => {
+    let isMounted = true;
+    
     const init = async () => {
-      const success = await kaos.initialize();
-      setIsInitialized(success);
+      try {
+        const success = await kaos.initialize();
+        if (isMounted) {
+          setIsInitialized(success);
+          setConfig(kaos.getConfig());
+        }
+      } catch (error) {
+        console.error('[KAOS Audio] Initialization failed:', error);
+      }
     };
+    
     init();
-  }, []);
+    return () => { isMounted = false; };
+  }, [kaos]);
 
   const playBinaural = useCallback(async (preset: BinauralPreset, duration?: number) => {
     await kaos.playBinauralPreset(preset, duration);
-  }, []);
+  }, [kaos]);
 
   const playNotification = useCallback(async (type: NotificationType, position?: { x: number; y: number; z: number }) => {
     await kaos.playNotification(type, position);
-  }, []);
+  }, [kaos]);
 
   const playEnvironment = useCallback(async (environment: AudioEnvironment, duration?: number) => {
     await kaos.playEnvironment(environment, duration);
-  }, []);
+  }, [kaos]);
 
   const stopBinaural = useCallback(() => {
     kaos.stopBinaural();
-  }, []);
+  }, [kaos]);
 
   const stopEnvironment = useCallback(() => {
     kaos.stopEnvironment();
-  }, []);
+  }, [kaos]);
 
   const setVolume = useCallback((volume: number) => {
     kaos.setMasterVolume(volume);
     setConfig(kaos.getConfig());
-  }, []);
+  }, [kaos]);
 
   const setListenerPosition = useCallback((x: number, y: number, z: number) => {
     kaos.setListenerPosition(x, y, z);
-  }, []);
+  }, [kaos]);
 
   return {
     isInitialized,
@@ -74,18 +85,28 @@ export function useKAOSAudio() {
 // ============================================================================
 
 export function useAnubisSecurity() {
-  const [metrics, setMetrics] = useState<SecurityMetrics>(anubis.getMetrics());
+  const [metrics, setMetrics] = useState<SecurityMetrics>(() => anubis.getMetrics());
   const [events, setEvents] = useState<SecurityEvent[]>([]);
-  const [isMonitoring, setIsMonitoring] = useState(false);
+  const [isMonitoring, setIsMonitoring] = useState<boolean>(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    let isMounted = true;
+    if (!isMonitoring) return;
+
+    const updateSecurityData = () => {
+      if (!isMounted) return;
       setMetrics(anubis.getMetrics());
       setEvents(anubis.getRecentEvents(20));
-    }, 5000);
+    };
 
-    return () => clearInterval(interval);
-  }, []);
+    updateSecurityData(); // Primera carga inmediata
+    const interval = setInterval(updateSecurityData, 5000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isMonitoring]);
 
   const runScan = useCallback(async () => {
     const scanEvents = await anubis.runSecurityScan();
@@ -97,12 +118,14 @@ export function useAnubisSecurity() {
   const blockThreat = useCallback(async (eventId: string) => {
     const success = await anubis.blockThreat(eventId);
     setMetrics(anubis.getMetrics());
+    setEvents(anubis.getRecentEvents(20));
     return success;
   }, []);
 
   const healThreat = useCallback(async (eventId: string) => {
     const success = await anubis.initiateSelfHealing(eventId);
     setMetrics(anubis.getMetrics());
+    setEvents(anubis.getRecentEvents(20));
     return success;
   }, []);
 
@@ -114,6 +137,7 @@ export function useAnubisSecurity() {
     metrics,
     events,
     isMonitoring,
+    setIsMonitoring,
     runScan,
     blockThreat,
     healThreat,
@@ -127,37 +151,46 @@ export function useAnubisSecurity() {
 
 export function useUniversity() {
   const user = useTAMVStore(state => state.user);
+  const userId = user?.id; // Primitivo para estabilizar dependencias de useEffect
+  
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [statistics, setStatistics] = useState(university.getStatistics());
+  const [statistics, setStatistics] = useState(() => university.getStatistics());
+
+  const syncUniversityData = useCallback(() => {
+    setCourses(university.getAllCourses());
+    setStatistics(university.getStatistics());
+    if (userId) {
+      setEnrollments(university.getUserEnrollments(userId));
+    } else {
+      setEnrollments([]);
+    }
+  }, [userId]);
 
   useEffect(() => {
-    setCourses(university.getAllCourses());
-    if (user) {
-      setEnrollments(university.getUserEnrollments(user.id));
-    }
-  }, [user]);
+    syncUniversityData();
+  }, [syncUniversityData]);
 
   const enroll = useCallback((courseId: string) => {
-    if (!user) return null;
-    const enrollment = university.enrollUser(user.id, courseId);
-    setEnrollments(university.getUserEnrollments(user.id));
+    if (!userId) return null;
+    const enrollment = university.enrollUser(userId, courseId);
+    syncUniversityData();
     return enrollment;
-  }, [user]);
+  }, [userId, syncUniversityData]);
 
   const updateProgress = useCallback((courseId: string, lessonId: string) => {
-    if (!user) return null;
-    const enrollment = university.updateLessonProgress(user.id, courseId, lessonId);
-    setEnrollments(university.getUserEnrollments(user.id));
+    if (!userId) return null;
+    const enrollment = university.updateLessonProgress(userId, courseId, lessonId);
+    syncUniversityData();
     return enrollment;
-  }, [user]);
+  }, [userId, syncUniversityData]);
 
   const completeCourse = useCallback(async (courseId: string) => {
-    if (!user) return null;
-    const certificate = await university.completeCourse(user.id, courseId);
-    setEnrollments(university.getUserEnrollments(user.id));
+    if (!userId) return null;
+    const certificate = await university.completeCourse(userId, courseId);
+    syncUniversityData();
     return certificate;
-  }, [user]);
+  }, [userId, syncUniversityData]);
 
   const searchCourses = useCallback((query: string) => {
     return university.searchCourses(query);
@@ -176,6 +209,7 @@ export function useUniversity() {
     completeCourse,
     searchCourses,
     getCourse,
+    refreshData: syncUniversityData
   };
 }
 
@@ -185,54 +219,56 @@ export function useUniversity() {
 
 export function useEconomy() {
   const user = useTAMVStore(state => state.user);
+  const userId = user?.id;
+
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [lotteryDraws, setLotteryDraws] = useState<LotteryDraw[]>([]);
-  const [fenixFund, setFenixFund] = useState(economy.getFenixFund());
-  const [statistics, setStatistics] = useState(economy.getStatistics());
+  const [fenixFund, setFenixFund] = useState(() => economy.getFenixFund());
+  const [statistics, setStatistics] = useState(() => economy.getStatistics());
 
-  useEffect(() => {
-    if (user) {
-      setWallet(economy.getWallet(user.id));
-      setTransactions(economy.getUserTransactions(user.id));
+  const refreshWallet = useCallback(() => {
+    if (userId) {
+      setWallet(economy.getWallet(userId));
+      setTransactions(economy.getUserTransactions(userId));
+    } else {
+      setWallet(null);
+      setTransactions([]);
     }
     setLotteryDraws(economy.getActiveDraws());
     setFenixFund(economy.getFenixFund());
     setStatistics(economy.getStatistics());
-  }, [user]);
+  }, [userId]);
 
-  const refreshWallet = useCallback(() => {
-    if (user) {
-      setWallet(economy.getWallet(user.id));
-      setTransactions(economy.getUserTransactions(user.id));
-    }
-  }, [user]);
+  useEffect(() => {
+    refreshWallet();
+  }, [refreshWallet]);
 
   const transferCredits = useCallback((toUserId: string, amount: number, description: string) => {
-    if (!user) return null;
-    const tx = economy.transferCredits(user.id, toUserId, amount, description);
+    if (!userId) return null;
+    const tx = economy.transferCredits(userId, toUserId, amount, description);
     refreshWallet();
     return tx;
-  }, [user, refreshWallet]);
+  }, [userId, refreshWallet]);
 
   const purchaseTickets = useCallback((drawId: string, quantity: number) => {
-    const result = economy.purchaseTickets(user?.id || '', drawId, quantity);
+    if (!userId) return null;
+    const result = economy.purchaseTickets(userId, drawId, quantity);
     refreshWallet();
-    setLotteryDraws(economy.getActiveDraws());
     return result;
-  }, [user, refreshWallet]);
+  }, [userId, refreshWallet]);
 
   const upgradeMembership = useCallback((tier: MembershipTier) => {
-    if (!user) return null;
-    const updatedWallet = economy.upgradeMembership(user.id, tier);
-    setWallet(updatedWallet);
+    if (!userId) return null;
+    const updatedWallet = economy.upgradeMembership(userId, tier);
+    refreshWallet();
     return updatedWallet;
-  }, [user]);
+  }, [userId, refreshWallet]);
 
   const getCommissionRate = useCallback(() => {
-    if (!user) return 0.30;
-    return economy.getCommissionRate(user.id);
-  }, [user]);
+    if (!userId) return 0.30;
+    return economy.getCommissionRate(userId);
+  }, [userId]);
 
   return {
     wallet,
@@ -249,7 +285,7 @@ export function useEconomy() {
 }
 
 // ============================================================================
-// Quantum State Hook (Enhanced)
+// Quantum State Hook
 // ============================================================================
 
 export function useQuantumState() {
@@ -259,6 +295,7 @@ export function useQuantumState() {
   const user = store.user;
   const sensorPermissions = store.sensorPermissions;
   const activeDreamSpace = store.activeDreamSpace;
+  const isAuthenticated = store.isAuthenticated;
 
   const updateCoherence = useCallback((delta: number) => {
     store.updateCoherence(delta);
@@ -269,12 +306,19 @@ export function useQuantumState() {
   }, [store]);
 
   const activateDreamSpace = useCallback((spaceId: string) => {
-    // Find the dream space and set it as active
     store.setActiveDreamSpace({ id: spaceId } as any);
   }, [store]);
 
   const deactivateDreamSpace = useCallback(() => {
     store.setActiveDreamSpace(null);
+  }, [store]);
+
+  const login = useCallback((userData: any) => {
+    store.setUser(userData);
+  }, [store]);
+
+  const logout = useCallback(() => {
+    store.logout();
   }, [store]);
 
   return {
@@ -286,9 +330,9 @@ export function useQuantumState() {
     setSensorPermission,
     activateDreamSpace,
     deactivateDreamSpace,
-    isAuthenticated: store.isAuthenticated,
-    login: store.setUser,
-    logout: store.logout,
+    isAuthenticated,
+    login,
+    logout,
   };
 }
 
@@ -303,7 +347,12 @@ export function useNotifications() {
   const markRead = useTAMVStore(state => state.markNotificationRead);
   const clearAll = useTAMVStore(state => state.clearNotifications);
 
-  const notify = useCallback((type: 'info' | 'success' | 'warning' | 'error' | 'social' | 'achievement', title: string, message: string, actionUrl?: string) => {
+  const notify = useCallback((
+    type: 'info' | 'success' | 'warning' | 'error' | 'social' | 'achievement', 
+    title: string, 
+    message: string, 
+    actionUrl?: string
+  ) => {
     addNotification({ type, title, message, actionUrl });
   }, [addNotification]);
 
@@ -317,56 +366,79 @@ export function useNotifications() {
 }
 
 // ============================================================================
-// WebSocket Hook for Real-time Features
+// WebSocket Hook (With Resilient Reconnection Engine)
 // ============================================================================
 
 export function useWebSocket(url?: string) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const [lastMessage, setLastMessage] = useState<any>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const reconnectAttempts = useRef<number>(0);
+  const maxReconnectInterval = 30000; // Máximo 30 segundos entre intentos
 
   useEffect(() => {
     const wsUrl = url || import.meta.env.VITE_SUPABASE_URL?.replace('https', 'wss') + '/websocket';
-    
     if (!wsUrl) return;
 
-    try {
-      wsRef.current = new WebSocket(wsUrl);
+    let connectTimeout: NodeJS.Timeout;
 
-      wsRef.current.onopen = () => {
-        setIsConnected(true);
-        console.log('[WebSocket] Connected');
-      };
+    const connect = () => {
+      try {
+        console.log(`[WebSocket] Connecting to ${wsUrl}...`);
+        wsRef.current = new WebSocket(wsUrl);
 
-      wsRef.current.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          setLastMessage(data);
-        } catch (e) {
-          setLastMessage(event.data);
-        }
-      };
+        wsRef.current.onopen = () => {
+          setIsConnected(true);
+          reconnectAttempts.current = 0;
+          console.log('[WebSocket] Connection established with Core Infrastructure.');
+        };
 
-      wsRef.current.onclose = () => {
-        setIsConnected(false);
-        console.log('[WebSocket] Disconnected');
-      };
+        wsRef.current.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            setLastMessage(data);
+          } catch {
+            setLastMessage(event.data);
+          }
+        };
 
-      wsRef.current.onerror = (error) => {
-        console.error('[WebSocket] Error:', error);
-      };
-    } catch (error) {
-      console.error('[WebSocket] Connection failed:', error);
-    }
+        wsRef.current.onclose = (event) => {
+          setIsConnected(false);
+          console.warn(`[WebSocket] Connection closed. Code: ${event.code}. Attempting recovery...`);
+          
+          // Cálculo de reconexión exponencial
+          const delay = Math.min(1000 * Math.pow(2, reconnectAttempts.current), maxReconnectInterval);
+          reconnectAttempts.current += 1;
+          
+          connectTimeout = setTimeout(() => {
+            connect();
+          }, delay);
+        };
+
+        wsRef.current.onerror = (error) => {
+          console.error('[WebSocket] Channel Error:', error);
+        };
+      } catch (error) {
+        console.error('[WebSocket] Initialization failed:', error);
+      }
+    };
+
+    connect();
 
     return () => {
-      wsRef.current?.close();
+      clearTimeout(connectTimeout);
+      if (wsRef.current) {
+        wsRef.current.onclose = null; // Evita el trigger de reconexión al desmontar
+        wsRef.current.close();
+      }
     };
   }, [url]);
 
   const send = useCallback((data: any) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(data));
+    } else {
+      console.error('[WebSocket] Cannot send payload. Connection state is not OPEN.');
     }
   }, []);
 
@@ -378,7 +450,7 @@ export function useWebSocket(url?: string) {
 }
 
 // ============================================================================
-// Export all hooks
+// Unified Export
 // ============================================================================
 
 export default {
