@@ -17,6 +17,7 @@ import IdentidadDemo from "@/pages/IdentidadDemo";
 import InvestigacionNodo001 from "@/pages/InvestigacionNodo001";
 import ConvergenceHub from "@/pages/ConvergenceHub";
 import FusionRegistry from "@/pages/FusionRegistry";
+import OfertaTAMV from "@/pages/OfertaTAMV";
 import DynamicWikiHome from "@/pages/wiki/WikiHome";
 import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
@@ -325,6 +326,16 @@ const AppShell = ({ children }: { children: ReactNode }) => (
             </li>
             <li>
               <Link
+                to="/oferta"
+                className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-cyan-500/70 hover:bg-slate-900/60 transition-colors"
+              >
+                <span className="text-[9px] text-cyan-300">TAMV-OFFER</span>
+                <span className="text-[10px] text-slate-200">Oferta TAMV por perfil</span>
+                <span className="text-[9px] text-slate-500 line-clamp-1">Catálogo funcional filtrable por tipo de usuario.</span>
+              </Link>
+            </li>
+            <li>
+              <Link
                 to="/investigacion/nodo-001"
                 className="flex flex-col gap-0.5 px-4 py-2 border-l-2 border-transparent hover:border-primary/70 hover:bg-slate-900/60 transition-colors"
               >
@@ -368,6 +379,7 @@ const App = () => (
                     <Route path="/investigacion/nodo-001" element={<InvestigacionNodo001 />} />
                     <Route path="/hub" element={<ConvergenceHub />} />
                     <Route path="/fusion" element={<FusionRegistry />} />
+                    <Route path="/oferta" element={<OfertaTAMV />} />
                     <Route path="/modulo/:id" element={<ModuleOverview />} />
                     <Route path="/articulo/:slug" element={<ArticleRouter />} />
                     <Route path="/wiki-legacy/:sectionId/:pageSlug" element={<LegacyWikiRouter />} />
