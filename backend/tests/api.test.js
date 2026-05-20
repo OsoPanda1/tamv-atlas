@@ -26,6 +26,15 @@ test('GET /healthz returns ok', async () => {
   assert.equal(data.ok, true);
 });
 
+test('GET /v1/security/posture returns controls and score', async () => {
+  const response = await fetch(`${base}/v1/security/posture`);
+  assert.equal(response.status, 200);
+  const data = await response.json();
+  assert.equal(typeof data.antifragilityScore, 'number');
+  assert.ok(data.controls);
+  assert.equal(data.controls.pidTriangulation, 'ok');
+});
+
 test('sign + verify cycle should be valid', async () => {
   const signRes = await fetch(`${base}/v1/signature/sign`, {
     method: 'POST',
