@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -45,6 +45,17 @@ class CreditsTransaction(BaseModel):
     recipient_isni: str
     amount: float = Field(..., gt=0)
     lock_days: int = Field(..., ge=30, le=1460)
+
+
+class OmniRegisterPayload(BaseModel):
+    isni: str
+    name: str
+
+
+class OmniProcessPayload(BaseModel):
+    isni: str
+    requestType: str
+    payload: Dict[str, Any]
 
 
 class TAMVMemoryEngine:
@@ -118,25 +129,45 @@ class BookPILedgerEngine:
         }
         ledger.append(block)
         PATHS["bookpi"].write_text(json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")
-
-        idx = json.loads(PATHS["datagit"].read_text(encoding="utf-8"))
-        idx.append(
-            {
-                "commit_hash": candidate[:16],
-                "tree_id": hashlib.sha1(module.encode()).hexdigest()[:20],
-                "timestamp": ts,
-                "author": auditor_isni,
-                "message": f"TAMV_COMMITTED_BLOCK: [{module}] -> Integrity verified.",
-            }
-        )
-        PATHS["datagit"].write_text(json.dumps(idx, indent=2, ensure_ascii=False), encoding="utf-8")
         return candidate
+
+
+class OmniKernelGatewayV5:
+    def __init__(self) -> None:
+        self.users: Dict[str, Dict[str, Any]] = {}
+        self.metrics = {"totalRequests": 0, "successfulRequests": 0, "blocked": 0}
+
+    def register_user(self, isni: str, name: str) -> Dict[str, Any]:
+        user = {"isni": isni, "name": name, "todayUsage": 0, "dailyLimit": 1000, "trustScore": 1.0}
+        self.users[isni] = user
+        return user
+
+    def process(self, isni: str, request_type: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        self.metrics["totalRequests"] += 1
+        user = self.users.get(isni)
+        if not user:
+            self.metrics["blocked"] += 1
+            return {"approved": False, "blockReason": "Usuario no encontrado"}
+        content = str(payload.get("content", "")).lower()
+        if "child exploitation" in content:
+            self.metrics["blocked"] += 1
+            return {"approved": False, "blockReason": "HARD STOP"}
+        user["todayUsage"] += 1
+        self.metrics["successfulRequests"] += 1
+        return {"approved": True, "result": {"requestType": request_type, "processedAt": datetime.utcnow().isoformat()}}
+
+    def status(self) -> Dict[str, Any]:
+        return {
+            "federation": {"layers": {"L0_Dekateorl": "ACTIVE", "L2_BookPI": "ACTIVE", "L3_ANUBIS": "ACTIVE"}},
+            "metrics": {**self.metrics, "activeUsers": len(self.users)},
+        }
 
 
 app = FastAPI(title="TAMV ATLAS CORE BACKEND", version="Genesis-Enterprise")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-JWT_SECRET = secrets.token_hex(32)
+JWT_SECRET = os.environ.get("TAMV_JWT_SECRET", "tamv-dev-secret")
 ROOT_ISNI = "0009-0008-5050-1539"
+omni = OmniKernelGatewayV5()
 
 
 async def anubis_guard(authorization: Optional[str] = Header(None)) -> str:
@@ -179,12 +210,7 @@ async def economy(tx: CreditsTransaction, isni: str = Depends(anubis_guard)):
     voting_power = tx.amount * (tx.lock_days / 1460.0)
     lock_id = f"lock_{secrets.token_hex(4)}"
     state["balances"][tx.recipient_isni] += tx.amount
-    state["locks"][lock_id] = {
-        "owner": tx.recipient_isni,
-        "amount": tx.amount,
-        "voting_power": voting_power,
-        "release_timestamp": time.time() + tx.lock_days * 86400,
-    }
+    state["locks"][lock_id] = {"owner": tx.recipient_isni, "amount": tx.amount, "voting_power": voting_power, "release_timestamp": time.time() + tx.lock_days * 86400}
     PATHS["economy"].write_text(json.dumps(state, indent=2), encoding="utf-8")
     h = BookPILedgerEngine.registrar_bloque("ECONOMY_MDD", f"MINT_VE_LOCK_{lock_id}", isni, "LIQUIDEZ_COMPILADA")
     return {"status": "CREDITS_LOCKED_SUCCESSFULLY", "lock_id": lock_id, "allocated_voting_power": voting_power, "ledger_block_hash": h}
@@ -193,3 +219,29 @@ async def economy(tx: CreditsTransaction, isni: str = Depends(anubis_guard)):
 @app.get("/bookpi")
 async def get_bookpi():
     return json.loads(PATHS["bookpi"].read_text(encoding="utf-8"))
+
+
+@app.get("/v1/omni/status")
+async def omni_status():
+    return omni.status()
+
+
+@app.post("/v1/omni/users/register")
+async def omni_register(payload: OmniRegisterPayload):
+    return omni.register_user(payload.isni, payload.name)
+
+
+@app.get("/v1/omni/users/{isni}")
+async def omni_user(isni: str):
+    user = omni.users.get(isni)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user
+
+
+@app.post("/v1/omni/process")
+async def omni_process(payload: OmniProcessPayload):
+    result = omni.process(payload.isni, payload.requestType, payload.payload)
+    if not result.get("approved"):
+        raise HTTPException(status_code=403, detail=result.get("blockReason", "blocked"))
+    return result

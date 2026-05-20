@@ -1,0 +1,1 @@
+{"openapi":"3.1.0","info":{"title":"TAMV Omni API","version":"5.0.0"},"paths":{"/v1/omni/status":{"get":{"responses":{"200":{"description":"ok"}}}},"/v1/omni/users/register":{"post":{"responses":{"201":{"description":"created"}}}},"/v1/omni/process":{"post":{"responses":{"200":{"description":"processed"},"403":{"description":"blocked"}}}}}}

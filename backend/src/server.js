@@ -1,5 +1,5 @@
 import { createServer } from 'node:http';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { config } from './config.js';
 import { buildSigningEngine } from './pqcHybrid.js';
@@ -9,11 +9,13 @@ import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
 import { AtlasStore } from './atlasStore.js';
 import { AtlasKernelRuntime } from './atlasKernelRuntime.js';
 import { createIsabellaEngine } from './isabellaEngine.js';
+import { createOmniKernelGateway } from './omniKernelGateway.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
 const atlasKernel = new AtlasKernelRuntime();
 const isabellaEngine = createIsabellaEngine();
+const omniKernelGateway = createOmniKernelGateway();
 const atlasStoreConfig = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -85,6 +87,27 @@ async function loadFederationReview() {
   return JSON.parse(payload);
 }
 
+async function loadMarkdownConsolidationReport() {
+  const payload = await readFile('data/knowledge/markdown-consolidation-report.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
+async function loadReviewCycleReport() {
+  const payload = await readFile('data/ops/review-reformulate-cycle-latest.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
+
+async function loadConfigData() {
+  const payload = await readFile('data/config/gateway-config.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
+async function loadBookpiBlock() {
+  const payload = await readFile('data/bookpi/bookpi-block-latest.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
 
 function requirePersistence(res) {
   if (atlasStore) return true;
@@ -127,6 +150,76 @@ const server = createServer(async (req, res) => {
       return writeJson(res, 200, review);
     } catch (error) {
       return writeJson(res, 404, { error: 'Federation review not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/docs/consolidation') {
+    try {
+      const report = await loadMarkdownConsolidationReport();
+      return writeJson(res, 200, report);
+    } catch (error) {
+      return writeJson(res, 404, { error: 'Markdown consolidation report not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/ops/review-cycle') {
+    try {
+      const report = await loadReviewCycleReport();
+      return writeJson(res, 200, report);
+    } catch (error) {
+      return writeJson(res, 404, { error: 'Review cycle report not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/omni/status') {
+    return writeJson(res, 200, omniKernelGateway.buildSystemStatus());
+  }
+
+  if (req.method === 'GET' && url.pathname.startsWith('/v1/omni/users/')) {
+    const isni = decodeURIComponent(url.pathname.replace('/v1/omni/users/', ''));
+    const user = omniKernelGateway.getUserMetrics(isni);
+    if (!user) return writeJson(res, 404, { error: 'Usuario no encontrado', isni });
+    return writeJson(res, 200, user);
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/omni/users/register') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.isni || !body.name) return writeJson(res, 400, { error: 'Missing required fields: isni, name' });
+      return writeJson(res, 201, omniKernelGateway.registerUser(body.isni, body.name));
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/v1/omni/process') {
+    try {
+      const body = await parseJsonBody(req);
+      if (!body.isni || !body.requestType || !body.payload) return writeJson(res, 400, { error: 'Missing required fields: isni, requestType, payload' });
+      const result = await omniKernelGateway.processRequest(body.isni, body.requestType, body.payload);
+      return writeJson(res, result.approved ? 200 : 403, result);
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
+    }
+  }
+
+
+  if (req.method === 'GET' && url.pathname === '/v1/ops/integration-dashboard') {
+    try {
+      const [configData, bookpi] = await Promise.all([loadConfigData(), loadBookpiBlock()]);
+      const candidate = { ...configData, checksum: 'sha256:pending' };
+      const hash = `sha256:${createHash('sha256').update(JSON.stringify(candidate)).digest('hex')}`;
+      const alerts = [];
+      if (hash !== configData.checksum) alerts.push('Config drift detected');
+      if (configData.THCF_COHERENCE_THRESHOLD < 0.6) alerts.push('THCF policy violation');
+      return writeJson(res, 200, {
+        bookpiChain: bookpi,
+        thcf: { threshold: configData.THCF_COHERENCE_THRESHOLD, status: configData.THCF_COHERENCE_THRESHOLD >= 0.6 ? 'approved' : 'rejected' },
+        anubis: { status: configData.ENABLE_ANUBIS_SENTINEL ? 'active' : 'disabled' },
+        alerts,
+      });
+    } catch (error) {
+      return writeJson(res, 404, { error: 'integration dashboard data unavailable', detail: error instanceof Error ? error.message : String(error) });
     }
   }
 
