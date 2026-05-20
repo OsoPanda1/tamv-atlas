@@ -1,0 +1,67 @@
+{
+  "schema": "tamv.federation.triple-review.v1",
+  "owner": "OsoPanda1",
+  "generatedAt": "2026-05-20T10:48:25.009Z",
+  "totals": {
+    "repositories": 2,
+    "federations": 1,
+    "averageReadiness": 35
+  },
+  "triplePasses": [
+    "metadata",
+    "classification",
+    "operational"
+  ],
+  "federations": {
+    "federation.general-labs": [
+      {
+        "repo": "tamv-digital-nexus",
+        "url": "https://github.com/OsoPanda1/tamv-digital-nexus",
+        "metadata": {
+          "name": "tamv-digital-nexus",
+          "private": false,
+          "archived": false,
+          "defaultBranch": "main",
+          "pushedAt": null
+        },
+        "classification": {
+          "federation": "federation.general-labs",
+          "primaryLanguage": "Unknown",
+          "topics": []
+        },
+        "operational": {
+          "readiness": 35,
+          "risk": "medium",
+          "recommendation": "integrate_iteratively"
+        }
+      },
+      {
+        "repo": "tamv-the-federated-frontier",
+        "url": "https://github.com/OsoPanda1/tamv-the-federated-frontier",
+        "metadata": {
+          "name": "tamv-the-federated-frontier",
+          "private": false,
+          "archived": false,
+          "defaultBranch": "main",
+          "pushedAt": null
+        },
+        "classification": {
+          "federation": "federation.general-labs",
+          "primaryLanguage": "Unknown",
+          "topics": []
+        },
+        "operational": {
+          "readiness": 35,
+          "risk": "medium",
+          "recommendation": "integrate_iteratively"
+        }
+      }
+    ]
+  },
+  "tamvInternalSha": "fd365d1ccfb4739bf672505cb52d51cb4fe3e34d74937cabd837d7709e205408",
+  "registry": {
+    "ledgerId": "tamv-online:OsoPanda1:20260520",
+    "signedAt": "2026-05-20T10:48:25.009Z",
+    "algorithm": "sha256"
+  }
+}

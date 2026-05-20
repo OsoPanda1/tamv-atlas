@@ -1,58 +1,181 @@
-# TAMV Atlas — Avance Real
+# TAMV Atlas
 
-TAMV Atlas es una base funcional para consolidar el ecosistema TAMV MD‑X4 en una experiencia operable para despliegue en Lovable:
+Plataforma full‑stack para operar el **Atlas TAMV**: una base de conocimiento/operación con frontend React, backend Node, integración de identidad (DID/PID), firma criptográfica, eventos XR y pipeline de federación de repositorios.
 
-- **Frontend Atlas/Wiki** en React + Vite con rutas de módulos civilizatorios.
-- **Capa federada inicial (7+ capas conceptual-operables)** para identidad, protocolos, memoria, guardianía, XR y economía.
-- **Contratos tipados y motor de integración** para trazabilidad (`MSR`) y narrativa (`BookPI`) de eventos críticos.
+> Este README describe el **estado real actual del repo** (no roadmap idealizado), incluyendo nivel de madurez para producción y despliegue.
 
-## Avance implementado en este corte
+---
 
-Se añadió un núcleo funcional de orquestación (`AtlasKernel`) que permite:
+## 1) ¿Qué es este repositorio?
 
-1. Crear usuarios y registrar su alta en memoria (`identity.user.created`).
-2. Asignar membresías con trazabilidad (`economy.membership.assigned`).
-3. Ejecutar protocolos con lógica quant-inspired de “evaluar rutas y colapsar decisión”.
-4. Emitir señales de guardianía cuando el riesgo ético supera el umbral.
-5. Crear DreamSpaces XR persistentes mínimos con permisos base.
-6. Registrar movimientos de economía interna en ledger con eventos auditables.
+`tamv-atlas` es un monorepo operativo que combina:
 
-## Estructura añadida
+- **Frontend web** (Vite + React + TypeScript) para Atlas/Wiki y módulos TAMV.
+- **Backend API** (Node HTTP nativo + ESM) con endpoints de identidad, firmas, fusión de repos y eventos.
+- **Núcleo federado** (`AtlasKernel`) con contratos y lógica de protocolos/economía/eventos.
+- **Integración opcional con Supabase** como persistencia y señalización SSE/WebRTC.
+- **Scripts de unificación** para descubrir/importar repos de `OsoPanda1` vía GitHub API + `git subtree`.
 
-- `src/lib/federated/types.ts`: contratos de dominio federado.
-- `src/lib/federated/atlasKernel.ts`: núcleo de integración funcional.
-- `src/test/federated/atlasKernel.test.ts`: pruebas unitarias del flujo integral.
+En resumen: este repo sirve como **plataforma base de operación del Atlas** (contenido + identidad + protocolos + telemetría).
 
-## Cómo correr en local
+---
+
+## 2) ¿Qué hace hoy, de forma funcional?
+
+### Frontend
+
+- Renderiza páginas y rutas wiki/módulos TAMV.
+- Consume backend para firmas, investigación/fusión y métricas (según configuración `VITE_TAMV_BACKEND_URL`).
+
+### Backend
+
+Expone endpoints funcionales para:
+
+- Salud del servicio (`/healthz`).
+- Identidad organizacional y DID (`/v1/identity/*`).
+- Estado de PIDs (ORCID/Zenodo/ISNI) (`/v1/pids/status`).
+- Firma y verificación de payloads (`/v1/signature/sign`, `/v1/signature/verify`).
+- Chat/visión/audio/háptica y ledger de Isabella (`/api/v1/*`).
+- Usuarios, protocolos, economía y stream XR con persistencia opcional (`/v1/users`, `/v1/protocols/execute`, `/v1/economy/ledger`, `/v1/xr/*`).
+- Postura de seguridad/antifragilidad (`/v1/security/posture`).
+
+### Federación de repos
+
+- Descubre repos del owner en GitHub.
+- Genera manifiesto consolidado.
+- Puede importar repos por `subtree --squash` en `federation/`.
+
+---
+
+## 3) ¿Cómo lo hace? (arquitectura real)
+
+```text
+[React/Vite Frontend]
+         |
+         | HTTP (REST)
+         v
+[Node API Server]
+  |      |         |
+  |      |         +--> [Repo Fusion Service -> Bash script -> GitHub API/git subtree]
+  |      +------------> [Identity/PQC/PID modules]
+  +-------------------> [AtlasKernelRuntime]
+                           |
+                           +--> [Supabase persistence/events/signals] (opcional por env)
+```
+
+Principio operativo real:
+
+- Si no hay `SUPABASE_URL` y `SUPABASE_SERVICE_ROLE_KEY`, la API sigue viva pero desactiva rutas que requieren persistencia (responde `503` con mensaje explícito).
+
+---
+
+## 4) ¿Para qué sirve?
+
+- **Orquestación de Atlas TAMV**: identidad, protocolos y ledger básico en un solo backend.
+- **Base de producto digital**: wiki + operación API para iterar producto real.
+- **Núcleo de integración**: puente entre narrativa/canon TAMV y ejecución técnica verificable.
+- **Preparación de ecosistema federado**: consolidación de repositorios y estructura común.
+
+---
+
+## 5) ¿Para quién sirve?
+
+- **Equipo núcleo TAMV (producto/arquitectura/operaciones)**: para consolidar stack y despliegue.
+- **Desarrolladores full‑stack**: para extender frontend, API y kernel federado.
+- **Investigación/estrategia digital**: para auditar madurez y planificar evolución a producción.
+- **Socios técnicos**: para integración con identidades, señales XR y flujos antifragilidad.
+
+---
+
+## 6) Importancia y posicionamiento global (honesto)
+
+### Importancia
+
+- Resuelve un punto clave: pasar de documentación dispersa a **base ejecutable** con API+frontend.
+- Ya ofrece componentes diferenciales (identidad soberana, firma, eventos y federación de repos).
+
+### Posicionamiento global actual
+
+- **Etapa:** pre‑producción avanzada / consolidación.
+- **Ventaja:** visión transversal (frontend + backend + protocolos + identidad + repos).
+- **Brecha:** hardening operativo (seguridad, observabilidad, CI/CD robusto, cumplimiento, SLAs).
+
+No está en nivel “enterprise global listo” todavía; está en nivel “plataforma técnicamente prometedora con piezas funcionales”.
+
+---
+
+## 7) Porcentaje real de avance para producción y despliegue
+
+> Estimación técnica basada en lo implementado visible en código, scripts y pruebas actuales.
+
+| Área | Estado real | % avance |
+|---|---|---:|
+| Frontend funcional (rutas, páginas, build) | Sólido para iteración | **78%** |
+| Backend funcional (endpoints core operativos) | Funcional, aún monolítico | **72%** |
+| Persistencia real (Supabase opcional) | Integrada pero dependiente de env y endurecimiento | **58%** |
+| Seguridad operativa (controles, posture endpoint) | Base creada, faltan controles enterprise | **46%** |
+| Observabilidad y monitoreo | Parcial (sin stack integral de tracing/alerting) | **38%** |
+| Calidad/QA automatizada | Existe test suite, pero con señales de estabilidad pendientes en runner | **52%** |
+| CI/CD y despliegue productivo | Parcial, requiere pipeline endurecido y gates | **44%** |
+| Gobernanza de APIs/contratos | Buena base, falta versionado y políticas formales | **55%** |
+| Federación de repos OsoPanda1 | Descubrimiento/importación funcional | **68%** |
+
+### Promedio ponderado de readiness
+
+- **Readiness producción (global): 56%**
+- **Readiness despliegue controlado (staging/partners): 67%**
+
+Interpretación:
+
+- Ya puede desplegarse en **entornos controlados** (demo, staging, pilotos).
+- Aún no recomendable para **producción crítica a gran escala** sin hardening adicional.
+
+---
+
+## 8) Qué falta para llegar a producción global (prioridad)
+
+1. **Estabilizar pruebas y ejecución concurrente** (eliminar cuelgues/handles abiertos, separar puertos y lifecycles por suite).
+2. **Seguridad enterprise**: authn/authz robusta, rate limiting, CORS estricto por entorno, secrets rotation, auditoría firmada.
+3. **Observabilidad total**: métricas, logs estructurados, tracing distribuido, alertas y SLOs.
+4. **CI/CD con quality gates**: lint, test, typecheck, build, security scans, release strategy.
+5. **Contrato API formal** (OpenAPI/versionado/deprecación).
+6. **Runbooks operativos** y recuperación (backup/restore, incident response, chaos drills).
+
+---
+
+## 9) Ejecución local
+
+### Frontend
 
 ```bash
 npm install
 npm run dev
 ```
 
-## Checks de calidad
+### Checks
 
 ```bash
+npm run lint
+npm run typecheck
 npm run test
 npm run build
 ```
 
-## Despliegue en Lovable
+### API local
 
-1. Conecta el repositorio en Lovable.
-2. Define variables de entorno (si aplica backend externo):
-   - `VITE_TAMV_BACKEND_URL`
-3. Usa comando de build:
-   - `npm run build`
-4. Publica el artefacto de Vite (`dist/`).
+```bash
+npm run api:start
+```
 
-## Siguiente iteración recomendada
+Variables clave:
 
-- Exponer `AtlasKernel` como API real (`/auth`, `/users`, `/protocols`, `/economy`, `/xr`) en backend.
-- Integrar persistencia (Postgres/Supabase) en vez de memoria en proceso.
-- Acoplar stream XR en tiempo real (WS/SSE) para render declarativo de eventos Guardian.
-- Completar videollamadas/streaming social con señalización WebRTC.
+- `VITE_TAMV_BACKEND_URL`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `TAMV_ORCID`, `TAMV_ZENODO_RECORD`, `TAMV_ISNI`
 
 ---
 
-Este README refleja el **avance real actual**: una base técnica funcional y testeada para seguir ensamblando TAMV como plataforma civilizatoria XR‑nativa.
+## 10) Estado ejecutivo
+
+**TAMV Atlas hoy es un sistema real funcional en evolución**, con capacidad de operar casos de uso concretos y base suficientemente robusta para pilotos serios. Su siguiente salto no depende de “más idea”, sino de **industrialización técnica** (hardening, observabilidad, CI/CD y seguridad operativa).
