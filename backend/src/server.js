@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
 import { config } from './config.js';
 import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
@@ -79,6 +80,11 @@ function buildSecurityPosture() {
   };
 }
 
+async function loadFederationReview() {
+  const payload = await readFile('data/federation/osopanda-triple-review-latest.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
 
 function requirePersistence(res) {
   if (atlasStore) return true;
@@ -114,6 +120,14 @@ const server = createServer(async (req, res) => {
   }
   if (req.method === 'GET' && url.pathname === '/v1/security/posture') {
     return writeJson(res, 200, buildSecurityPosture());
+  }
+  if (req.method === 'GET' && url.pathname === '/v1/federation/review') {
+    try {
+      const review = await loadFederationReview();
+      return writeJson(res, 200, review);
+    } catch (error) {
+      return writeJson(res, 404, { error: 'Federation review not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
   }
 
   if (req.method === 'GET' && url.pathname === '/v1/identity/org') {

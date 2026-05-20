@@ -17,7 +17,8 @@
     "api:test": "node --test backend/tests/*.test.js",
     "unify:discover": "./scripts/unify_osopanda_repos.sh --import-mode none",
     "unify:dry-run": "./scripts/unify_osopanda_repos.sh --import-mode squash --dry-run",
-    "unify:import": "./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json"
+    "unify:import": "./scripts/unify_osopanda_repos.sh --import-mode squash --state-file .tamv-unify-state.json",
+    "federation:review": "node scripts/triple_review_osopanda_repos.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
