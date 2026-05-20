@@ -8,7 +8,7 @@ const OUTPUTS = [
   'docs/UNIFIED_01_PLATFORM_AND_ARCHITECTURE.md',
   'docs/UNIFIED_02_SERVICES_AND_APIS.md',
   'docs/UNIFIED_03_GOVERNANCE_AND_SECURITY.md',
-  'docs/UNIFIED_04_ROADMAP_AND_OPERATIONS.md',
+  'docs/REPO_UNIFICATION_PLAYBOOK.md',
 ];
 
 async function walk(dir) {

@@ -90,6 +90,11 @@ async function loadMarkdownConsolidationReport() {
   return JSON.parse(payload);
 }
 
+async function loadReviewCycleReport() {
+  const payload = await readFile('data/ops/review-reformulate-cycle-latest.json', 'utf-8');
+  return JSON.parse(payload);
+}
+
 
 function requirePersistence(res) {
   if (atlasStore) return true;
@@ -141,6 +146,15 @@ const server = createServer(async (req, res) => {
       return writeJson(res, 200, report);
     } catch (error) {
       return writeJson(res, 404, { error: 'Markdown consolidation report not generated yet', detail: error instanceof Error ? error.message : String(error) });
+    }
+  }
+
+  if (req.method === 'GET' && url.pathname === '/v1/ops/review-cycle') {
+    try {
+      const report = await loadReviewCycleReport();
+      return writeJson(res, 200, report);
+    } catch (error) {
+      return writeJson(res, 404, { error: 'Review cycle report not generated yet', detail: error instanceof Error ? error.message : String(error) });
     }
   }
 
