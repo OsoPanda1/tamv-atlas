@@ -1,0 +1,370 @@
+{
+  "generated_at": "2026-05-20T09:23:10.086656Z",
+  "sources": [
+    {
+      "repo": "OsoPanda1/tamv-digital-nexus",
+      "url": "https://github.com/OsoPanda1/tamv-digital-nexus",
+      "local": "federation/tamv-digital-nexus"
+    },
+    {
+      "repo": "OsoPanda1/tamv-the-federated-frontier",
+      "url": "https://github.com/OsoPanda1/tamv-the-federated-frontier",
+      "local": "federation/tamv-the-federated-frontier"
+    }
+  ],
+  "stats": [
+    {
+      "name": "tamv-digital-nexus",
+      "file_count": 313,
+      "total_bytes": 1779425,
+      "extensions": {
+        ".md": 135,
+        ".json": 10,
+        ".yml": 4,
+        ".toml": 2,
+        ".ts": 140,
+        ".yaml": 11,
+        ".sql": 11
+      },
+      "top_files": [
+        {
+          "path": "docs/TAMV_UNIFIED_API_MASTER_TECHNICAL_v3.md",
+          "size": 61204
+        },
+        {
+          "path": "apps/web/src/integrations/supabase/types.ts",
+          "size": 50380
+        },
+        {
+          "path": ".playwright-cli/page-2026-02-24T16-00-42-416Z.yml",
+          "size": 34645
+        },
+        {
+          "path": "apps/web/src/systems/BCIEmotionalSystem.ts",
+          "size": 32425
+        },
+        {
+          "path": "apps/web/src/systems/UniversitySystem.ts",
+          "size": 31092
+        },
+        {
+          "path": "docs/TAMV_OPENAPI_SPEC_v3.1.0.yaml",
+          "size": 28723
+        },
+        {
+          "path": "packages/contracts/openapi/tamv.v1.yaml",
+          "size": 28723
+        },
+        {
+          "path": "apps/web/src/systems/SocialCoreSystem.ts",
+          "size": 28042
+        },
+        {
+          "path": "docs/14_hexa_edimap_architecture.md",
+          "size": 27902
+        },
+        {
+          "path": "apps/web/src/systems/AnubisSentinelSystem.ts",
+          "size": 26842
+        },
+        {
+          "path": "apps/web/src/lib/isabella/core.ts",
+          "size": 26346
+        },
+        {
+          "path": "docs/MDX4_FUNCTIONAL_ARCHITECTURE_MAP.md",
+          "size": 26224
+        },
+        {
+          "path": "supabase/migrations/001_initial_schema.sql",
+          "size": 23829
+        },
+        {
+          "path": "supabase/functions/auth-service-v3/index.ts",
+          "size": 23596
+        },
+        {
+          "path": "apps/web/src/systems/DekateotlGovernanceSystem.ts",
+          "size": 22019
+        },
+        {
+          "path": "docs/14b_hexa_edimap_tamv_integration_map.md",
+          "size": 21730
+        },
+        {
+          "path": "apps/web/src/systems/MembershipSystem.ts",
+          "size": 21581
+        },
+        {
+          "path": "apps/web/src/systems/FederationSystem.ts",
+          "size": 21286
+        },
+        {
+          "path": "supabase/functions/security-service/index.ts",
+          "size": 20882
+        },
+        {
+          "path": "apps/web/src/systems/EconomySystem.ts",
+          "size": 20195
+        },
+        {
+          "path": "supabase/functions/ai-generation-service/index.ts",
+          "size": 20053
+        },
+        {
+          "path": "docs/02_arquitectura_tamv_mdx4.md",
+          "size": 19781
+        },
+        {
+          "path": "apps/web/src/lib/media-gallery.ts",
+          "size": 19423
+        },
+        {
+          "path": "apps/web/src/systems/OsirisRecoverySystem.ts",
+          "size": 19264
+        },
+        {
+          "path": "apps/web/src/systems/RadaresSignalSystem.ts",
+          "size": 19182
+        }
+      ]
+    },
+    {
+      "name": "tamv-the-federated-frontier",
+      "file_count": 138,
+      "total_bytes": 487911,
+      "extensions": {
+        "(none)": 1,
+        ".md": 3,
+        ".json": 5,
+        ".js": 2,
+        ".html": 1,
+        ".ts": 49,
+        ".py": 1,
+        ".txt": 2,
+        ".docx": 1,
+        ".ico": 1,
+        ".svg": 1,
+        ".css": 2,
+        ".tsx": 69
+      },
+      "top_files": [
+        {
+          "path": "docs/core_backend.docx",
+          "size": 95034
+        },
+        {
+          "path": "src/components/ui/sidebar.tsx",
+          "size": 22837
+        },
+        {
+          "path": "src/pages/Blueprint.tsx",
+          "size": 20492
+        },
+        {
+          "path": "public/favicon.ico",
+          "size": 20373
+        },
+        {
+          "path": "src/pages/Index.tsx",
+          "size": 19940
+        },
+        {
+          "path": "src/pages/Publicaciones.tsx",
+          "size": 16743
+        },
+        {
+          "path": "src/pages/Certificaciones.tsx",
+          "size": 11772
+        },
+        {
+          "path": "src/pages/CEO.tsx",
+          "size": 10426
+        },
+        {
+          "path": "src/pages/Registros.tsx",
+          "size": 10204
+        },
+        {
+          "path": "src/components/ui/chart.tsx",
+          "size": 9987
+        },
+        {
+          "path": "README.md",
+          "size": 8571
+        },
+        {
+          "path": "src/components/ui/menubar.tsx",
+          "size": 7863
+        },
+        {
+          "path": "backend/tamv-atlas-core/main.py",
+          "size": 7677
+        },
+        {
+          "path": "src/components/ui/dropdown-menu.tsx",
+          "size": 7260
+        },
+        {
+          "path": "src/pages/Ecosistema.tsx",
+          "size": 7210
+        },
+        {
+          "path": "src/components/ui/context-menu.tsx",
+          "size": 7191
+        },
+        {
+          "path": "src/components/Layout.tsx",
+          "size": 7092
+        },
+        {
+          "path": "src/pages/Comunidad.tsx",
+          "size": 6973
+        },
+        {
+          "path": "src/pages/UTAMV.tsx",
+          "size": 6488
+        },
+        {
+          "path": "src/components/ui/carousel.tsx",
+          "size": 6249
+        },
+        {
+          "path": "src/components/ui/select.tsx",
+          "size": 5575
+        },
+        {
+          "path": "src/pages/Tecnologia.tsx",
+          "size": 5339
+        },
+        {
+          "path": "src/index.css",
+          "size": 5144
+        },
+        {
+          "path": "tailwind.config.ts",
+          "size": 5063
+        },
+        {
+          "path": "src/components/ui/navigation-menu.tsx",
+          "size": 5030
+        }
+      ]
+    }
+  ],
+  "catalog": {
+    "nexus_services": [
+      "README.md",
+      "ai-generation-service",
+      "auth-service",
+      "auth-service-v3",
+      "bci-emotional-handler",
+      "create-checkout",
+      "dashboard-metrics",
+      "dekateotl-security",
+      "dekateotl-security-enhanced",
+      "embedding-service",
+      "events",
+      "github-repo-scanner",
+      "governance-service",
+      "isabella-chat",
+      "isabella-chat-enhanced",
+      "isabella-tts",
+      "kaos-audio-system",
+      "membership-validator",
+      "orchestrator",
+      "payment-service",
+      "policy-engine",
+      "quantum-analytics",
+      "quantum-analytics-enhanced",
+      "rdm-digital-api",
+      "security-service",
+      "sensory-gate",
+      "stripe-webhook",
+      "tamv-content-sync",
+      "tamv-fusion-core",
+      "tamv-unified-api",
+      "transaction-service",
+      "voice-service",
+      "wallet-service"
+    ],
+    "nexus_edge_functions": [
+      "ai-generation-service",
+      "auth-service",
+      "auth-service-v3",
+      "bci-emotional-handler",
+      "create-checkout",
+      "dashboard-metrics",
+      "dekateotl-security",
+      "dekateotl-security-enhanced",
+      "embedding-service",
+      "events",
+      "github-repo-scanner",
+      "governance-service",
+      "isabella-chat",
+      "isabella-chat-enhanced",
+      "isabella-tts",
+      "kaos-audio-system",
+      "membership-validator",
+      "orchestrator",
+      "payment-service",
+      "policy-engine",
+      "quantum-analytics",
+      "quantum-analytics-enhanced",
+      "rdm-digital-api",
+      "security-service",
+      "sensory-gate",
+      "stripe-webhook",
+      "tamv-content-sync",
+      "tamv-fusion-core",
+      "tamv-unified-api",
+      "transaction-service",
+      "voice-service",
+      "wallet-service"
+    ],
+    "nexus_migrations": [
+      "001_initial_schema.sql",
+      "20250301_utamv_bci_membership.sql",
+      "20251024005602_26440f5d-289f-4821-9cc0-7520dacde20f.sql",
+      "20251024005823_73ef2f15-6067-4e05-b5b1-fcaef18b6cb6.sql",
+      "20251114002516_3e987028-f523-4936-af0b-d2a34a4a3b7e.sql",
+      "20251117220453_48082875-dec3-460b-95ca-b9b81a215898.sql",
+      "20251118014638_7c941545-2095-46dd-966d-a45d44733565.sql",
+      "20260221181111_4cdd3d47-5453-4bd8-8ec8-2010b07209b7.sql",
+      "20260301000000_university_extended.sql",
+      "20260308212143_ccc96fea-3326-4904-9276-62a93119b81f.sql",
+      "20260515000000_rdm_digital_os.sql"
+    ],
+    "frontier_pages": [
+      "Blueprint.tsx",
+      "CEO.tsx",
+      "Certificaciones.tsx",
+      "Comunidad.tsx",
+      "Ecosistema.tsx",
+      "Index.tsx",
+      "IntegracionTamv.tsx",
+      "IsabellaAI.tsx",
+      "ManifestoHumano.tsx",
+      "NotFound.tsx",
+      "Publicaciones.tsx",
+      "Registros.tsx",
+      "Tecnologia.tsx",
+      "UTAMV.tsx",
+      "VisualCenter.tsx"
+    ],
+    "frontier_core_modules": [
+      "api",
+      "catalog",
+      "domain",
+      "economy",
+      "eoct",
+      "guardian",
+      "identity",
+      "isabella",
+      "memory",
+      "protocol",
+      "social",
+      "xr"
+    ]
+  }
+}
