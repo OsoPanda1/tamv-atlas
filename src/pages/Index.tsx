@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Sparkles, Shield, Cpu, Database, Network, BookOpen, Globe2, Activity } from "lucide-react";
