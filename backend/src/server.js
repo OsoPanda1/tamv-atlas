@@ -7,10 +7,12 @@ import { loadPidStatus } from './pidConnectors.js';
 import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
 import { AtlasStore } from './atlasStore.js';
 import { AtlasKernelRuntime } from './atlasKernelRuntime.js';
+import { createIsabellaEngine } from './isabellaEngine.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
 const atlasKernel = new AtlasKernelRuntime();
+const isabellaEngine = createIsabellaEngine();
 const atlasStoreConfig = {
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
@@ -18,11 +20,6 @@ const atlasStoreConfig = {
 const hasPersistence = Boolean(atlasStoreConfig.supabaseUrl && atlasStoreConfig.supabaseServiceRoleKey);
 const atlasStore = hasPersistence ? new AtlasStore(atlasStoreConfig) : null;
 if (atlasStore) await atlasStore.init();
-import { createIsabellaEngine } from './isabellaEngine.js';
-
-const signingEngine = buildSigningEngine(config.signing.seed);
-const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
-const isabellaEngine = createIsabellaEngine();
 
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -65,6 +62,23 @@ function emitSse(res, event, payload) {
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
 }
 
+function buildSecurityPosture() {
+  const hasStrongSeed = Boolean(config.signing.seed && config.signing.seed.length >= 16);
+  const hasPidTriangulation = Boolean(config.pid.orcid && config.pid.zenodoRecord && config.pid.isni);
+  const corsMode = process.env.TAMV_CORS_MODE ?? 'open';
+  return {
+    status: hasStrongSeed && hasPidTriangulation ? 'hardened' : 'degraded',
+    antifragilityScore: [hasStrongSeed, hasPidTriangulation, hasPersistence].filter(Boolean).length / 3,
+    controls: {
+      pqcSigningSeed: hasStrongSeed ? 'ok' : 'weak',
+      pidTriangulation: hasPidTriangulation ? 'ok' : 'missing',
+      persistenceAuditTrail: hasPersistence ? 'ok' : 'disabled',
+      cors: corsMode,
+    },
+    checkedAt: new Date().toISOString(),
+  };
+}
+
 
 function requirePersistence(res) {
   if (atlasStore) return true;
@@ -97,6 +111,9 @@ const server = createServer(async (req, res) => {
       environment: config.environment,
       timestamp: new Date().toISOString(),
     });
+  }
+  if (req.method === 'GET' && url.pathname === '/v1/security/posture') {
+    return writeJson(res, 200, buildSecurityPosture());
   }
 
   if (req.method === 'GET' && url.pathname === '/v1/identity/org') {
