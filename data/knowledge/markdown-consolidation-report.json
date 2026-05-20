@@ -1,0 +1,18 @@
+{
+  "generatedAt": "2026-05-20T11:18:04.288Z",
+  "keptMarkdownFiles": [
+    "README.md",
+    "docs/REPO_UNIFICATION_PLAYBOOK.md",
+    "docs/UNIFIED_01_PLATFORM_AND_ARCHITECTURE.md",
+    "docs/UNIFIED_02_SERVICES_AND_APIS.md",
+    "docs/UNIFIED_03_GOVERNANCE_AND_SECURITY.md",
+    "federation/tamv-digital-nexus/AGENTS.md"
+  ],
+  "count": 6,
+  "outputs": [
+    "docs/UNIFIED_01_PLATFORM_AND_ARCHITECTURE.md",
+    "docs/UNIFIED_02_SERVICES_AND_APIS.md",
+    "docs/UNIFIED_03_GOVERNANCE_AND_SECURITY.md",
+    "docs/REPO_UNIFICATION_PLAYBOOK.md"
+  ]
+}

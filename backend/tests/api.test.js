@@ -108,3 +108,31 @@ test('GET /v1/pids/status returns aggregated provider state', async () => {
     globalThis.fetch = originalFetch;
   }
 });
+
+test('omni-kernel register/process/status endpoints work', async () => {
+  const isni = 'TAMVONLINE-ECOSISTEM-LATAM';
+
+  const registerRes = await fetch(`${base}/v1/omni/users/register`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ isni, name: 'Edwin Oswaldo Castillo Trejo' }),
+  });
+  assert.equal(registerRes.status, 201);
+
+  const processRes = await fetch(`${base}/v1/omni/process`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ isni, requestType: 'model-inference', payload: { content: 'Explica arquitectura MD-X4' } }),
+  });
+  assert.equal(processRes.status, 200);
+  const processData = await processRes.json();
+  assert.equal(processData.approved, true);
+
+  const userRes = await fetch(`${base}/v1/omni/users/${encodeURIComponent(isni)}`);
+  assert.equal(userRes.status, 200);
+
+  const statusRes = await fetch(`${base}/v1/omni/status`);
+  assert.equal(statusRes.status, 200);
+  const status = await statusRes.json();
+  assert.equal(typeof status.metrics.totalRequests, 'number');
+});
