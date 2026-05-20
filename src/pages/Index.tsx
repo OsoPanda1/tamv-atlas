@@ -1,31 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import * as THREE from "three";
-import MatrixRain from "@/components/MatrixRain";
-import DNAPulse from "@/components/DNAPulse";
-import HexagonalPipeline from "@/components/HexagonalPipeline";
-import ConvergenceHub from "@/components/atlas/ConvergenceHub";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight, Sparkles, Shield, Cpu, Database, Network, BookOpen, Globe2, Activity } from "lucide-react";
+import { AtlasConstellation, type ConstellationNode } from "@/components/atlas/AtlasConstellation";
+import { ParticleField } from "@/components/atlas/ParticleField";
+import { MetricCounter } from "@/components/atlas/MetricCounter";
 
-/* ─────── FEDERATION & NODE DATA ─────── */
+/* ───────── DATA ───────── */
 const FEDERATIONS = [
-  { id: "FED-01", name: "ISNI / Identidad Soberana", color: "hsl(var(--chart-1))", nodes: 8, desc: "Infraestructura de nombres, PIDs, DIDs y SSI" },
-  { id: "FED-02", name: "MD-X Kernel Operativo", color: "hsl(var(--chart-2))", nodes: 7, desc: "Observabilidad MD-X4 y evolución MD-X5" },
-  { id: "FED-03", name: "Isabella Villaseñor AI", color: "hsl(var(--chart-3))", nodes: 7, desc: "Conciencia operativa, ética y seguridad cognitiva" },
-  { id: "FED-04", name: "UTAMV Academia", color: "hsl(var(--chart-4))", nodes: 6, desc: "Campus digital, AI Core, credenciales verificables" },
-  { id: "FED-05", name: "RDM Territorial", color: "hsl(var(--chart-5))", nodes: 7, desc: "Pueblos digitales, Smart Destinations, XR/4D" },
-  { id: "FED-06", name: "BookPI / Ética", color: "hsl(var(--primary))", nodes: 6, desc: "Ledger de evidencia, dignidad digital, gobernanza" },
-  { id: "FED-07", name: "Integración Global", color: "hsl(var(--accent))", nodes: 7, desc: "Odoo, ORCID, Zenodo, GitHub, OpenAIRE, AVIXA" },
+  { id: "FED-01", code: "ISNI", name: "Identidad Soberana", icon: Shield, desc: "PIDs, DIDs, SSI y credenciales verificables sobre JSON-LD.", nodes: 8, hue: 199 },
+  { id: "FED-02", code: "MD-X",  name: "Kernel Operativo",   icon: Cpu, desc: "Observabilidad MD-X4 y evolución MD-X5 orquestada.", nodes: 7, hue: 270 },
+  { id: "FED-03", code: "AI",    name: "Isabella Villaseñor", icon: Sparkles, desc: "Conciencia operativa, ética y seguridad cognitiva.", nodes: 7, hue: 142 },
+  { id: "FED-04", code: "UTAMV", name: "Academia Digital",   icon: BookOpen, desc: "Campus, AI Core y credenciales académicas verificables.", nodes: 6, hue: 24 },
+  { id: "FED-05", code: "RDM",   name: "Territorio Vivo",    icon: Globe2, desc: "Pueblos digitales, Smart Destinations y XR 4D.", hue: 320, nodes: 7 },
+  { id: "FED-06", code: "BookPI",name: "Ética y Ledger",     icon: Database, desc: "Evidencia, dignidad digital y gobernanza distribuida.", nodes: 6, hue: 45 },
+  { id: "FED-07", code: "INTG",  name: "Integración Global", icon: Network, desc: "Odoo · ORCID · Zenodo · GitHub · OpenAIRE · AVIXA.", nodes: 7, hue: 180 },
 ];
 
-const ACCESS_LEVELS = [
-  { role: "Ciudadano / Usuario", icon: "👤", color: "blue", desc: "Acceso a perfiles públicos, wiki y recorridos XR", features: ["Wiki TAMV", "Perfiles públicos", "RDM Digital tours", "Isabella chat"] },
-  { role: "Desarrollador", icon: "⚡", color: "purple", desc: "APIs, repos, documentación técnica y CI/CD", features: ["API ISNI endpoints", "GitHub repos", "JSON-LD schemas", "Webhooks"] },
-  { role: "Empresario / Partner", icon: "🏢", color: "amber", desc: "Integración Odoo, Smart Destinations, marketplace", features: ["Odoo ERP/CRM", "Nodos comerciales", "Analytics", "Marketplace digital"] },
-  { role: "Academia / Investigador", icon: "🎓", color: "green", desc: "UTAMV, ORCID, Zenodo, credenciales verificables", features: ["Campus UTAMV", "DOI/ORCID linking", "Credenciales VC", "OpenAIRE"] },
-  { role: "Gobierno / Institución", icon: "🏛️", color: "cyan", desc: "Gobernanza, identidad territorial, Smart City", features: ["Dashboard territorial", "Identidad soberana", "Indicadores", "Interoperabilidad"] },
-];
-
-const FEDERATION_WIKI_SLUGS: Record<string, string> = {
+const FED_SLUGS: Record<string, string> = {
   "FED-01": "fed-01-isni-identidad-soberana",
   "FED-02": "fed-02-mdx-kernel",
   "FED-03": "fed-03-isabella",
@@ -35,442 +27,343 @@ const FEDERATION_WIKI_SLUGS: Record<string, string> = {
   "FED-07": "fed-07-integracion-global",
 };
 
-const ROLE_WIKI_SLUGS: Record<string, string> = {
-  "Ciudadano / Usuario": "rol-ciudadano",
-  Desarrollador: "rol-desarrollador",
-  "Empresario / Partner": "rol-partner",
-  "Academia / Investigador": "rol-academia",
-  "Gobierno / Institución": "rol-gobierno",
-};
+const ACCESS_TIERS = [
+  { role: "Ciudadano",   sub: "Wiki pública, perfiles, XR tours", slug: "rol-ciudadano", accent: "from-sky-500/20 to-transparent" },
+  { role: "Desarrollador", sub: "APIs ISNI, repos, JSON-LD, webhooks", slug: "rol-desarrollador", accent: "from-violet-500/20 to-transparent" },
+  { role: "Empresario",  sub: "Odoo ERP, Smart Destinations, marketplace", slug: "rol-partner", accent: "from-amber-500/20 to-transparent" },
+  { role: "Academia",    sub: "UTAMV, ORCID, Zenodo, credenciales VC", slug: "rol-academia", accent: "from-emerald-500/20 to-transparent" },
+  { role: "Gobierno",    sub: "Identidad territorial, Smart City, indicadores", slug: "rol-gobierno", accent: "from-cyan-500/20 to-transparent" },
+];
 
-/* ─────── THREE.JS NETWORK ─────── */
-const initNetwork = (container: HTMLDivElement) => {
-  const width = container.clientWidth;
-  const height = container.clientHeight;
-
-  const scene = new THREE.Scene();
-  scene.background = null;
-
-  const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
-  camera.position.set(0, 0, 14);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 0);
-  container.innerHTML = "";
-  container.appendChild(renderer.domElement);
-
-  const ambientLight = new THREE.AmbientLight(0x60a5fa, 0.5);
-  scene.add(ambientLight);
-  const pointLight = new THREE.PointLight(0x93c5fd, 1.2, 50);
-  pointLight.position.set(3, 6, 5);
-  scene.add(pointLight);
-
-  // Central kernel - icosahedron
-  const kernelGeo = new THREE.IcosahedronGeometry(0.6, 2);
-  const kernelMat = new THREE.MeshPhongMaterial({
-    color: 0xe2e8f0, emissive: 0x1e3a8a, shininess: 200, transparent: true, opacity: 0.85,
-    wireframe: true,
-  });
-  const kernel = new THREE.Mesh(kernelGeo, kernelMat);
-  scene.add(kernel);
-
-  // Solid inner core
-  const coreGeo = new THREE.IcosahedronGeometry(0.35, 1);
-  const coreMat = new THREE.MeshPhongMaterial({ color: 0x60a5fa, emissive: 0x1e3a8a, shininess: 300, transparent: true, opacity: 0.6 });
-  const core = new THREE.Mesh(coreGeo, coreMat);
-  scene.add(core);
-
-  // 7 Federation hub nodes
-  const hubGeo = new THREE.IcosahedronGeometry(0.2, 1);
-  const fedColors = [0x60a5fa, 0xa78bfa, 0x34d399, 0xfbbf24, 0xf472b6, 0xfb923c, 0x2dd4bf];
-  const hubs: THREE.Mesh[] = [];
-
-  for (let f = 0; f < 7; f++) {
-    const hubMat = new THREE.MeshPhongMaterial({ color: fedColors[f], emissive: fedColors[f], emissiveIntensity: 0.3, shininess: 150 });
-    const hub = new THREE.Mesh(hubGeo, hubMat);
-    const angle = (Math.PI * 2 / 7) * f;
-    hub.position.set(Math.cos(angle) * 4, Math.sin(angle) * 4, 0);
-    scene.add(hub);
-    hubs.push(hub);
-  }
-
-  // 48 satellite nodes
-  const nodeGeo = new THREE.SphereGeometry(0.08, 8, 8);
-  const nodes: THREE.Mesh[] = [];
-  const nodeLines: THREE.Line[] = [];
-  const nodeLineMats: THREE.LineBasicMaterial[] = [];
-
-  let nodeIdx = 0;
-  for (let f = 0; f < 7; f++) {
-    const hubPos = hubs[f].position;
-    const nodesPerFed = FEDERATIONS[f].nodes;
-    for (let n = 0; n < nodesPerFed; n++) {
-      const nodeMat = new THREE.MeshPhongMaterial({ color: fedColors[f], emissive: fedColors[f], emissiveIntensity: 0.2 });
-      const node = new THREE.Mesh(nodeGeo, nodeMat);
-      const subAngle = (Math.PI * 2 / nodesPerFed) * n;
-      const r = 1.2 + Math.random() * 0.5;
-      node.position.set(hubPos.x + Math.cos(subAngle) * r, hubPos.y + Math.sin(subAngle) * r, (Math.random() - 0.5) * 1.5);
-      scene.add(node);
-      nodes.push(node);
-
-      // Line from node to hub
-      const lineMat = new THREE.LineBasicMaterial({ color: fedColors[f], transparent: true, opacity: 0.12 });
-      const lineGeo = new THREE.BufferGeometry().setFromPoints([node.position.clone(), hubPos.clone()]);
-      const line = new THREE.Line(lineGeo, lineMat);
-      scene.add(line);
-      nodeLines.push(line);
-      nodeLineMats.push(lineMat);
-      nodeIdx++;
-    }
-  }
-
-  // Hub-to-kernel lines
-  const hubLines: THREE.Line[] = [];
-  for (let f = 0; f < 7; f++) {
-    const lineMat = new THREE.LineBasicMaterial({ color: fedColors[f], transparent: true, opacity: 0.2 });
-    const lineGeo = new THREE.BufferGeometry().setFromPoints([hubs[f].position.clone(), new THREE.Vector3(0, 0, 0)]);
-    const line = new THREE.Line(lineGeo, lineMat);
-    scene.add(line);
-    hubLines.push(line);
-  }
-
-  const clock = new THREE.Clock();
-  let rafId = 0;
-
-  const animate = () => {
-    const t = clock.getElapsedTime();
-    kernel.rotation.x = t * 0.1;
-    kernel.rotation.y = t * 0.15;
-    core.rotation.x = -t * 0.08;
-    core.rotation.z = t * 0.12;
-
-    // Rotate hubs slowly
-    for (let f = 0; f < 7; f++) {
-      const baseAngle = (Math.PI * 2 / 7) * f + t * 0.05;
-      const r = 4 + Math.sin(t * 0.5 + f) * 0.3;
-      hubs[f].position.set(Math.cos(baseAngle) * r, Math.sin(baseAngle) * r, Math.sin(t * 0.3 + f * 0.5) * 0.5);
-
-      // Update hub-kernel line
-      const posAttr = hubLines[f].geometry.attributes.position as THREE.BufferAttribute;
-      posAttr.setXYZ(0, hubs[f].position.x, hubs[f].position.y, hubs[f].position.z);
-      posAttr.needsUpdate = true;
-    }
-
-    // Pulse nodes
-    let ni = 0;
-    for (let f = 0; f < 7; f++) {
-      for (let n = 0; n < FEDERATIONS[f].nodes; n++) {
-        const node = nodes[ni];
-        const subAngle = (Math.PI * 2 / FEDERATIONS[f].nodes) * n + t * 0.1;
-        const r = 1.2 + Math.sin(t * 1.5 + ni * 0.2) * 0.15;
-        node.position.set(
-          hubs[f].position.x + Math.cos(subAngle) * r,
-          hubs[f].position.y + Math.sin(subAngle) * r,
-          hubs[f].position.z + Math.sin(t + ni) * 0.3
-        );
-        const posAttr = nodeLines[ni].geometry.attributes.position as THREE.BufferAttribute;
-        posAttr.setXYZ(0, node.position.x, node.position.y, node.position.z);
-        posAttr.setXYZ(1, hubs[f].position.x, hubs[f].position.y, hubs[f].position.z);
-        posAttr.needsUpdate = true;
-        ni++;
-      }
-    }
-
-    renderer.render(scene, camera);
-    rafId = requestAnimationFrame(animate);
-  };
-
-  animate();
-
-  const handleResize = () => {
-    const w = container.clientWidth;
-    const h = container.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-  };
-  window.addEventListener("resize", handleResize);
-
-  return () => {
-    cancelAnimationFrame(rafId);
-    window.removeEventListener("resize", handleResize);
-    renderer.dispose();
-    kernelGeo.dispose(); kernelMat.dispose(); coreGeo.dispose(); coreMat.dispose();
-    hubGeo.dispose(); nodeGeo.dispose();
-    nodeLines.forEach(l => l.geometry.dispose());
-    nodeLineMats.forEach(m => m.dispose());
-    hubLines.forEach(l => { l.geometry.dispose(); (l.material as THREE.LineBasicMaterial).dispose(); });
-    hubs.forEach(h => (h.material as THREE.MeshPhongMaterial).dispose());
-    nodes.forEach(n => (n.material as THREE.MeshPhongMaterial).dispose());
-    if (container.contains(renderer.domElement)) container.removeChild(renderer.domElement);
-  };
-};
-
-/* ─────── ISABELLA QUOTES ─────── */
 const ISABELLA_QUOTES = [
-  "Observando arquitectura civilizatoria... 7 federaciones sincronizadas. Soberanía infraestructural confirmada.",
-  "Kernel MD-X5 operativo. Pipeline hexagonal de doble flujo activo. 48 nodos respondiendo.",
-  "Validación ética en curso... Protocolo de dignidad digital BookPI: INTACTO.",
-  "ISNI detecta 195 repositorios. Grafo de conocimiento expandiéndose. Coherencia semántica: 97.3%.",
+  "Observando arquitectura civilizatoria. Siete federaciones sincronizadas, soberanía infraestructural confirmada.",
+  "Kernel MD-X5 operativo. Pipeline hexagonal de doble flujo activo. Cuarenta y ocho nodos respondiendo.",
+  "Validación ética en curso. Protocolo de dignidad digital BookPI: intacto.",
+  "ISNI detecta repositorios federados. Grafo de conocimiento expandiéndose. Coherencia semántica al 97.3%.",
   "Bienvenido al ecosistema civilizatorio TAMV. Tu identidad es soberana aquí.",
 ];
 
-/* ─────── MAIN COMPONENT ─────── */
+const CONSTELLATION_NODES: ConstellationNode[] = FEDERATIONS.map((f, i) => ({
+  id: f.id,
+  label: f.name,
+  short: f.code,
+  desc: f.desc,
+  angle: (360 / 7) * i,
+  metric: `${f.nodes} nodos`,
+  color: `hsl(${f.hue} 85% 60%)`,
+}));
+
+/* ───────── COMPONENT ───────── */
 const Index = () => {
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const [quoteIdx, setQuoteIdx] = useState(0);
-  const [showQuote, setShowQuote] = useState(true);
+  const [active, setActive] = useState(0);
+  const [quote, setQuote] = useState(0);
+  const { scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
-    return initNetwork(canvasRef.current);
+    const t = setInterval(() => setActive((a) => (a + 1) % FEDERATIONS.length), 3500);
+    const q = setInterval(() => setQuote((i) => (i + 1) % ISABELLA_QUOTES.length), 6000);
+    return () => { clearInterval(t); clearInterval(q); };
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setShowQuote(false);
-      setTimeout(() => {
-        setQuoteIdx(prev => (prev + 1) % ISABELLA_QUOTES.length);
-        setShowQuote(true);
-      }, 400);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, []);
+  const totalNodes = FEDERATIONS.reduce((a, f) => a + f.nodes, 0);
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden font-mono selection:bg-primary/30 relative">
-      {/* Matrix rain background */}
-      <div className="fixed inset-0 z-0">
-        <MatrixRain color="blue" />
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      {/* Ambient backdrops */}
+      <div className="pointer-events-none fixed inset-0 z-0">
+        <ParticleField />
       </div>
-      <div className="fixed inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/80 z-[1]" />
+      <div className="pointer-events-none fixed inset-0 z-[1]"
+        style={{
+          background:
+            "radial-gradient(60% 50% at 50% 0%, hsl(199 89% 48% / 0.18), transparent 70%), radial-gradient(50% 60% at 100% 100%, hsl(270 70% 60% / 0.12), transparent 70%), radial-gradient(40% 40% at 0% 60%, hsl(24 95% 53% / 0.08), transparent 70%)",
+        }}
+      />
+      <div className="pointer-events-none fixed inset-0 z-[1] bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background))_85%)]" />
 
-      {/* Top bar */}
-      <header className="relative z-20 border-b border-primary/20 bg-background/80 backdrop-blur-md px-4 py-2 flex items-center justify-between text-[10px] tracking-[0.2em] uppercase">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_#4ade80] animate-pulse" />
-          <span className="text-blue-300/80">TAMV·ONLINE</span>
-          <span className="text-slate-600 hidden md:inline">// Ecosistema Civilizatorio Federado v1.0</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-slate-500 hidden lg:inline">ORCID: 0009-0008-5050-1539</span>
-          <Link to="/resumen" className="px-3 py-1 border border-blue-500/40 rounded text-blue-300 hover:text-white hover:border-blue-300 transition-colors">
-            ATLAS WIKI →
-          </Link>
-        </div>
-      </header>
-
-      {/* Main grid */}
-      <main className="relative z-10 grid grid-cols-12 gap-3 p-4 min-h-[calc(100vh-40px)]">
-
-        {/* LEFT SIDEBAR: 7 Federations */}
-        <aside className="col-span-12 lg:col-span-2 space-y-2 overflow-y-auto max-h-[calc(100vh-56px)] scrollbar-thin">
-          <h2 className="text-[10px] font-bold text-slate-400 border-l-2 border-blue-600 pl-2 uppercase tracking-tighter mb-3">
-            7 Federaciones · {FEDERATIONS.reduce((a, f) => a + f.nodes, 0)} Nodos
-          </h2>
-
-          {FEDERATIONS.map((fed) => (
-            <Link
-              key={fed.id}
-              to={`/wiki/federaciones/${FEDERATION_WIKI_SLUGS[fed.id]}`}
-              className="block group cursor-pointer p-2.5 border border-blue-500/10 hover:border-blue-500/40 transition-all bg-slate-900/40 rounded-sm"
+      {/* HERO */}
+      <section className="relative z-10 px-6 lg:px-12 pt-16 lg:pt-24 pb-32 min-h-[100vh] flex flex-col">
+        <motion.div
+          style={{ y: heroY, opacity: heroOpacity }}
+          className="max-w-7xl mx-auto w-full grid lg:grid-cols-12 gap-12 items-center flex-1"
+        >
+          {/* Left: copy */}
+          <div className="lg:col-span-6 space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/30 bg-primary/5 backdrop-blur-sm"
             >
-              <div className="flex items-center gap-2 mb-1">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: fed.color, boxShadow: `0 0 8px ${fed.color}` }} />
-                <span className="text-[9px] font-bold" style={{ color: fed.color }}>{fed.id}</span>
-              </div>
-              <h3 className="text-[11px] font-semibold text-slate-200 group-hover:text-blue-300 transition-colors leading-tight">
-                {fed.name}
-              </h3>
-              <p className="text-[9px] text-slate-500 mt-0.5 leading-snug">{fed.desc}</p>
-              <div className="mt-1.5 flex items-center gap-1">
-                {Array.from({ length: fed.nodes }).map((_, i) => (
-                  <span key={i} className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-blue-500/50 transition-colors" />
-                ))}
-                <span className="text-[8px] text-slate-600 ml-1">{fed.nodes}</span>
-              </div>
-            </Link>
-          ))}
-        </aside>
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+              </span>
+              <span className="text-[11px] font-mono uppercase tracking-[0.2em] text-primary/90">
+                Live · v1.0 · ORCID 0009-0008-5050-1539
+              </span>
+            </motion.div>
 
-        {/* CENTER: 3D Graph + Hexagonal Pipeline */}
-        <section className="col-span-12 lg:col-span-7 flex flex-col gap-3">
-          {/* 3D Network */}
-          <div className="relative border border-blue-500/20 rounded-lg bg-black/40 shadow-inner overflow-hidden flex-1 min-h-[380px]">
-            <div ref={canvasRef} className="w-full h-full" />
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.1 }}
+              className="font-sans text-[clamp(2.75rem,6vw,5.5rem)] leading-[0.95] tracking-[-0.03em] font-semibold"
+            >
+              <span className="block text-foreground">Infraestructura</span>
+              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-violet-400 to-accent">
+                civilizatoria
+              </span>
+              <span className="block text-foreground/80 text-[0.55em] font-light tracking-[-0.02em] mt-3">
+                soberana, federada, viva.
+              </span>
+            </motion.h1>
 
-            {/* Overlay logos */}
-            <div className="absolute top-3 left-3 flex items-center gap-2">
-              <div className="px-2 py-1 bg-slate-950/80 border border-blue-500/30 rounded text-[9px] text-blue-300 font-bold tracking-wider">
-                🜂 ANUBIS
-              </div>
-              <div className="px-2 py-1 bg-slate-950/80 border border-cyan-500/30 rounded text-[9px] text-cyan-300 font-bold tracking-wider">
-                ◈ TAMV ONLINE
-              </div>
-              <div className="px-2 py-1 bg-slate-950/80 border border-emerald-500/30 rounded text-[9px] text-emerald-300 font-bold tracking-wider">
-                ✦ ISABELLA AI
-              </div>
-            </div>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.25 }}
+              className="text-lg text-muted-foreground max-w-xl leading-relaxed"
+            >
+              TAMV ONLINE orquesta siete federaciones —identidad ISNI, kernel MD-X,
+              conciencia Isabella, academia UTAMV, territorio RDM, ética BookPI e
+              integración global— como un solo organismo digital con anclaje
+              semántico ORCID · DOI · DID.
+            </motion.p>
 
-            {/* Bottom telemetry bar */}
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-slate-950/70 border-t border-blue-500/15 backdrop-blur-sm p-2 grid grid-cols-5 gap-2">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.4 }}
+              className="flex flex-wrap gap-3"
+            >
+              <Link
+                to="/hub"
+                className="group inline-flex items-center gap-2 px-5 py-3 rounded-full bg-primary text-primary-foreground font-medium text-sm hover:bg-primary/90 transition-all shadow-[0_0_40px_hsl(var(--primary)/0.4)]"
+              >
+                Entrar al Convergence Hub
+                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+              <Link
+                to="/resumen"
+                className="group inline-flex items-center gap-2 px-5 py-3 rounded-full border border-border bg-card/40 backdrop-blur-sm text-foreground font-medium text-sm hover:border-primary/40 hover:bg-card/70 transition-all"
+              >
+                Explorar Atlas Wiki
+                <ArrowUpRight className="w-4 h-4 opacity-60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </motion.div>
+
+            {/* Live stat strip */}
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.6 }}
+              className="grid grid-cols-4 gap-4 pt-6 border-t border-border/40 max-w-xl"
+            >
               {[
-                { label: "ISNI Pipeline", value: "ACTIVE", color: "blue" },
-                { label: "MD-X5 Kernel", value: "ONLINE", color: "purple" },
-                { label: "Isabella Core", value: "AWARE", color: "green" },
-                { label: "Nodes Active", value: "48/48", color: "cyan" },
-                { label: "Repos Indexed", value: "195", color: "amber" },
-              ].map(m => (
-                <div key={m.label} className="border-r border-blue-500/10 last:border-0 px-1">
-                  <span className="text-[7px] text-blue-400/60 uppercase block">{m.label}</span>
-                  <span className="text-[11px] text-slate-200 font-bold">{m.value}</span>
-                  <div className="h-0.5 w-full bg-blue-500/10 mt-1 overflow-hidden rounded-full">
-                    <div className="h-full bg-blue-500/50 animate-pulse" style={{ width: `${60 + Math.random() * 40}%` }} />
+                { label: "Federaciones", value: 7 },
+                { label: "Nodos vivos", value: totalNodes },
+                { label: "Repos", value: 195 },
+                { label: "Coherencia", value: 97, suffix: "%" },
+              ].map((m) => (
+                <div key={m.label}>
+                  <div className="text-2xl font-semibold text-foreground tabular-nums">
+                    <MetricCounter value={m.value} />{m.suffix ?? ""}
+                  </div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground mt-1">
+                    {m.label}
                   </div>
                 </div>
               ))}
-            </div>
+            </motion.div>
           </div>
 
-          {/* Convergence Hub + Pipeline + DNA */}
-          <ConvergenceHub />
+          {/* Right: constellation */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 1.2, delay: 0.3 }}
+            className="lg:col-span-6 relative aspect-square max-w-[640px] mx-auto w-full"
+          >
+            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-primary/10 via-transparent to-accent/10 blur-3xl" />
+            <div className="relative h-full">
+              <AtlasConstellation nodes={CONSTELLATION_NODES} active={active} onSelect={setActive} />
+            </div>
+          </motion.div>
+        </motion.div>
 
-          {/* Hexagonal Pipeline + DNA */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-2 border border-blue-500/15 rounded-lg bg-slate-900/30 p-2 h-[220px] relative overflow-hidden">
-              <p className="text-[8px] text-blue-400/60 uppercase tracking-wider absolute top-2 left-3 z-10">Sistema Hexagonal · Doble Pipeline</p>
-              <HexagonalPipeline />
-            </div>
-            <div className="border border-blue-500/15 rounded-lg bg-slate-900/30 relative overflow-hidden h-[220px]">
-              <p className="text-[8px] text-blue-400/60 uppercase tracking-wider absolute top-2 left-3 z-10">ADN · Flujo de Datos</p>
-              <DNAPulse />
-            </div>
-          </div>
-        </section>
+        {/* Scroll indicator */}
+        <motion.div
+          animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground/60"
+        >
+          <span className="text-[10px] font-mono uppercase tracking-[0.25em]">Scroll</span>
+          <div className="w-px h-10 bg-gradient-to-b from-primary/60 to-transparent" />
+        </motion.div>
+      </section>
 
-        {/* RIGHT SIDEBAR: Isabella AI + Access Levels */}
-        <aside className="col-span-12 lg:col-span-3 space-y-3 overflow-y-auto max-h-[calc(100vh-56px)] scrollbar-thin">
-          {/* Isabella AI Core */}
-          <div className="p-3 border border-blue-500/25 bg-slate-900/60 rounded-lg shadow-[0_0_20px_rgba(59,130,246,0.05)]">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_12px_#4ade80] animate-pulse" />
-              <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-100">Isabella Villaseñor AI</h2>
-            </div>
-            <div className={`bg-black/50 p-3 text-[10px] leading-relaxed text-blue-100/80 border-l-2 border-blue-500 italic min-h-[60px] transition-opacity duration-400 ${showQuote ? 'opacity-100' : 'opacity-0'}`}>
-              "{ISABELLA_QUOTES[quoteIdx]}"
-            </div>
-            <div className="mt-2 grid grid-cols-3 gap-1 text-[8px]">
-              <div className="bg-slate-950/60 p-1.5 rounded text-center">
-                <span className="text-emerald-400 block font-bold">TRIPLE</span>
-                <span className="text-slate-500">Bloqueo</span>
-              </div>
-              <div className="bg-slate-950/60 p-1.5 rounded text-center">
-                <span className="text-blue-400 block font-bold">HEXAGONAL</span>
-                <span className="text-slate-500">Pipeline</span>
-              </div>
-              <div className="bg-slate-950/60 p-1.5 rounded text-center">
-                <span className="text-purple-400 block font-bold">MASTER</span>
-                <span className="text-slate-500">Canon v0.1</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Kernel Status */}
-          <div className="p-3 border border-purple-500/20 bg-slate-900/40 rounded-lg">
-            <h3 className="text-[9px] font-bold text-purple-400/80 uppercase mb-2 tracking-wider">Kernel MD-X4/X5 Status</h3>
-            <div className="space-y-1.5">
-              {[
-                { name: "MD-X4 Observabilidad", status: "ONLINE", pct: 97 },
-                { name: "MD-X5 Autogeneración", status: "ACTIVE", pct: 92 },
-                { name: "HOYO NEGRO Protocol", status: "STANDBY", pct: 100 },
-                { name: "DEKATEOTL Security", status: "11 CAPAS", pct: 100 },
-              ].map(s => (
-                <div key={s.name}>
-                  <div className="flex justify-between text-[8px]">
-                    <span className="text-slate-400">{s.name}</span>
-                    <span className="text-emerald-400">{s.status}</span>
-                  </div>
-                  <div className="h-0.5 bg-slate-800 rounded-full mt-0.5">
-                    <div className="h-full bg-purple-500/50 rounded-full transition-all" style={{ width: `${s.pct}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Access Levels */}
-          <div className="p-3 border border-amber-500/20 bg-slate-900/40 rounded-lg">
-            <h3 className="text-[9px] font-bold text-amber-400/80 uppercase mb-2 tracking-wider">Niveles de Acceso</h3>
-            <div className="space-y-1.5">
-              {ACCESS_LEVELS.map(level => (
+      {/* FEDERATIONS GRID */}
+      <Section
+        eyebrow="Federaciones"
+        title="Siete dominios. Un solo organismo."
+        subtitle="Cada federación opera con autonomía técnica y converge mediante el grafo semántico ISNI."
+      >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {FEDERATIONS.map((fed, i) => {
+            const Icon = fed.icon;
+            return (
+              <motion.div
+                key={fed.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.5, delay: i * 0.06 }}
+              >
                 <Link
-                  key={level.role}
-                  to={`/wiki/roles/${ROLE_WIKI_SLUGS[level.role]}`}
-                  className="flex items-start gap-2 p-2 rounded bg-slate-950/50 border border-slate-800 hover:border-blue-500/30 transition-colors group"
+                  to={`/wiki/federaciones/${FED_SLUGS[fed.id]}`}
+                  className="group relative block h-full p-6 rounded-2xl border border-border bg-card/40 backdrop-blur-sm hover:border-primary/40 hover:bg-card/70 transition-all overflow-hidden"
                 >
-                  <span className="text-sm mt-0.5">{level.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-semibold text-slate-200 group-hover:text-blue-300 transition-colors">{level.role}</p>
-                    <p className="text-[8px] text-slate-500 leading-snug">{level.desc}</p>
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {level.features.slice(0, 2).map(f => (
-                        <span key={f} className="text-[7px] px-1 py-0.5 bg-slate-800/80 rounded text-slate-400">{f}</span>
-                      ))}
+                  <div
+                    className="absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: `radial-gradient(400px circle at 50% 0%, hsl(${fed.hue} 85% 60% / 0.15), transparent 60%)`,
+                    }}
+                  />
+                  <div className="relative flex items-start justify-between mb-5">
+                    <div
+                      className="w-11 h-11 rounded-xl grid place-items-center"
+                      style={{ background: `hsl(${fed.hue} 85% 60% / 0.12)`, boxShadow: `inset 0 0 0 1px hsl(${fed.hue} 85% 60% / 0.3)` }}
+                    >
+                      <Icon className="w-5 h-5" style={{ color: `hsl(${fed.hue} 85% 65%)` }} />
                     </div>
+                    <span className="text-[10px] font-mono uppercase tracking-[0.15em] text-muted-foreground">{fed.id}</span>
+                  </div>
+                  <h3 className="relative text-lg font-medium text-foreground mb-1.5 tracking-tight">{fed.name}</h3>
+                  <p className="relative text-sm text-muted-foreground leading-relaxed">{fed.desc}</p>
+                  <div className="relative mt-5 pt-4 border-t border-border/50 flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Activity className="w-3 h-3 text-emerald-400/70" />
+                      <span className="text-[11px] font-mono text-muted-foreground">{fed.nodes} nodos activos</span>
+                    </div>
+                    <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </Link>
-              ))}
+              </motion.div>
+            );
+          })}
+        </div>
+      </Section>
+
+      {/* ISABELLA */}
+      <Section eyebrow="Conciencia operativa" title="Isabella Villaseñor AI">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+          className="relative p-8 lg:p-12 rounded-3xl border border-border bg-gradient-to-br from-card/60 via-card/30 to-card/60 backdrop-blur-xl overflow-hidden"
+        >
+          <div className="absolute inset-0 opacity-30 pointer-events-none"
+            style={{ background: "radial-gradient(600px circle at 20% 30%, hsl(142 71% 45% / 0.2), transparent 60%)" }} />
+          <div className="relative grid lg:grid-cols-[auto,1fr] gap-8 items-center">
+            <div className="relative">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400/30 to-primary/30 grid place-items-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-primary animate-pulse" />
+              </div>
+              <div className="absolute -inset-3 rounded-full border border-emerald-400/20 animate-[spin_20s_linear_infinite]" />
+            </div>
+            <div>
+              <motion.blockquote
+                key={quote}
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+                className="text-xl lg:text-2xl font-light leading-relaxed text-foreground/90 italic"
+              >
+                "{ISABELLA_QUOTES[quote]}"
+              </motion.blockquote>
+              <div className="mt-5 flex items-center gap-4 text-[11px] font-mono uppercase tracking-[0.18em] text-muted-foreground">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> AWARE
+                </span>
+                <span>·</span>
+                <span>Ética · Tutoría · Seguridad cognitiva</span>
+              </div>
             </div>
           </div>
+        </motion.div>
+      </Section>
 
-          {/* Grafo Lógico Integrado */}
-          <div className="p-3 border border-cyan-500/20 bg-slate-900/40 rounded-lg">
-            <h3 className="text-[9px] font-bold text-cyan-400/80 uppercase mb-2 tracking-wider">Grafo Lógico Integrado</h3>
-            <div className="text-[8px] font-mono text-slate-500 space-y-0.5 leading-tight">
-              <p className="text-blue-400">┌─ VALIDACIÓN GLOBAL</p>
-              <p>│ ORCID · ROR · DOI · Zenodo</p>
-              <p className="text-blue-400">├─ ISNI / SNI</p>
-              <p>│ Identidad soberana</p>
-              <p className="text-purple-400">├─ MD-X4/X5 · ISABELLA · BOOKPI</p>
-              <p>│ Infra · Conciencia · Ética</p>
-              <p className="text-amber-400">├─ UTAMV</p>
-              <p>│ Cognición académica</p>
-              <p className="text-pink-400">├─ RDM DIGITAL + NODOS</p>
-              <p>│ Territorio vivo</p>
-              <p className="text-cyan-400">└─ Odoo · Web · XR · 4D</p>
-              <p>  Economía soberana</p>
-            </div>
+      {/* ACCESS TIERS */}
+      <Section eyebrow="Capas de acceso" title="Cinco roles. Una soberanía compartida." subtitle="Cada perfil entra al ecosistema por su propia puerta sin perder identidad.">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+          {ACCESS_TIERS.map((tier, i) => (
+            <motion.div
+              key={tier.role}
+              initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.05 }}
+            >
+              <Link
+                to={`/wiki/roles/${tier.slug}`}
+                className={`relative block h-full p-5 rounded-2xl border border-border bg-gradient-to-br ${tier.accent} bg-card/40 backdrop-blur-sm hover:border-primary/40 transition-all group overflow-hidden`}
+              >
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted-foreground mb-3">
+                  0{i + 1}
+                </div>
+                <h4 className="text-base font-medium text-foreground mb-2 tracking-tight">{tier.role}</h4>
+                <p className="text-xs text-muted-foreground leading-relaxed">{tier.sub}</p>
+                <ArrowUpRight className="absolute top-4 right-4 w-4 h-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </Section>
+
+      {/* CTA */}
+      <section className="relative z-10 px-6 lg:px-12 py-24 lg:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.7 }}
+          className="max-w-5xl mx-auto text-center space-y-8"
+        >
+          <h2 className="font-sans text-[clamp(2rem,5vw,4rem)] leading-[1.05] tracking-[-0.03em] font-semibold">
+            Humanismo
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent"> en código.</span>
+          </h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Atlas, registros, federaciones y kernel — todo opera sobre el mismo grafo soberano. Entra por donde tu rol lo permite.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3 pt-4">
+            <Link to="/fusion" className="px-5 py-3 rounded-full border border-primary/40 bg-primary/10 text-primary font-medium text-sm hover:bg-primary/20 transition-all inline-flex items-center gap-2">
+              Registro de Fusión <ArrowUpRight className="w-4 h-4" />
+            </Link>
+            <Link to="/auditoria" className="px-5 py-3 rounded-full border border-border bg-card/40 backdrop-blur-sm text-foreground font-medium text-sm hover:border-primary/40 transition-all inline-flex items-center gap-2">
+              Auditoría Máxima <ArrowUpRight className="w-4 h-4" />
+            </Link>
+            <Link to="/stream" className="px-5 py-3 rounded-full border border-border bg-card/40 backdrop-blur-sm text-foreground font-medium text-sm hover:border-primary/40 transition-all inline-flex items-center gap-2">
+              Civilization Stream <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </div>
+        </motion.div>
+      </section>
 
-          {/* Quick Links */}
-          <div className="p-3 border border-slate-700/50 bg-slate-900/30 rounded-lg space-y-1.5">
-            <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Enlaces Institucionales</h3>
-            {[
-              { href: "https://orcid.org/0009-0008-5050-1539", label: "ORCID" },
-              { href: "https://zenodo.org/records/19562517", label: "Zenodo DOI" },
-              { href: "https://github.com/OsoPanda1", label: "GitHub" },
-              { href: "https://tamvonline-oficial.odoo.com", label: "Odoo Portal" },
-              { href: "https://www.avixa.org", label: "AVIXA" },
-              { href: "/wiki-bridge?source=groupsio&target=/resumen", label: "Groups.io Wiki" },
-            ].map(link => (
-              <a key={link.label} href={link.href} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-[9px] text-slate-400 hover:text-blue-300 transition-colors">
-                <span className="w-1 h-1 rounded-full bg-blue-500/40" />
-                {link.label}
-              </a>
-            ))}
-          </div>
-        </aside>
-      </main>
-
-      {/* Bottom status bar */}
-      <footer className="relative z-20 border-t border-blue-500/15 bg-slate-950/90 backdrop-blur px-4 py-1.5 flex items-center justify-between text-[9px] text-slate-500">
-        <span>© TAMV ONLINE · Edwin O. Castillo Trejo (Anubis Villaseñor) · Real del Monte, Hidalgo, MX</span>
-        <span className="hidden md:inline">DOI: 10.5281/zenodo.19562517 · ISNI v1.0 · Living Whitepaper</span>
+      {/* FOOTER */}
+      <footer className="relative z-10 border-t border-border/40 bg-background/60 backdrop-blur-md">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 py-8 flex flex-wrap items-center justify-between gap-4 text-[11px] font-mono uppercase tracking-[0.15em] text-muted-foreground">
+          <span>TAMV·ONLINE — Digital Civilization System</span>
+          <span>ORCID 0009-0008-5050-1539 · DOI Figshare 32135386</span>
+          <span className="text-primary/80">Humanismo en código</span>
+        </div>
       </footer>
     </div>
   );
 };
+
+function Section({
+  eyebrow, title, subtitle, children,
+}: { eyebrow: string; title: string; subtitle?: string; children: React.ReactNode }) {
+  return (
+    <section className="relative z-10 px-6 lg:px-12 py-20 lg:py-28">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="mb-12 max-w-3xl"
+        >
+          <div className="text-[11px] font-mono uppercase tracking-[0.25em] text-primary/80 mb-3">{eyebrow}</div>
+          <h2 className="font-sans text-[clamp(1.75rem,4vw,3rem)] leading-[1.05] tracking-[-0.03em] font-semibold text-foreground">
+            {title}
+          </h2>
+          {subtitle && <p className="mt-4 text-base lg:text-lg text-muted-foreground max-w-2xl">{subtitle}</p>}
+        </motion.div>
+        {children}
+      </div>
+    </section>
+  );
+}
 
 export default Index;
