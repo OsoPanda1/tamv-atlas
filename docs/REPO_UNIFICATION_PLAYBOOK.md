@@ -1,8 +1,8 @@
-# TAMV Digital Nexus · Playbook de unificación de repos (OsoPanda1)
+# Consolidado 4
 
-Este playbook define el proceso operativo para consolidar los repositorios de `OsoPanda1` dentro de un repo federado único (`tamv-digital-nexus`) con trazabilidad, reversibilidad y control de riesgo.
+Generado: 2026-05-20T11:18:04.265Z
 
-## 1) Objetivo
+Fuentes: 0
 
 - Descubrir automáticamente los repositorios fuente de `OsoPanda1`.
 - Generar un manifiesto auditable de importación.
