@@ -5,9 +5,11 @@ import { buildSigningEngine } from './pqcHybrid.js';
 import { buildDidDocument, buildOrganizationIdentity } from './identityRegistry.js';
 import { loadPidStatus } from './pidConnectors.js';
 import { discoverFusionPlan, executeFusion } from './repoFusionService.js';
+import { createIsabellaEngine } from './isabellaEngine.js';
 
 const signingEngine = buildSigningEngine(config.signing.seed);
 const orgIdentity = buildOrganizationIdentity(config, signingEngine.profile);
+const isabellaEngine = createIsabellaEngine();
 
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -107,6 +109,63 @@ const server = createServer(async (req, res) => {
       return writeJson(res, 502, {
         error: error instanceof Error ? error.message : 'Fusion execution failed',
       });
+    }
+  }
+
+
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/chat') {
+    try {
+      const body = await parseJsonBody(req);
+      return writeJson(res, 200, isabellaEngine.chat(body));
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/vision') {
+    const body = await parseJsonBody(req);
+    return writeJson(res, 200, isabellaEngine.vision(body));
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/audio') {
+    const body = await parseJsonBody(req);
+    return writeJson(res, 200, isabellaEngine.audio(body));
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/haptics') {
+    try {
+      const body = await parseJsonBody(req);
+      return writeJson(res, 200, isabellaEngine.haptics(body));
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
+    }
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/ledger/events') {
+    const body = await parseJsonBody(req);
+    return writeJson(res, 201, { event: isabellaEngine.registerLedgerEvent(body) });
+  }
+
+  if (req.method === 'GET' && url.pathname.startsWith('/api/v1/ledger/events/')) {
+    const id = url.pathname.replace('/api/v1/ledger/events/', '');
+    const event = isabellaEngine.getLedgerEvent(id);
+    if (!event) {
+      return writeJson(res, 404, { error: 'Ledger event not found', id });
+    }
+    return writeJson(res, 200, { event });
+  }
+
+  if (req.method === 'GET' && url.pathname === '/api/v1/plugins') {
+    return writeJson(res, 200, { plugins: isabellaEngine.listPlugins() });
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/v1/plugins/install') {
+    try {
+      const body = await parseJsonBody(req);
+      return writeJson(res, 201, { plugin: isabellaEngine.installPlugin(body.id) });
+    } catch (error) {
+      return writeJson(res, 400, { error: error instanceof Error ? error.message : 'Invalid request' });
     }
   }
 
