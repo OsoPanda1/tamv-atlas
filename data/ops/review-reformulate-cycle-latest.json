@@ -1,0 +1,31 @@
+{
+  "schema": "tamv.ops.review-reformulate-cycle.v1",
+  "generatedAt": "2026-05-20T11:18:04.456Z",
+  "checks": {
+    "markdownCount": 6,
+    "markdownLimitOk": true,
+    "consolidationCountMatches": true,
+    "federationReviewPresent": true
+  },
+  "structure": {
+    "root": 170,
+    "backend": 20,
+    "knowledge": 5,
+    "federation": 317,
+    "automation": 4,
+    "frontend": 191,
+    "data": 10
+  },
+  "federation": {
+    "owner": "OsoPanda1",
+    "repositories": 2,
+    "federations": 1,
+    "tamvInternalSha": "f8f2918bd2c9e6d6ac017346e3ea0726e12c5429ef333afd8361b011e98c4b6c"
+  },
+  "nextCycle": [
+    "run scripts/triple_review_osopanda_repos.mjs",
+    "run scripts/consolidate_markdown_canon.mjs",
+    "run scripts/review_reformulate_cycle.mjs"
+  ],
+  "cycleSha": "9baa999eebc04b7478f6a094fa3680ec580a29888d98145226f62365da614c73"
+}
