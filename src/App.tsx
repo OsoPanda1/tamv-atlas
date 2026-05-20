@@ -16,6 +16,7 @@ import Auditoria from "@/pages/Auditoria";
 import IdentidadDemo from "@/pages/IdentidadDemo";
 import InvestigacionNodo001 from "@/pages/InvestigacionNodo001";
 import ConvergenceHub from "@/pages/ConvergenceHub";
+import FusionRegistry from "@/pages/FusionRegistry";
 import DynamicWikiHome from "@/pages/wiki/WikiHome";
 import WikiPage from "@/pages/wiki/WikiPage";
 import { wikiStructure } from "@/data/wikiStructure";
