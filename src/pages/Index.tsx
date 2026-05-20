@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Sparkles, Shield, Cpu, Database, Network, BookOpen, Globe2, Activity } from "lucide-react";
 import { AtlasConstellation, type ConstellationNode } from "@/components/atlas/AtlasConstellation";
 import { ParticleField } from "@/components/atlas/ParticleField";
-import { useRef } from "react";
+
 
 /* ───────── DATA ───────── */
 const FEDERATIONS = [
