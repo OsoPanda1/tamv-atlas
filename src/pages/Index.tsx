@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight, Sparkles, Shield, Cpu, Database, Network, BookOpen, Globe2, Activity } from "lucide-react";
@@ -6,8 +6,6 @@ import { AtlasConstellation, type ConstellationNode } from "@/components/atlas/A
 import { ParticleField } from "@/components/atlas/ParticleField";
 import MatrixRain from "@/components/horizon/MatrixRain";
 import CinematicIntro from "@/components/horizon/CinematicIntro";
-
-const TAMVBackgroundScene = lazy(() => import("@/components/horizon/TAMVBackgroundScene"));
 
 const INTRO_KEY = "tamv_cinematic_shown_v1";
 
@@ -88,10 +86,7 @@ const Index = () => {
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       {showIntro && <CinematicIntro onComplete={handleIntroComplete} />}
 
-      {/* 3D federated background */}
-      <Suspense fallback={null}>
-        <TAMVBackgroundScene />
-      </Suspense>
+
 
       {/* Matrix data rain */}
       <MatrixRain />
