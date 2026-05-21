@@ -86,10 +86,7 @@ const Index = () => {
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
       {showIntro && <CinematicIntro onComplete={handleIntroComplete} />}
 
-      {/* 3D federated background */}
-      <Suspense fallback={null}>
-        <TAMVBackgroundScene />
-      </Suspense>
+
 
       {/* Matrix data rain */}
       <MatrixRain />
