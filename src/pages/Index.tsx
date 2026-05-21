@@ -63,22 +63,41 @@ const CONSTELLATION_NODES: ConstellationNode[] = FEDERATIONS.map((f, i) => ({
 const Index = () => {
   const [active, setActive] = useState(0);
   const [quote, setQuote] = useState(0);
+  const [showIntro, setShowIntro] = useState(false);
   const { scrollYProgress } = useScroll();
   const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
 
   useEffect(() => {
+    if (typeof window !== "undefined" && !localStorage.getItem(INTRO_KEY)) {
+      setShowIntro(true);
+    }
     const t = setInterval(() => setActive((a) => (a + 1) % FEDERATIONS.length), 3500);
     const q = setInterval(() => setQuote((i) => (i + 1) % ISABELLA_QUOTES.length), 6000);
     return () => { clearInterval(t); clearInterval(q); };
   }, []);
 
+  const handleIntroComplete = () => {
+    setShowIntro(false);
+    try { localStorage.setItem(INTRO_KEY, "1"); } catch {}
+  };
+
   const totalNodes = FEDERATIONS.reduce((a, f) => a + f.nodes, 0);
 
   return (
     <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      {showIntro && <CinematicIntro onComplete={handleIntroComplete} />}
+
+      {/* 3D federated background */}
+      <Suspense fallback={null}>
+        <TAMVBackgroundScene />
+      </Suspense>
+
+      {/* Matrix data rain */}
+      <MatrixRain />
+
       {/* Ambient backdrops */}
-      <div className="pointer-events-none fixed inset-0 z-0">
+      <div className="pointer-events-none fixed inset-0 z-0 opacity-60">
         <ParticleField />
       </div>
       <div className="pointer-events-none fixed inset-0 z-[1]"
@@ -88,6 +107,7 @@ const Index = () => {
         }}
       />
       <div className="pointer-events-none fixed inset-0 z-[1] bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background))_85%)]" />
+
 
       {/* HERO */}
       <section className="relative z-10 px-6 lg:px-12 pt-16 lg:pt-24 pb-32 min-h-[100vh] flex flex-col">
