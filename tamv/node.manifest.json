@@ -1,0 +1,22 @@
+{
+  "protocol": "tamv-federation-v1",
+  "nodeId": "tamv.atlas",
+  "repository": "OsoPanda1/tamv-atlas",
+  "role": "knowledge",
+  "version": "0.1.0",
+  "description": "Knowledge node for documentation indexing, context packaging and reference routing.",
+  "capabilities": ["knowledge-index", "documentation-routing", "context-packaging"],
+  "channels": {
+    "publishes": ["NODE_HEARTBEAT", "KNOWLEDGE_UPDATED"],
+    "subscribes": ["TASK_ASSIGNED", "QUALITY_REVIEW_REQUESTED"]
+  },
+  "state": {
+    "mode": "active",
+    "persistence": ".tamv/state/events.jsonl",
+    "heartbeat": "manual-or-scheduled"
+  },
+  "links": {
+    "orchestrator": "OsoPanda1/tamv-orchestrator",
+    "protocol": "tamv-federation-v1"
+  }
+}
